@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>File Manager</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Segoe UI, Arial, sans-serif;
+            margin: 0;
+            background: #fff;
+            color: #333;
+        }
+
+        /* ---------- Toolbar ---------- */
+        #toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #d8d8d8;
+        }
+
+        .tb-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 5px 9px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+        }
+
+            .tb-btn:hover {
+                background: #e8f0fe;
+                border-color: #cfe0fc;
+            }
+
+            .tb-btn svg {
+                width: 16px;
+                height: 16px;
+                flex-shrink: 0;
+            }
+
+        .tb-sep {
+            width: 1px;
+            height: 20px;
+            background: #d8d8d8;
+            margin: 0 4px;
+        }
+
+        #currentPathLabel {
+            margin-left: auto;
+            font-size: 12px;
+            color: #888;
+            padding-right: 6px;
+        }
+
+        #searchInput {
+            border: 1px solid #d8d8d8;
+            border-radius: 3px;
+            padding: 5px 10px;
+            font-size: 13px;
+            width: 160px;
+            outline: none;
+        }
+
+            #searchInput:focus {
+                border-color: #8ab4f8;
+            }
+
+        /* ---------- Layout ---------- */
+        #layout {
+            display: flex;
+            height: calc(100vh - 40px);
+        }
+
+        #folderPanel {
+            width: 210px;
+            border-right: 1px solid #e0e0e0;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+            #folderPanel h3 {
+                margin: 0;
+                padding: 10px 12px;
+                font-size: 16px;
+                font-weight: 700;
+                border-bottom: 1px solid #e8e8e8;
+                color: #222;
+            }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #333;
+        }
+
+            .folder-item:hover {
+                background: #f0f4fa;
+            }
+
+            .folder-item.active {
+                background: #fdeecb;
+            }
+
+            .folder-item svg {
+                width: 16px;
+                height: 16px;
+                flex-shrink: 0;
+                color: #e0a733;
+            }
+
+        /* ---------- File grid ---------- */
+        #files {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 14px;
+            align-content: start;
+        }
+
+        .file-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            text-align: center;
+            background: #fff;
+        }
+
+            .file-card:hover {
+                border-color: #8ab4f8;
+                box-shadow: 0 1px 4px rgba(0,0,0,.1);
+            }
+
+            .file-card img {
+                width: 100%;
+                height: 72px;
+                object-fit: cover;
+                border-radius: 3px;
+                background: #f2f2f2;
+            }
+
+            .file-card .icon {
+                font-size: 30px;
+                height: 72px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .file-card .name {
+                font-size: 11px;
+                margin-top: 6px;
+                word-break: break-all;
+            }
+
+        #empty {
+            color: #999;
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        /* ---------- Demo notice (mirrors the old CKFinder banner) ---------- */
+        #notice {
+            background: #eaf2ff;
+            border-bottom: 1px solid #cfe0fc;
+            color: #33475b;
+            font-size: 12.5px;
+            padding: 8px 14px;
+            grid-column: 1 / -1;
+        } 
+
+        /* ---------- Settings modal ---------- */
+        #settingsModal, #helpModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.35);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+            #settingsModal .box, #helpModal .box {
+                background: #fff;
+                border-radius: 6px;
+                padding: 18px 20px;
+                width: 320px;
+                box-shadow: 0 6px 20px rgba(0,0,0,.2);
+                font-size: 13px;
+            }
+
+            #settingsModal h4, #helpModal h4 {
+                margin: 0 0 10px;
+                font-size: 15px;
+            }
+
+            #settingsModal .closeBtn, #helpModal .closeBtn {
+                margin-top: 14px;
+                background: #4a5a72;
+                color: #fff;
+                border: none;
+                padding: 6px 14px;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+
+    <div id="toolbar">
+        <label class="tb-btn" for="uploadInput" title="Upload a file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3aa348" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12l4-4 4 4" /></svg>
+            Upload
+        </label>
+        <input id="uploadInput" type="file" style="display:none" />
+
+        <button class="tb-btn" id="refreshBtn" title="Refresh">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4a90d9" stroke-width="2"><path d="M4 4v6h6M20 20v-6h-6" /><path d="M20 8a8 8 0 0 0-14.9-3M4 16a8 8 0 0 0 14.9 3" /></svg>
+            Refresh
+        </button>
+
+        <div class="tb-sep"></div>
+
+        <button class="tb-btn" id="newFolderBtn" title="New Folder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#e0a733" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" /><path d="M12 12v4M10 14h4" /></svg>
+            New Folder
+        </button>
+
+        <button class="tb-btn" id="settingsBtn" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
+            Settings
+        </button>
+
+        <button class="tb-btn" id="maximizeBtn" title="Maximize">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4a6fd9" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="1" /><path d="M4 9h16" /></svg>
+            Maximize
+        </button>
+
+        <button class="tb-btn" id="helpBtn" title="Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4aa0d9" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1.3 1-1.3 1.9" /><circle cx="12" cy="17" r="0.6" fill="#4aa0d9" /></svg>
+            Help
+        </button>
+
+        <span id="currentPathLabel">/</span>
+        <input type="text" id="searchInput" placeholder="Search" />
+    </div>
+
+    <div id="layout">
+        <div id="folderPanel">
+            <h3>Folders</h3>
+            <div id="folders"></div>
+        </div>
+        <div id="files"></div>
+    </div>
+
+    <!-- Settings modal -->
+    <div id="settingsModal">
+        <div class="box">
+            <h4>File Manager Settings</h4>
+            <p>Allowed file types: jpg, jpeg, png, gif, webp, svg, pdf, doc, docx, xls, xlsx, zip, txt</p>
+            <p>Max upload size: 20 MB</p>
+            <button class="closeBtn" onclick="document.getElementById('settingsModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <!-- Help modal -->
+    <div id="helpModal">
+        <div class="box">
+            <h4>Help</h4>
+            <p>Click a folder on the left to browse it. Click <b>Upload</b> to add a new file, or <b>New Folder</b> to organize your files. Click any file thumbnail to insert it into the editor.</p>
+            <button class="closeBtn" onclick="document.getElementById('helpModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <script>// ---- read CKEditor's callback params from the popup URL ----
+  const params = new URLSearchParams(window.location.search);
+  const funcNum = params.get('CKEditorFuncNum');
+
+  let currentPath = '/';
+
+  function apiUrl(endpoint, query) {
+    const qs = new URLSearchParams(query || {});
+    return '/api/filemanager/' + endpoint + (qs.toString() ? '?' + qs.toString() : '');
+  }
+
+  async function loadFolders(path) {
+    const res = await fetch(apiUrl('folders', { path }));
+    const folders = await res.json();
+    const container = document.getElementById('folders');
+    container.innerHTML = '';
+
+    const folderIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>`;
+
+    const rootItem = document.createElement('div');
+    rootItem.className = 'folder-item' + (path === '/' ? ' active' : '');
+    rootItem.innerHTML = folderIcon + '<span>(root)</span>';
+    rootItem.onclick = () => navigate('/');
+    container.appendChild(rootItem);
+
+    folders.forEach(f => {
+      const item = document.createElement('div');
+      const fullPath = (path.replace(/\/$/, '')) + '/' + f.name + '/';
+      item.className = 'folder-item' + (path === fullPath ? ' active' : '');
+      item.innerHTML = folderIcon + `<span>${f.name}</span>`;
+      item.onclick = () => navigate(fullPath);
+      container.appendChild(item);
+    });
+  }
+
+  let allFiles = [];
+
+  function isImage(name) {
+    return /\.(jpe?g|png|gif|webp|svg)$/i.test(name);
+  }
+
+  function renderFiles(files) {
+    const container = document.getElementById('files');
+    container.innerHTML = '';
+
+    if (files.length === 0) {
+      container.innerHTML = '<div id="empty">No files found.</div>';
+      return;
+    }
+
+    files.forEach(f => {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      card.title = f.name;
+      card.onclick = () => selectFile(f.url);
+
+      if (isImage(f.name)) {
+        card.innerHTML = `<img src="${f.url}" alt="${f.name}" />`;
+      } else {
+        card.innerHTML = `<div class="icon">📄</div>`;
+      }
+      const nameEl = document.createElement('div');
+      nameEl.className = 'name';
+      nameEl.textContent = f.name;
+      card.appendChild(nameEl);
+
+      container.appendChild(card);
+    });
+  }
+
+  async function loadFiles(path) {
+    const res = await fetch(apiUrl('files', { path }));
+    allFiles = await res.json();
+    document.getElementById('searchInput').value = '';
+    renderFiles(allFiles);
+  }
+
+  function navigate(path) {
+    currentPath = path || '/';
+    document.getElementById('currentPathLabel').textContent = currentPath;
+    loadFolders(currentPath);
+    loadFiles(currentPath);
+  }
+
+  function selectFile(url) {
+    if (window.opener && window.opener.CKEDITOR && funcNum) {
+      window.opener.CKEDITOR.tools.callFunction(funcNum, url);
+      window.close();
+    } else if (window.parent && window.parent.CKEDITOR && funcNum) {
+      window.parent.CKEDITOR.tools.callFunction(funcNum, url);
+    } else {
+      alert('Selected: ' + url);
+    }
+  }
+
+  document.getElementById('uploadInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('path', currentPath);
+    formData.append('file', file);
+
+    const res = await fetch('/api/filemanager/upload', { method: 'POST', body: formData });
+    if (res.ok) {
+      loadFiles(currentPath);
+    } else {
+      alert('Upload failed: ' + await res.text());
+    }
+    e.target.value = '';
+  });
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    const term = e.target.value.trim().toLowerCase();
+    if (!term) {
+      renderFiles(allFiles);
+      return;
+    }
+    const filtered = allFiles.filter(f => f.name.toLowerCase().includes(term));
+    renderFiles(filtered);
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', () => {
+    navigate(currentPath);
+  });
+
+  document.getElementById('newFolderBtn').addEventListener('click', async () => {
+    const name = prompt('New folder name:');
+    if (!name) return;
+
+    const formData = new FormData();
+    formData.append('path', currentPath);
+    formData.append('name', name);
+
+    const res = await fetch('/api/filemanager/create-folder', { method: 'POST', body: formData });
+    if (res.ok) {
+      loadFolders(currentPath);
+    } else {
+      alert('Could not create folder.');
+    }
+  });
+
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    document.getElementById('settingsModal').style.display = 'flex';
+  });
+
+  document.getElementById('helpBtn').addEventListener('click', () => {
+    document.getElementById('helpModal').style.display = 'flex';
+  });
+
+  document.getElementById('maximizeBtn').addEventListener('click', () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen().catch(() => {
+        // Fullscreen API might be blocked in a popup — fall back to resizing the window
+        window.resizeTo(screen.availWidth, screen.availHeight);
+        window.moveTo(0, 0);
+      });
+    }
+  });
+
+  navigate('/');</script>
+
+</body>
+</html>

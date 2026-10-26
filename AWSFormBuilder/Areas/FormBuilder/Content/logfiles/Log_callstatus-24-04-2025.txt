@@ -1,0 +1,45 @@
+-------------------START-------------4/24/2025 11:32:47 AM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504240557.78803999128@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 11:32:47 AM
+-------------------START-------------4/24/2025 11:32:48 AM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504240558.26499149976@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 11:32:48 AM
+-------------------START-------------4/24/2025 11:59:22 AM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504240624.89620895817@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 11:59:22 AM
+-------------------START-------------4/24/2025 11:59:23 AM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504240624.86563369663@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 11:59:23 AM
+-------------------START-------------4/24/2025 12:47:45 PM
+Page :/Members/Acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504240712.56705000554@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 12:47:45 PM
+-------------------START-------------4/24/2025 12:47:46 PM
+Page :/Members/Acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504240712.66268410853@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 12:47:46 PM
+-------------------START-------------4/24/2025 9:21:01 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504241546.47588716658@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 9:21:01 PM
+-------------------START-------------4/24/2025 9:27:36 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504241552.92932436153@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 9:27:36 PM
+-------------------START-------------4/24/2025 9:28:12 PM
+Page :/Admin/Account/UserValidate
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504241553.33237428177@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/24/2025 9:28:12 PM

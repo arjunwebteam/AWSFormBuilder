@@ -1,0 +1,216 @@
+﻿@using System.Configuration
+@{
+    ViewBag.Title = "Log Report";
+    ViewBag.Pageheading = "Logs";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    int status = 0;
+   AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = new AWSFormBuilder.Entities.AppInfo();
+    objAppInfo = _AppInfo.GetAppInfoDetails(ref status);
+    var objForms = (List<AWSFormBuilder.Entities.FormBuilder>)ViewBag.objForms;
+
+}
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type : "GET",
+            url  : '@Url.Action("LogReportGetList", "Home")',
+
+            success: function (data) {
+                $("#divLogReportList").html(data);
+            },
+            error: function () {
+                $("#divLogReportList").html('<p class="text-danger">Failed to load.</p>');
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+          $('#wLogs, #LogsMenu').addClass('active');
+
+          $("#StartDate, #EndDate").datepicker({
+              changeMonth: true,
+              changeYear: true,
+              showButtonPanel: true,
+              dateFormat: 'mm/dd/yy'
+          });
+
+          $("#StartDate").on("change", function () {
+              var startDate = $(this).datepicker("getDate");
+              if (startDate) {
+                  $("#EndDate").datepicker("option", "minDate", startDate);
+              }
+          });
+
+          // Guard: only run inputmask if the plugin is actually loaded
+          if (typeof $.fn.inputmask === "function") {
+              $("[data-mask]").inputmask();
+          } else {
+              console.warn("jquery.inputmask plugin not loaded — skipping input masking.");
+          }
+
+          ServiceDonationBind();
+          PagerClickBind();
+      });
+
+    function sortresult(sortcolumn) {
+        $('#hdnsortorder').val(($('#hdnsortorder').val() == 'ASC' ? 'DESC' : 'ASC'));
+        $('#hdnsortcolumn').val(sortcolumn);
+        ServiceDonationBind(1);
+    }
+
+    function ServiceDonationBind(Pageno) {
+        var pageno = Common.Pageno(Pageno);
+        var search    = $('#keyword').val();
+        var sortcolumn = $('#hdnsortcolumn').val();
+        var sortorder  = $('#hdnsortorder').val();
+        var items      = $('#txtitems').val();
+        var startdate  = $('#StartDate').val();
+        var enddate    = $('#EndDate').val();
+
+        $.ajax({
+            url: '@Url.Action("LogReportGetList", "Home")',
+            type: 'GET',
+            cache: false,
+            data: {
+                StartDate:  startdate,
+                EndDate:    enddate,
+                search:     search,
+                PageNo:     pageno,
+                SortColumn: sortcolumn,
+                SortOrder:  sortorder,
+                Items:      items
+            },
+            success: function (result) {
+                $('#divLogReportList').html(result);
+                PagerClickBind();
+            },
+            error: function () {
+                $('#divLogReportList').html('<p class="text-danger">Failed to load.</p>');
+            }
+        });
+    }
+
+        function PagerClickBind() {
+        $(document).off("click", ".pagination .page-link").on("click", ".pagination .page-link", function (e) {
+            e.preventDefault();
+
+            var id = $(this).attr("id");
+            var pageNo;
+
+            if (id === "Previous" || id === "Next") {
+                pageNo = parseInt($(this).data("page"));
+            } else {
+                pageNo = parseInt(id);
+
+                // Fallback: id missing/invalid -> try data-page, then visible text
+                if (!pageNo || isNaN(pageNo)) {
+                    pageNo = parseInt($(this).data("page"));
+                }
+                if (!pageNo || isNaN(pageNo)) {
+                    pageNo = parseInt($(this).text().trim());
+                }
+            }
+
+            if (!pageNo || isNaN(pageNo) || pageNo < 1) return;
+
+            ServiceDonationBind(pageNo);
+        });
+    }
+
+    function ClearSearch() {
+        $('#keyword').val('').trigger('change');
+        $('#StartDate').val('@DateTime.UtcNow.AddMonths(-1).ToString("MM/dd/yyyy")');
+        $('#EndDate').val('@DateTime.UtcNow.AddDays(1).ToString("MM/dd/yyyy")');
+        $('#hdnPageNo').val(1);
+        ServiceDonationBind(1);
+    }
+</script>
+
+<input id="hdnPageNo" type="hidden" value="1" />
+<input id="hdnsortorder" name="hdnsortorder" value="ASC" type="hidden" />
+<input id="hdnsortcolumn" name="hdnsortcolumn" value="InsertedDate" type="hidden" />
+
+<div class="zentic-card">
+
+    <div class="zentic-card-header">
+        <div class="d-flex flex-wrap align-items-end gap-3 w-100">
+
+            <div class="input-box">
+                <label class="form-label">Search by Form Type :</label>
+                <select class="single-select" name="keyword" id="keyword" type="text">
+                    @if (objForms != null)
+                    {
+                        <option value="">Select</option>
+                        foreach (var item in objForms)
+                        {
+                            <option value="@item.Title">@item.Title</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label">Date Range</label>
+                <div class="d-flex gap-2">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                        <input type="text"
+                               data-mask=""
+                               data-inputmask="'alias': 'mm/dd/yyyy'"
+                               class="form-control"
+                               placeholder="From"
+                               value="@DateTime.UtcNow.AddHours(-24).ToString(" MM /dd/yyyy")"
+                               name="StartDate" id="StartDate" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                        <input type="text"
+                               data-mask=""
+                               data-inputmask="'alias': 'mm/dd/yyyy'"
+                               class="form-control"
+                               placeholder="To"
+                               value="@DateTime.UtcNow.AddHours(24).ToString(" MM /dd/yyyy")"
+                               name="EndDate" id="EndDate" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 log-report-actions">
+                <button type="button" class="btn btn-primary registration-search-btn"
+                        onclick="ServiceDonationBind(1);">
+                    Search
+                </button>
+                <button type="button" class="btn btn-secondary registration-clear-btn"
+                        onclick="ClearSearch();">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="divLogReportList" class="zentic-card-body">
+        {{-- table loads here via AJAX --}}
+    </div>
+</div>
+<style>
+    .zentic-card-header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--zc-border-light);
+        font-size: 15px;
+    }
+
+   
+    .log-report-actions .btn {
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+</style>

@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Pageheading = "Admin Menu";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+    List<AWSFormBuilder.Entities.Chapters> lstChapters = ViewBag.lstChapters;
+    List<AWSFormBuilder.Entities.PageDetails> lstPageDetails = ViewBag.lstPageDetails;
+    // Int64 ChapterId = 0;
+    Int64 ChapterId = ViewBag.ChapterId;
+
+
+
+    bool IsEdit = Convert.ToBoolean(Context.Session.GetString("IsEdit"));
+    bool IsView = Convert.ToBoolean(Context.Session.GetString("IsView"));
+    bool IsDelete = Convert.ToBoolean(Context.Session.GetString("IsDelete"));
+    bool IsExport = Convert.ToBoolean(Context.Session.GetString("IsExport"));
+    bool IsAdd = Convert.ToBoolean(Context.Session.GetString("IsAdd"));
+    Int64 Mid = ViewBag.mid;
+    string userRole = Context.Session.GetString("userrole") ?? string.Empty;
+}
+<script>
+    $(document).ready(function () {
+        loadMenuItems();
+    });
+
+    function loadMenuItems() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("AdminMenuItemsList", "AdminMenuItems")',
+            data: {
+                IsEdit    : '@ViewBag.IsEdit',
+                IsView    : '@ViewBag.IsView',
+                IsDelete  : '@ViewBag.IsDelete',
+                IsExport  : '@ViewBag.IsExport',
+                IsAdd     : '@ViewBag.IsAdd',
+                Mid       : '@ViewBag.mid',
+                ChapterId : '@(ViewBag.ChapterId == null || ViewBag.ChapterId == 0 ? 1 : ViewBag.ChapterId)'
+            },
+            success: function (data) {
+                $("#divAdminMenuItemsList").html(data);
+            },
+            error: function () {
+                $("#divAdminMenuItemsList").html('<p class="text-danger">Failed to load.</p>');
+            }
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+      //  $('#wAdminMenuItems').addClass('active');
+        $('#wOthers, #wAdminMenu').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+
+
+    function AdminMenuItemsBind() {
+        var ChapterId = $('#ChapterId').val();
+        $.ajax({
+            type: "GET",
+            cache: false,
+            url: '@Url.Action("AdminMenuItemsList", "AdminMenuItems")',
+            data: { ChapterId: ChapterId, IsEdit: '@IsEdit', IsView: '@IsView', IsDelete: '@IsDelete', IsExport: '@IsExport', IsAdd: '@IsAdd', Mid: '@Mid' }, // optional data
+            success: function (result) {
+                $('#divAdminMenuItemsList').html(result);
+            }
+        });
+    }
+
+    function EditMenuPages(MenuPagesId) {
+        $.ajax({
+            url: '@Url.Action("EditMenuPages", "MenuPages")',
+            type: 'POST',
+            data: { MenuPagesId: MenuPagesId },
+            datatype: "JSON",
+            success: function (result) {
+                if (result.ok) {
+                    var objMenuPages = result.data;
+                    $('#AMenuPageId').val(objMenuPages.MenuPageId);
+                    $('#AMenuItemId').val(objMenuPages.MenuItemId);
+                    $('#APageDetailId').val(objMenuPages.PageDetailId);
+                    $('#lbltitle').html('Change Page to Item');
+                    $('#hdnPageDetails').html('Change Page to Item');
+
+                    $("#AddMenuPages").modal("show");
+                }
+                else {
+                    alert(result.data);
+                }
+            }
+        });
+    }
+
+    function AddPageToItem(itemid, ChapterId) {
+        $('#AMenuItemId').val(itemid);
+        $('#AChapterId').val(ChapterId);
+        $('#APageDetailId').val('');
+        $("#AddMenuPages").modal("show");
+        $('#hdnPageDetails').html('Add Page to Item');
+    }
+    function Validate() {
+
+        if ($('#APageDetailId').val() == '') { $('#spanAPageDetailId').html('Required.'); $('#APageDetailId').focus(); return false; } else { $('#spanAPageDetailId').html(''); $('#APageDetailId').focus(); }
+
+        return true;
+    }
+</script>
+<div class="zentic-card">
+
+    <div class="zentic-card-header">
+
+            <div class="d-flex gap-2">
+                <div class="btn btn-primarymahi">Admin Menu</div>
+            </div>
+   
+        <div class="d-flex gap-2">
+
+            @if (IsAdd == true)
+            {
+                <a class="btn btn-primary" href="@Url.Action("CreateAdminMenuItems", "AdminMenuItems", new { ChapterId = ChapterId, mid = Mid })" style="color:#fff;">+ Add Admin Menu</a>
+            }
+            else
+            {
+                <a class="btn btn-primary" href="@Url.Action("CreateAdminMenuItems", "AdminMenuItems", new { ChapterId = ChapterId, mid = Mid })" style="color:#fff;">+ Add Admin Menu</a>
+            }
+
+        </div>
+    </div>
+
+    <!-- Menu tree (loaded by AdminMenuItemsBind / loadMenuItems) -->
+    <div id="divAdminMenuItemsList" class="zentic-card-body"></div>
+
+
+    <!-- Footer -->
+    <div class="zentic-card-footer">
+
+        <div class="table-entries-info"></div>
+
+        <a onclick="ScrollUp();" class="registration-view-btn btn btn-secondary cursor-pointer">
+            Back to top
+            <i class="fa fa-arrow-up"></i>
+        </a>
+
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+    function ScrollUp() {
+        $('html, body').animate({
+            scrollTop: "0px"
+        }, 800);
+    }
+
+</script>

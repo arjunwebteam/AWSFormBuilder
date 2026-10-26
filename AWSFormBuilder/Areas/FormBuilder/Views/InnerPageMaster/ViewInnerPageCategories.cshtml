@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "Create Menu Item";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+     
+    AWSFormBuilder.Entities.InnerPageCategories objInnerPageCategories = ViewBag.objInnerPageCategories;
+}
+
+<script type="text/javascript">     
+    $(document).ready(function () {
+        $('#wInnerPageCategories, #WebPages').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+</script>
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckfinder/ckfinder.js"></script>
+<!-- breadcumb -->
+<div class="content-header">
+    <h1>View Webpage Category</h1>
+    <ol class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>Home</a></li>
+        <li><a href="@Url.Action("Index", "InnerPageMaster")"><i class="fa fa-sort-amount-asc"></i>Webpage Categories</a></li>
+        <li class="active">View Webpage Category</li>
+    </ol>
+</div>
+<!--end breadcumb -->
+
+<div class="content">
+    <!-- Main content -->
+    <div id="divmessage">
+        @if (TempData["message"] != null)
+        { @Html.Raw(TempData["message"].ToString())}
+
+        @if (ViewBag.message != null)
+        { @Html.Raw(ViewBag.message.ToString())}
+    </div>
+    <div class="box validation"> 
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Category Name : </label>
+                        @objInnerPageCategories.DisplayName
+                    </div>
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Parent Category : </label>
+                        @(objInnerPageCategories.ParentName == null || objInnerPageCategories.ParentName == "" ? "N/A" : objInnerPageCategories.ParentName)
+                    </div>
+
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Chapter Name : </label>
+                        @objInnerPageCategories.ChapterName
+                    </div>
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Display Order : </label>
+                        @objInnerPageCategories.Position
+                    </div>
+                    <div class="col-xs-12 col-lg-2 col-sm-6">
+                        <label style="display: block;">&nbsp;</label>
+                        <label class="checkbox-in">
+                            <input type="checkbox" name="IsMenuBar" id="IsMenuBar" @(objInnerPageCategories.IsMenuBar ? "checked=checked" : "") class="flat-red" disabled="disabled" value="true" />
+                            Is Menu Bar
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-lg-2 col-sm-6">
+                        <label style="display: block;">&nbsp;</label>
+                        <label class="checkbox-in">
+                            <input type="checkbox" name="IsQuickLinks" id="IsQuickLinks" @(objInnerPageCategories.IsQuickLinks ? "checked=checked" : "") class="flat-red" disabled="disabled" value="true" />
+                            Is Quick Links
+                        </label>
+                    </div>
+                    @*  <div class="col-xs-12 col-lg-2 col-sm-6">
+            <label style="display: block;">&nbsp;</label>
+            <label class="checkbox-in">
+                <input type="checkbox" name="IsFooterBar" id="IsFooterBar" @(objInnerPageCategories.IsFooterBar ? "checked=checked" : "") class="flat-red" disabled="disabled" value="true" />
+                Is Footer Bar</label>
+        </div>*@
+                </div>
+            </div>  
+        <!-- /.box-body -->
+    </div>
+    <!-- /.content -->
+</div>
+

@@ -1,0 +1,752 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+    ViewBag.Pageheading = "ApplicationSettings";
+    AWSFormBuilder.Entities.AppInfo objAppInfo = ViewBag.objAppInfo;
+    List<AWSFormBuilder.Entities.Chapters> lstChapters = ViewBag.lstChapters;
+}
+@*mahi//*@@*mahi//*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wSettings').addClass('active');
+        $('#wApplicationSettings').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+    function ValidateApplication() {
+
+        var returnval = true;
+
+        if ($('#SiteName').val() == '') { $('#SiteName').focus().addClass("validate"); returnval = false; } else { $('#SiteName').focus().removeClass("validate"); }
+        if ($('#CompanyAddress').val() == '') { $('#CompanyAddress').focus().addClass("validate"); returnval = false; } else { $('#CompanyAddress').focus().removeClass("validate"); }
+        if ($('#CompanyWebSite').val() == '') { $('#CompanyWebSite').focus().addClass("validate"); returnval = false; } else { $('#CompanyWebSite').focus().removeClass("validate"); }
+        if ($('#CompanyEmail').val() == '') { $('#CompanyEmail').focus().addClass("validate"); returnval = false; }
+        else {
+            $('#CompanyEmail').focus().removeClass("validate");
+            if (!Common.CheckEmail($('#CompanyEmail').val())) { $('#CompanyEmail').val(''); document.getElementsByName('CompanyEmail')[0].placeholder = 'Please enter valid email.'; $('#CompanyEmail').focus().addClass("validate"); returnval = false; } else { $('#CompanyEmail').focus().removeClass("validate"); }
+        }
+
+        return returnval;
+    }
+
+    function ResetValidateClass() {
+        $('#SiteName').removeClass("validate");
+        $('#CompanyAddress').removeClass("validate");
+        $('#CompanyWebSite').removeClass("validate");
+        $('#CompanyEmail').removeClass("validate");
+        $('#CompanyPhone').removeClass("validate");
+    }
+
+    function phonenochange(event) {
+        if (event.keyCode == 8 || event.keyCode == 46) {
+        }
+        else {
+            var ph = $('#CompanyPhone').val();
+            if (ph.length == 3) { $('#CompanyPhone').val(ph + '-'); }
+            if (ph.length == 7) { $('#CompanyPhone').val(ph + '-'); }
+        }
+    }
+</script>
+
+
+@using (Html.BeginForm("UpdateAppInfo", "ApplicationSettings", FormMethod.Post, new { enctype = "multipart/form-data", @id = "AppinfoForm", @name = "AppinfoForm" }))
+{
+
+    <input type="hidden" name="AppInfoId" id="AppInfoId" value="@(objAppInfo.AppInfoId)" />
+    <input type="hidden" name="ChapterId" id="ChapterId" value="1" />
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                   @*  <h3 class="box-title dis-in">Application Settings</h3> *@
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Application Name: </label>
+                                <input type="text" class="form-control" placeholder="Application Name *" value="@objAppInfo.SiteName" name="SiteName" id="SiteName" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Company Address  :</label>
+                                <input type="text" placeholder="Company Address *" class="form-control" value="@objAppInfo.CompanyAddress" name="CompanyAddress" id="CompanyAddress" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">Company WebSite :</label>
+                                    <input type="text" placeholder="Company WebSite *" class="form-control" value="@objAppInfo.CompanyWebSite" name="CompanyWebSite" id="CompanyWebSite" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                                </div>
+                            </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Company Email : </label>
+                                <input type="text" placeholder="Company Email *" class="form-control" value="@objAppInfo.CompanyEmail" name="CompanyEmail" id="CompanyEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                     @*    <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Company Phone :</label>
+                                <input type="text" placeholder="Company Phone" class="form-control" value="@objAppInfo.CompanyPhone" name="CompanyPhone" onkeypress="return Common.isNumberKey(event);" id="CompanyPhone" onclick="ResetValidateClass();">
+                            </div>
+                        </div> *@
+                      @*   <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Event Ticket Prefix:</label>
+                                <input type="text" placeholder="Short Name" class="form-control" value="@objAppInfo.PresidentPhone" name="PresidentPhone" id="PresidentPhone" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" />
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Whatsapp Number :</label>
+                                <input type="text" placeholder="Whatsapp Number" class="form-control" value="@objAppInfo.WhatsappNumber" name="WhatsappNumber" id="WhatsappNumber" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" />
+                            </div>
+                        </div> *@
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+@*     <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">Registration Emails </h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Event.Reg Email :</label>
+                                <input type="text" placeholder="Event.Reg Email" class="form-control" value="@objAppInfo.EventsEmail" name="EventsEmail" id="EventsEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Membership.Reg Email  </label>
+                                <input type="text" placeholder="Membership.Reg Email" class="form-control" value="@objAppInfo.MemberEmail" name="MemberEmail" id="MemberEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Volunteer.Reg Email :</label>
+                                <input type="text" placeholder="Volunteer.Reg Email" class="form-control" value="@objAppInfo.VolunteerEmail" name="VolunteerEmail" id="VolunteerEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Donations.Reg  Email : </label>
+                                <input type="text" placeholder="DonationEmail" class="form-control" value="@objAppInfo.DonationEmail" name="DonationEmail" id="DonationEmail" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Exhibits.Reg  Email : </label>
+                                <input type="text" placeholder="Exhibits.Reg Email" class="form-control" value="@objAppInfo.ExhibitEmail" name="ExhibitEmail" id="ExhibitEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Sponsorship.Reg  Email :</label>
+                                <input type="text" placeholder="Sponsorship.Reg Email" class="form-control" value="@objAppInfo.SponsorshipEmail" name="SponsorshipEmail" id="SponsorshipEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Enquiry  Email :</label>
+                                <input type="text" placeholder="ContactEmail" class="form-control" value="@objAppInfo.ContactEmail" name="ContactEmail" id="ContactEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                       
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+ *@
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">Website Settings  </h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Base Url :</label>
+                                <input type="text" placeholder="Base Url" class="form-control" value="@objAppInfo.BaseUrl" name="BaseUrl" id="BaseUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Upload Path :</label>
+                                <input type="text" placeholder="Upload Path" class="form-control" value="@objAppInfo.UploadPath" name="UploadPath" id="UploadPath" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Usersite Url : </label>
+                                <input type="text" placeholder="Usersite Url" class="form-control" value="@objAppInfo.UserSiteUrl" name="UserSiteUrl" id="UserSiteUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                      @*   <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">ServerMap Url : </label>
+                                <input type="text" placeholder="ServerMap Url" class="form-control" value="@objAppInfo.ServerMapUrl" name="ServerMapUrl" id="ServerMapUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div> *@
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Image Url : </label>
+                                <input type="text" placeholder="Image Url" class="form-control" value="@objAppInfo.AdminImageUrl" name="AdminImageUrl" id="AdminImageUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Admin Site Url :</label>
+                                <input type="text" placeholder="Admin Site Url" class="form-control" value="@objAppInfo.AdminSiteUrl" name="AdminSiteUrl" id="AdminSiteUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                     @*    <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Mail Name :</label>
+                                <input type="text" placeholder="Mail Name" class="form-control" value="@objAppInfo.MailName" name="MailName" id="MailName" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div> *@
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Capcha SiteKey :
+                                    <button type="button"
+                                            class="btn btn-link p-0"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right"
+                                            data-bs-html="true"
+                                            title="
+    <strong>Create Google reCAPTCHA Keys</strong><br><br>
+
+    <b>Steps:</b><br>
+    1. Open <b>https://www.google.com/recaptcha/admin/create</b>.<br>
+    2. Sign in with your Google account.<br>
+    3. Enter a <b>Label</b> (Example: AWS Association).<br>
+    4. Select <b>reCAPTCHA v2</b> → <b>I'm not a robot</b> Checkbox.<br>
+    5. Add your domain (Example: yourdomain.com).<br>
+    6. Accept the Terms of Service.<br>
+    7. Click <b>Submit</b>.<br><br>
+
+    <b>After Registration:</b><br>
+    • Copy the <b>Site Key</b> and paste it into the <b>CAPTCHA Site Key</b> field.<br>
+    • Copy the <b>Secret Key</b> and paste it into the <b>CAPTCHA Secret Key</b> field.
+    ">
+               <i class="bi bi-info-circle" style="
+        color: black;
+    "></i>
+        </button>
+                                </label>
+                                <input type="text" placeholder="Capcha SiteKey" class="form-control" value="@objAppInfo.CapchaSiteKey" name="CapchaSiteKey" id="CapchaSiteKey" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6" style="display:none;">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Capcha SecreatKey :<button type="button"
+                                                               class="btn btn-link p-0"
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-placement="right"
+                                                               data-bs-html="true"
+                                                               title="
+    <strong>Create Google reCAPTCHA Keys</strong><br><br>
+
+    <b>Steps:</b><br>
+    1. Open <b>https://www.google.com/recaptcha/admin/create</b>.<br>
+    2. Sign in with your Google account.<br>
+    3. Enter a <b>Label</b> (Example: AWS Association).<br>
+    4. Select <b>reCAPTCHA v2</b> → <b>I'm not a robot</b> Checkbox.<br>
+    5. Add your domain (Example: localhost, yourdomain.com).<br>
+    6. Accept the Terms of Service.<br>
+    7. Click <b>Submit</b>.<br><br>
+
+    <b>After Registration:</b><br>
+    • Copy the <b>Site Key</b> and paste it into the <b>CAPTCHA Site Key</b> field.<br>
+    • Copy the <b>Secret Key</b> and paste it into the <b>CAPTCHA Secret Key</b> field.
+    ">
+               <i class="bi bi-info-circle" style="
+        color: black;
+    "></i>
+        </button>
+                                </label>
+                                <input type="text" placeholder="Capcha SecreatKey" class="form-control" value="@objAppInfo.CapchaSecreatKey" name="CapchaSecreatKey" id="CapchaSecreatKey" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+
+                        </div>
+                         <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Sender  Email :</label>
+                                <input type="text" placeholder="Sender Email" class="form-control" value="@objAppInfo.SenderEmail" name="SenderEmail" id="SenderEmail" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Brevo Key :
+                                    <button type="button"
+                                            class="btn p-0 border-0 bg-transparent"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-html="true"
+                                            title="
+    <b>Create a Brevo Account (Free Plan)</b><br><br>
+    The free plan allows sending up to <b>300 emails per day</b>.<br><br>
+
+    <b>Brevo Website:</b><br>
+    https://www.brevo.com/<br><br>
+
+    <b>Steps:</b><br>
+    1. Open the Brevo website and click <b>Sign Up Free</b>.<br>
+    2. Create an account using your email address and complete the email verification.<br>
+    3. Log in to your Brevo account.<br><br>
+
+    <b>Generate API Key:</b><br>
+    1. Click the <b>Profile</b> icon (top-right) and select <b>Settings</b>.<br>
+    2. Open <b>SMTP &amp; API</b>.<br>
+    3. Go to the <b>API Keys</b> tab.<br>
+    4. Click <b>Create New API Key</b>.<br>
+    5. Copy the generated API key and paste it into the <b>Brevo Key</b> field below.
+    ">
+               <i class="bi bi-info-circle" style="
+        color: black;
+    "></i>
+        </button>
+                                </label>
+                                <input type="text" placeholder="Brevo Key" class="form-control" value="@objAppInfo.BrevoKey" name="BrevoKey" id="BrevoKey" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Version :</label>
+                                <input type="text" placeholder="Version" class="form-control" value="@objAppInfo.DesktopVersion" name="DesktopVersion" id="DesktopVersion" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                       @*  
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Google Analytics Script :</label>
+                                <input type="text" placeholder="Google Analytics Script" class="form-control" value="@objAppInfo.GoogleAnalyticsScript" name="GoogleAnalyticsScript" id="GoogleAnalyticsScript" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Whatsapp Script :</label>
+                                <input type="text" placeholder="Whatsapp Script" class="form-control" value="@objAppInfo.WhatsappScript" name="WhatsappScript" id="WhatsappScript" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+
+                        </div>
+
+
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Promo Code :</label>
+                                <select id="CustomerCareNumber" class="form-control" name="CustomerCareNumber" onclick="ResetValidateClass();">
+                                    <option value="">- Select -</option>
+                                    <option @(objAppInfo.CustomerCareNumber == "Yes" ? "selected=selected" : "") value="Yes">Yes</option>
+                                    <option @(objAppInfo.CustomerCareNumber == "No" ? "selected=selected" : "") value="No">No</option>
+
+
+
+                                </select>
+                            </div>
+                        </div>
+
+
+
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Is Capcha Validate? :</label>
+                                <select id="ShowCapcha" class="form-control" name="ShowCapcha" onclick="ResetValidateClass();">
+                                    <option value="">- Select -</option>
+                                    <option @(objAppInfo.ShowCapcha == "Yes" ? "selected=selected" : "") value="Yes">Yes</option>
+                                    <option @(objAppInfo.ShowCapcha == "No" ? "selected=selected" : "") value="No">No</option>
+
+
+
+                                </select>
+                            </div>
+                        </div>
+ 
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Time Zones :</label>
+                                <select id="TimeZones" class="form-control" name="TimeZones" onclick="ResetValidateClass();">
+                                    <option value="">- Select -</option>
+                                    <option @(objAppInfo.TimeZones == "Indian Standard Time" ? "selected=selected" : "") value="Indian Standard Time">Indian Standard Time</option>
+                                    <option @(objAppInfo.TimeZones == "Eastern Standard Time" ? "selected=selected" : "") value="Eastern Standard Time">Eastern Standard Time</option>
+                                    <option @(objAppInfo.TimeZones == "Central Standard Time" ? "selected=selected" : "") value="Central Standard Time">Central Standard Time</option>
+                                    <option @(objAppInfo.TimeZones == "Pacific Standard Time" ? "selected=selected" : "") value="Pacific Standard Time">Pacific Standard Time</option>
+
+
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Security Check Required? :</label>
+                                <select id="CAPTCHA" class="form-control" name="CAPTCHA" onclick="ResetValidateClass();">
+                                    <option value="">- Select -</option>
+                                    <option @(objAppInfo.CAPTCHA == "Yes" ? "selected=selected" : "") value="Yes">Yes</option>
+                                    <option @(objAppInfo.CAPTCHA == "No" ? "selected=selected" : "") value="No">No</option>
+
+
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Email Required? :</label>
+                                <select id="Email" class="form-control" name="Email" onclick="ResetValidateClass();">
+                                    <option value="">- Select -</option>
+                                    <option @(objAppInfo.Email == "Yes" ? "selected=selected" : "") value="Yes">Yes</option>
+                                    <option @(objAppInfo.Email == "No" ? "selected=selected" : "") value="No">No</option>
+
+
+
+                                </select>
+                            </div>
+                        </div>
+ *@
+@* 
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                            <label class="form-label">Is QRCode enable?:</label>
+                                <select id="Field1" class="form-control" name="Field1" onclick="ResetValidateClass();">
+                                    <option value="">- Select -</option>
+                                    <option @(objAppInfo.Field1 == "Yes" ? "selected=selected" : "") value="Yes">Yes</option>
+                                    <option @(objAppInfo.Field1 == "No" ? "selected=selected" : "") value="No">No</option>
+
+                                </select>
+                            </div>
+                        </div> *@
+
+
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">Social Site Details  </h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Facebook Url :</label>
+                                <input type="text" placeholder="Facebook Url" class="form-control" value="@objAppInfo.FacebookUrl" name="FacebookUrl" id="FacebookUrl" size="30">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Twitter Url :</label>
+                                <input type="text" placeholder="Twitter Url" class="form-control" value="@objAppInfo.TwitterUrl" name="TwitterUrl" id="TwitterUrl" size="30">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Youtube Url :</label>
+                                <input type="text" placeholder="Youtube Url" class="form-control" value="@objAppInfo.YoutubeUrl" name="YoutubeUrl" id="YoutubeUrl" size="30">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Google Plus :</label>
+                                <input type="text" placeholder="Google Plus Url" class="form-control" value="@objAppInfo.GooglePlusUrl" name="GooglePlusUrl" id="GooglePlusUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Instagram Url : </label>
+                                <input type="text" placeholder="Instagram Url" class="form-control" value="@objAppInfo.InstagramUrl" name="InstagramUrl" id="InstagramUrl" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Linked in Url : </label>
+                                <input type="text" placeholder="Linked in Url" class="form-control" value="@objAppInfo.AppUpdate" name="AppUpdate" id="AppUpdate" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">SEO Details </h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Page Title : </label>
+                                <textarea placeholder="Page Title" name="PageTitle" id="PageTitle" class="form-control">@objAppInfo.PageTitle</textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Meta Keywords : </label>
+                                <textarea placeholder="Meta Keywords" name="MetaKeywords" id="MetaKeywords" class="form-control">@objAppInfo.MetaKeywords</textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Meta Description:</label>
+                                <textarea placeholder="Meta Description" name="MetaDescription" id="MetaDescription" class="form-control">@objAppInfo.MetaDescription</textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Top Line:</label>
+                                <textarea placeholder="Top Line" name="Topline" id="Topline" class="form-control">@objAppInfo.Topline</textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">Company admin portal logos</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Layout Logo<span class="text-danger">*</span>
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (32*32)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+
+                                </label>
+                                <input type="file" id="LayoutLogo" name="LayoutLogo" class="form-control">
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Website favicon logo<span class="text-danger">*</span>
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (32*32)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+
+                                </label>
+                                <input type="file" id="faviconlogo" name="faviconlogo" class="form-control">
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Login page branding logo<span class="text-danger">*</span>
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (227*67)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+
+                                </label>
+                                <input type="file" id="Loginlogo" name="Loginlogo" class="form-control">
+
+                            </div>
+
+                        </div>
+                        @* <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Mail Logo<span class="text-danger">*</span>
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (1010*240)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+
+                                </label>
+                                <input type="file" id="MailLogo" name="MailLogo" class="form-control">
+
+                            </div>
+
+                        </div> *@
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-3 text-end ms-auto">
+            <button type="submit" class="btn btn-primary" style="width: 113px;"> Submit</button>
+            @*<a class="btn btn-primary px-3" href="@Url.Action("Index", "ApplicationSettings", new { mid = ViewBag.mid })">Cancel</a>*@
+
+        </div>
+    </div>
+}
+
+<script>
+
+   $(document).ready(function () {
+
+    // Custom method for image-only file validation
+    $.validator.addMethod("imageOnly", function (value, element) {
+        if (element.files && element.files[0]) {
+            var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+            return allowedTypes.indexOf(element.files[0].type) !== -1;
+        }
+        return true; // No file selected, skip (required rule handles empty)
+    }, "Only image files are allowed (JPG, PNG, GIF, WebP, SVG).");
+
+    $("#AppinfoForm").validate({
+        rules: {
+            SiteName: "required",
+            CompanyAddress: "required",
+            CompanyWebSite: "required",
+            CompanyEmail: "required",
+
+            // ✅ Add image-only validation for all 3 logo fields
+            LayoutLogo: {
+                imageOnly: true
+            },
+            faviconlogo: {
+                imageOnly: true
+            },
+            Loginlogo: {
+                imageOnly: true
+            },
+        },
+        messages: {
+            SiteName: "Please Enter Site Name",
+            CompanyAddress: "Please Enter Company Address",
+            CompanyWebSite: "Please Enter Company WebSite",
+            CompanyEmail: "Please Enter Company Email",
+
+            // ✅ Custom messages for logo fields
+            LayoutLogo: {
+                imageOnly: "Only image files allowed (JPG, PNG, GIF, WebP, SVG)."
+            },
+            faviconlogo: {
+                imageOnly: "Only image files allowed (JPG, PNG, GIF, WebP, SVG)."
+            },
+            Loginlogo: {
+                imageOnly: "Only image files allowed (JPG, PNG, GIF, WebP, SVG)."
+            },
+        },
+        errorElement: "div",
+        errorPlacement: function (error, element) {
+            error.addClass("invalid-feedback");
+            if (element.prop("type") === "checkbox") {
+                error.insertAfter(element.parent("label"));
+            } else {
+                error.insertAfter(element);
+            }
+            if (element.closest(".input-box").length) {
+                element.closest(".input-box").after(error);
+            }
+        },
+        highlight: function (element, errorClass, validClass) {
+            var $element = $(element);
+            if ($element.is('input, textarea, select')) {
+                $element.addClass("is-invalid").removeClass("is-valid");
+            }
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            var $element = $(element);
+            if ($element.is('input, textarea, select')) {
+                $element.addClass("is-valid").removeClass("is-invalid");
+            }
+        },
+    });
+
+    // ✅ Real-time validation on file change (instant feedback)
+    $("#LayoutLogo, #faviconlogo, #Loginlogo").on("change", function () {
+        $(this).valid();
+    });
+
+});
+
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+<style>
+    .tooltip-inner {
+        max-width: 500px !important;
+        width: 500px;
+        text-align: left;
+        white-space: normal;
+        padding: 15px;
+        line-height: 1.6;
+    }
+</style>

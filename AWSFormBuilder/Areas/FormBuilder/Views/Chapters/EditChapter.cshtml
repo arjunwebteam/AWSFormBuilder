@@ -1,0 +1,371 @@
+﻿@{
+    ViewBag.Title = "AddChapter";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    var cssloc = System.Configuration.ConfigurationManager.AppSettings["usersiteurl"] + "Content/Admin/front-end-style.css";
+
+    AWSFormBuilder.Entities.Chapters objChapters = ViewBag.objChapters;
+
+    List<AWSFormBuilder.Entities.Chapters> lstChapters = ViewBag.lstChapters;
+    ViewBag.Pageheading = "Edit Chapter";
+}
+
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckfinder/ckfinder.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#Chapters').addClass('active');
+        $('#wChapters').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+    function Validate() {
+
+        if ($.trim($('#ChapterName').val()) == '') { document.getElementsByName('ChapterName')[0].placeholder = 'Chapter Name Required'; $('#ChapterName').focus().addClass("validate"); return false; } else { $('#ChapterName').focus().removeClass("validate"); }
+        if ($.trim($('#ShortName').val()) == '') { document.getElementsByName('ShortName')[0].placeholder = 'Short Name Required'; $('#ShortName').focus().addClass("validate"); return false; } else { $('#ShortName').focus().removeClass("validate"); }
+        if ($.trim($('#City').val()) == '') { document.getElementsByName('City')[0].placeholder = 'City Required'; $('#City').focus().addClass("validate"); return false; } else { $('#City').focus().removeClass("validate"); }
+        if ($.trim($('#State').val()) == '') { document.getElementsByName('State')[0].placeholder = 'State Required'; $('#State').focus().addClass("validate"); return false; } else { $('#State').focus().removeClass("validate"); }
+        //if ($.trim($('#ZipCode').val()) == '') { document.getElementsByName('ZipCode')[0].placeholder = 'ZipCode Required'; $('#ZipCode').focus().addClass("validate"); return false; } else { $('#ZipCode').focus().removeClass("validate"); }
+        if (CKEDITOR.instances.Description.getData() == "") { $('#Description').focus().addClass("red-border"); $('#lblDescription').html('Description Required.'); return false; } else { $('#Description').val(CKEDITOR.instances.Description.getData()); $('#lblDescription').html(''); }
+
+        return true;
+    }
+    function ResetValidateClass() {
+        $('#ChapterName').removeClass("validate");
+        $('#ShortName').removeClass("validate");
+        $('#City').removeClass("validate");
+        $('#State').removeClass("validate");
+        $('#ZipCode').removeClass("validate");
+    }
+
+</script>
+
+
+<div class="content">
+    @using (Html.BeginForm("AddChapter", "Chapters", FormMethod.Post, new { enctype = "multipart/form-data", @id = "ChaptersForm", @name = "ChaptersForm" }))
+    {
+        <input type="hidden" name="ChapterId" id="ChapterId" value="@objChapters.ChapterId" />
+        <input type="hidden" value="@ViewBag.mid" name="mid" id="mid" />
+        <div class="box validation">
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Chapter Name : <span class="text-danger">*</span></label>
+                                <input type="text" id="ChapterName" value="@objChapters.ChapterName" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" name="ChapterName" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label>Previous Chapters to Clone </label>
+                                <select class="single-select" id="ShortDescription" name="ShortDescription" readonly="readonly" disabled="disabled">
+                                    <option value="1">Global</option>
+                                    @if (lstChapters != null && lstChapters.Count != 0)
+                                    {
+                                        foreach (var item in lstChapters)
+                                        {
+                                            <option @(objChapters.ShortDescription == item.ChapterId.ToString() ? "selected=selected" : "")
+                                                    value="@item.ChapterId">@item.ChapterName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Clone Type : <span class="text-danger"></span></label>
+                                <select class="form-control" id="Address" name="Address" readonly="readonly" disabled="disabled">
+                                    <option @(objChapters.Address == "Menu Items Only" ? "selected=selected" : "") value="Menu Items Only">Menu Items Only</option>
+                                    <option @(objChapters.Address == "Menu Items With Pages" ? "selected=selected" : "") value="Menu Items With Pages">Menu Items With Pages</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Short Name : <span class="text-danger">*</span></label>
+                                <input type="text" id="ShortName" value="@objChapters.ShortName" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" name="ShortName" class="form-control">
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">City : <span class="text-danger">*</span></label>
+                                    <input type="text" id="City" value="@objChapters.City" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" name="City" class="form-control">
+                                </div>
+                            </div>*@
+                        <div class="col-lg-3 col-md-6 d-none">
+                            <div class="input-box">
+                                <label class="form-label">State : </label>
+                                <select class="form-control" id="State" name="State">
+                                    <option value="">--Select--</option>
+                                    <option @(objChapters.State == "AK" ? "selected=selected" : "") value="AK"> AK - Alaska</option>
+                                    <option @(objChapters.State == "AL" ? "selected=selected" : "") value="AL"> AL - Alabama</option>
+                                    <option @(objChapters.State == "AR" ? "selected=selected" : "") value="AR"> AR - Arkansas</option>
+                                    <option @(objChapters.State == "AZ" ? "selected=selected" : "") value="AZ"> AZ - Arizona</option>
+                                    <option @(objChapters.State == "CA" ? "selected=selected" : "") value="CA"> CA - California</option>
+                                    <option @(objChapters.State == "CO" ? "selected=selected" : "") value="CO"> CO - Colorado</option>
+                                    <option @(objChapters.State == "CT" ? "selected=selected" : "") value="CT"> CT - Connecticut</option>
+                                    <option @(objChapters.State == "DC" ? "selected=selected" : "") value="DC"> DC - District of Columbia</option>
+                                    <option @(objChapters.State == "DE" ? "selected=selected" : "") value="DE"> DE - Delaware</option>
+                                    <option @(objChapters.State == "FL" ? "selected=selected" : "") value="FL"> FL - Florida</option>
+                                    <option @(objChapters.State == "GA" ? "selected=selected" : "") value="GA"> GA - Georgia</option>
+                                    <option @(objChapters.State == "HI" ? "selected=selected" : "") value="HI"> HI - Hawaii</option>
+                                    <option @(objChapters.State == "IA" ? "selected=selected" : "") value="IA"> IA - Iowa</option>
+                                    <option @(objChapters.State == "ID" ? "selected=selected" : "") value="ID"> ID - Idaho</option>
+                                    <option @(objChapters.State == "IL" ? "selected=selected" : "") value="IL"> IL - Illinois</option>
+                                    <option @(objChapters.State == "IN" ? "selected=selected" : "") value="IN"> IN - Indiana</option>
+                                    <option @(objChapters.State == "KS" ? "selected=selected" : "") value="KS"> KS - Kansas</option>
+                                    <option @(objChapters.State == "KY" ? "selected=selected" : "") value="KY"> KY - Kentucky</option>
+                                    <option @(objChapters.State == "LA" ? "selected=selected" : "") value="LA"> LA - Louisiana</option>
+                                    <option @(objChapters.State == "MA" ? "selected=selected" : "") value="MA"> MA - Massachusetts</option>
+                                    <option @(objChapters.State == "MD" ? "selected=selected" : "") value="MD"> MD - Maryland</option>
+                                    <option @(objChapters.State == "ME" ? "selected=selected" : "") value="ME"> ME - Maine</option>
+                                    <option @(objChapters.State == "MI" ? "selected=selected" : "") value="MI"> MI - Michigan</option>
+                                    <option @(objChapters.State == "MN" ? "selected=selected" : "") value="MN"> MN - Minnesota</option>
+                                    <option @(objChapters.State == "MO" ? "selected=selected" : "") value="MO"> MO - Missouri</option>
+                                    <option @(objChapters.State == "MS" ? "selected=selected" : "") value="MS"> MS - Mississippi</option>
+                                    <option @(objChapters.State == "MT" ? "selected=selected" : "") value="MT"> MT - Montana</option>
+                                    <option @(objChapters.State == "NC" ? "selected=selected" : "") value="NC"> NC - North Carolina</option>
+                                    <option @(objChapters.State == "ND" ? "selected=selected" : "") value="ND"> ND - North Dakota</option>
+                                    <option @(objChapters.State == "NE" ? "selected=selected" : "") value="NE"> NE - Nebraska</option>
+                                    <option @(objChapters.State == "NH" ? "selected=selected" : "") value="NH"> NH - New Hampshire</option>
+                                    <option @(objChapters.State == "NJ" ? "selected=selected" : "") value="NJ"> NJ - New Jersey</option>
+                                    <option @(objChapters.State == "NM" ? "selected=selected" : "") value="NM"> NM - New Mexico</option>
+                                    <option @(objChapters.State == "NV" ? "selected=selected" : "") value="NV"> NV - Nevada</option>
+                                    <option @(objChapters.State == "NY" ? "selected=selected" : "") value="NY"> NY - New York</option>
+                                    <option @(objChapters.State == "OH" ? "selected=selected" : "") value="OH"> OH - Ohio</option>
+                                    <option @(objChapters.State == "OK" ? "selected=selected" : "") value="OK"> OK - Oklahoma</option>
+                                    <option @(objChapters.State == "OR" ? "selected=selected" : "") value="OR"> OR - Oregon</option>
+                                    <option @(objChapters.State == "PA" ? "selected=selected" : "") value="PA"> PA - Pennsylvania</option>
+                                    <option @(objChapters.State == "RI" ? "selected=selected" : "") value="RI"> RI - Rhode Island</option>
+                                    <option @(objChapters.State == "SC" ? "selected=selected" : "") value="SC"> SC - South Carolina</option>
+                                    <option @(objChapters.State == "SD" ? "selected=selected" : "") value="SD"> SD - South Dakota</option>
+                                    <option @(objChapters.State == "TN" ? "selected=selected" : "") value="TN"> TN - Tennessee</option>
+                                    <option @(objChapters.State == "TX" ? "selected=selected" : "") value="TX"> TX - Texas</option>
+                                    <option @(objChapters.State == "UT" ? "selected=selected" : "") value="UT"> UT - Utah</option>
+                                    <option @(objChapters.State == "VA" ? "selected=selected" : "") value="VA"> VA - Virginia</option>
+                                    <option @(objChapters.State == "VT" ? "selected=selected" : "") value="VT"> VT - Vermont</option>
+                                    <option @(objChapters.State == "WA" ? "selected=selected" : "") value="WA"> WA - Washington</option>
+                                    <option @(objChapters.State == "WI" ? "selected=selected" : "") value="WI"> WI - Wisconsin</option>
+                                    <option @(objChapters.State == "WV" ? "selected=selected" : "") value="WV"> WV - West Virginia</option>
+                                    <option @(objChapters.State == "WY" ? "selected=selected" : "") value="WY"> WY - Wyoming</option>
+                                    <option @(objChapters.State == "AS" ? "selected=selected" : "") value="AS"> AS - American Samoa</option>
+                                    <option @(objChapters.State == "FM" ? "selected=selected" : "") value="FM"> FM - Federated States of Micronesia</option>
+                                    <option @(objChapters.State == "GU" ? "selected=selected" : "") value="GU"> GU - Guam</option>
+                                    <option @(objChapters.State == "MH" ? "selected=selected" : "") value="MH"> MH - Marshall Islands</option>
+                                    <option @(objChapters.State == "MP" ? "selected=selected" : "") value="MP"> MP - Northern Mariana Islands</option>
+                                    <option @(objChapters.State == "PR" ? "selected=selected" : "") value="PR"> PR - Puerto Rico</option>
+                                    <option @(objChapters.State == "PW" ? "selected=selected" : "") value="PW"> PW - Palau</option>
+                                    <option @(objChapters.State == "VI" ? "selected=selected" : "") value="VI"> VI - Virgin Islands</option>
+                                    <option @(objChapters.State == "AA" ? "selected=selected" : "") value="AA"> AA - Armed Forces Americas</option>
+                                    <option @(objChapters.State == "AE" ? "selected=selected" : "") value="AE"> AE - Armed Forces</option>
+                                    <option @(objChapters.State == "AP" ? "selected=selected" : "") value="AP"> AP - Armed Forces Pacific</option>
+                                    <option @(objChapters.State == "AB" ? "selected=selected" : "") value="AB"> AB - Alberta</option>
+                                    <option @(objChapters.State == "BC" ? "selected=selected" : "") value="BC"> BC - British Columbia</option>
+                                    <option @(objChapters.State == "MB" ? "selected=selected" : "") value="MB"> MB - Manitoba</option>
+                                    <option @(objChapters.State == "NB" ? "selected=selected" : "") value="NB"> NB - New Brunswick</option>
+                                    <option @(objChapters.State == "NL" ? "selected=selected" : "") value="NL"> NL - Newfoundland and Labrador</option>
+                                    <option @(objChapters.State == "NS" ? "selected=selected" : "") value="NS"> NS - Nova Scotia</option>
+                                    <option @(objChapters.State == "NT" ? "selected=selected" : "") value="NT"> NT - Northwest Territories</option>
+                                    <option @(objChapters.State == "NU" ? "selected=selected" : "") value="NU"> NU - Nunavut</option>
+                                    <option @(objChapters.State == "ON" ? "selected=selected" : "") value="ON"> ON - Ontario</option>
+                                    <option @(objChapters.State == "PE" ? "selected=selected" : "") value="PE"> PE - Prince Edward Island</option>
+                                    <option @(objChapters.State == "QC" ? "selected=selected" : "") value="QC"> QC - Quebec</option>
+                                    <option @(objChapters.State == "SK" ? "selected=selected" : "") value="SK"> SK - Saskatchewan</option>
+                                    <option @(objChapters.State == "YT" ? "selected=selected" : "") value="YT"> YT - Yukon</option>
+                                </select>
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">ZipCode : <span class="text-danger">*</span></label>
+                                    <input type="text" onkeypress="return Common.isNumberKey(event)" maxlength="6" value="@objChapters.ZipCode" id="ZipCode" onclick="ResetValidateClass();" name="ZipCode" class="form-control">
+                                </div>
+                            </div>*@
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Display Order : <span class="text-danger">*</span></label>
+                                <input type="text" onkeypress="return Common.isNumberKey(event)" value="@objChapters.OrderNo" id="OrderNo" onclick="ResetValidateClass();" name="OrderNo" class="form-control">
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">Subject : <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="Subject" id="Subject" placeholder="Subject">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">Mail Type : </label>
+                                    <select class="single-select" name="Target">
+                                        <option value="">Selct Mail Type</option>
+                                        <option selected="selected" value="Auto">Auto</option>
+                                        <option value="Manual">Manual</option>
+                                    </select>
+                                </div>
+                            </div>*@
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="box validation">
+                        <div class="box-header">
+
+
+                            <h3 class="box-title dis-in"> Coordinator Details </h3>
+                            <label>&nbsp;</label>
+                        </div>
+                        <div class="box-body">
+                            <div class="row  g-3">
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="input-box">
+                                        <label class="form-label">First Name </label>
+
+                                        <input type="text" class="form-control" id="CoordinatorName" value="@objChapters.CoordinatorName" name="CoordinatorName" placeholder=" First Name">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="input-box">
+                                        <label class="form-label">Mobile Phone </label>
+                                        <input type="text" class="form-control" id="CoordinatorPhone" value="@objChapters.CoordinatorPhone" name="CoordinatorPhone" onkeypress="return Common.isNumberKey(event)" maxlength="12" placeholder="Mobile Phone" onpaste="handlePaste(event);" autocomplete="off" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="input-box">
+                                        <label class="form-label">Email</label>
+                                        <input type="text" class="form-control" id="CoordinatorEmail" value="@objChapters.CoordinatorEmail" name="CoordinatorEmail" placeholder=" Email">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <label class="form-label">Is Notification</label>
+                                    <div class="menu-hover">
+                                        @{
+                                            var titleValue = objChapters.IsNotification == "Yes" ? "Yes" : "No";
+                                        }
+                                        <div>
+                                            <label class="switch" title="@titleValue">
+                                                <!-- Checkbox to toggle between Yes/No -->
+                                                <input type="checkbox"
+                                                       name="IsNotification"
+                                                       value="Yes"
+                                                       @if (objChapters.IsNotification == "Yes") { <text> checked</text> }>
+                                                <span class="slider"></span>
+                                            </label>
+                                            <!-- Hidden input to ensure No is submitted when the checkbox is unchecked -->
+                                            <input type="hidden" name="IsNotification" value="No">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="box validation">
+                        <div class="box-header">
+                            <h3 class="box-title dis-in"> Description <span class="text-danger">*</span></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row  g-3">
+                                <div class="col-lg-12">
+                                    <div class="input-box">
+                                        <textarea rows="10" placeholder="Description *" name="Description" id="Description" cols="80" style="visibility: hidden; display: none;">@objChapters.Description</textarea><br />
+                                        <span class="field-validation-error" id="Description"></span>
+                                        <script type="text/javascript">
+                                            var editor = CKEDITOR.replace('Description', { contentsCss: '@(cssloc)' });
+                                            CKFinder.setupCKEditor(editor, '@(System.Configuration.ConfigurationManager.AppSettings["baseurl"])ckfinder/');
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-3 text-end ms-auto">
+                <button type="submit" class="btn btn-success px-3 " value="submit">Submit</button>
+                <a class="btn btn-primary px-3" href="@Url.Action("Index", "Chapters", new { mid = ViewBag.mid })">Cancel</a>
+            </div>
+        </div>
+    }
+</div>
+<script src="Scripts/Admin/Common.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $("#ChaptersForm").validate({
+            rules: {
+                ChapterName: "required",
+                ShortName: "required",
+
+                CoordinatorEmail: {                    required: function () {                        return $("input[name='IsNotification']:checked").val() === "Yes";                    },                    email: true,                }
+            },
+            messages: {
+                ChapterName: "Chapter Name Required",
+                ShortName: "Short Name Required",
+
+                CoordinatorEmail: {
+                    required: "Please Enter Email Address",
+
+                    email: "Please Enter Valid Email Address",
+
+                },
+            },
+
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                // Add the `invalid-feedback` class to the error element
+                error.addClass("invalid-feedback");
+
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else {
+                    error.insertAfter(element);
+                }
+
+                // Move the error element after the fieldset element
+                if (element.closest(".input-box").length) {
+                    element.closest(".input-box").after(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                // Highlight the input, textarea, or select element with the `is-invalid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-invalid").removeClass("is-valid");
+                }
+
+
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                // Unhighlight the input, textarea, or select element by adding the `is-valid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-valid").removeClass("is-invalid");
+                }
+
+            },
+
+
+        });
+    });
+
+</script>

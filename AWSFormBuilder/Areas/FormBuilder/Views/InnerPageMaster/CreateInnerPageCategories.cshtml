@@ -1,0 +1,176 @@
+﻿@{
+    ViewBag.Title = "Create Menu Item";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories = ViewBag.lstInnerPageCategories;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories2 = ViewBag.lstInnerPageCategories2;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories3 = ViewBag.lstInnerPageCategories3;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories4 = ViewBag.lstInnerPageCategories4;
+    List<AWSFormBuilder.Entities.Chapters> lstChapters = ViewBag.lstChapters;
+
+    
+
+}
+
+<script type="text/javascript">
+    function ValidateInnerPageCategories() {
+      
+        if ($.trim($('#DisplayName').val()) == '') { document.getElementsByName('DisplayName')[0].placeholder = 'Category Name Required'; $('#DisplayName').focus().addClass("validate"); return false; } else { $('#DisplayName').focus().removeClass("validate"); }
+    
+        return true;
+    } 
+
+
+    $(document).ready(function () {
+        $('#wInnerPageCategories, #WebPages').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+ 
+    function ChapterCategories() {
+        var ChapterId = ($('#ChapterId').val());
+
+        $.ajax({
+            url: '@Url.Action("GetCategoryByChapter", "InnerPageMaster")',
+            type: 'POST',
+            data: { ChapterId: ChapterId },
+            datatype: "JSON",
+            success: function (result) {
+                if (result.ok) {
+                    var lstInnerPageCategories = result.data;
+                    var lstInnerPageCategories2 = result.data1;
+                    var lstInnerPageCategories3 = result.data2;
+                    var lstInnerPageCategories4 = result.data3;
+                    var sb = "";
+                    sb = sb + "<label>Parent Category </label>";
+                    sb = sb + "<select id=\"PageParentId\" name=\"PageParentId\" class=\"form-control\">";
+                    sb = sb + "<option selected=\"selected\" value=\"\">--Select Parent Category--</option>"; 
+                         if (lstInnerPageCategories != null && lstInnerPageCategories.Count != 0)
+                         {
+                             for (var i = 0; i < lstInnerPageCategories.length; i++)
+                             {
+                                 sb = sb + "<option value=\"" + lstInnerPageCategories[i].InnerPageCategoryId + "\">" + lstInnerPageCategories[i].DisplayName + " </option>";
+                                  
+                                    if (lstInnerPageCategories2 != null && lstInnerPageCategories2.Count != 0)
+                                    {
+                                        for (var j = 0; j < lstInnerPageCategories2.length; j++) {
+ 
+                                            if (lstInnerPageCategories2[j].PageParentId == lstInnerPageCategories[i].InnerPageCategoryId)
+                                            {
+                                                sb = sb + "<option value=\"" + lstInnerPageCategories2[j].InnerPageCategoryId + "\">" + lstInnerPageCategories2[j].DisplayName + " </option>";
+                                                 
+                                                if (lstInnerPageCategories3 != null && lstInnerPageCategories3.Count != 0)
+                                                {
+                                                    for (var k = 0; k < lstInnerPageCategories3.length; k++) {
+
+                                                        if (lstInnerPageCategories3[k].PageParentId == lstInnerPageCategories2[j].InnerPageCategoryId)
+                                                        {
+                                                            sb = sb + "<option value=\"" + lstInnerPageCategories3[k].InnerPageCategoryId + "\">" + lstInnerPageCategories3[k].DisplayName + " </option>";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                    sb = sb + "</select> <span class=\"error3\" id=\"spanPageParentId\"></span>";
+                    $('#divAddTypes').show();
+                    $('#divAddTypes').html(sb);
+                } 
+            }
+        });
+    }
+
+</script>
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckfinder/ckfinder.js"></script>
+<!-- breadcumb -->
+<div class="content-header">
+    <h1>Create Webpage Category</h1>
+    <ol class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>Home</a></li>
+        <li><a href="@Url.Action("Index", "InnerPageMaster")"><i class="fa fa-sort-amount-asc"></i>Webpage Categories</a></li>
+        <li class="active">Create Webpage Category</li>
+    </ol>
+</div>
+<!--end breadcumb -->
+
+<div class="content">
+    <!-- Main content -->
+    <div id="divmessage">
+        @if (TempData["message"] != null)
+        { @Html.Raw(TempData["message"].ToString())}
+
+        @if (ViewBag.message != null)
+        { @Html.Raw(ViewBag.message.ToString())}
+    </div>
+    <div class="box validation">
+        @using (Html.BeginForm("CreateInnerPageCategories", "InnerPageMaster", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Chapters <span class="red-t">*</span> </label>
+                        <select name="ChapterId" id="ChapterId" class="form-control" onchange="ChapterCategories();">
+
+                            @if (lstChapters != null && lstChapters.Count != 0)
+                            {
+                                foreach (var item in lstChapters)
+                                {
+                                    <option value="@item.ChapterId">@item.ChapterName</option>
+                                }
+                            }
+                        </select>
+                        <b style="color: #f00; font-size: 12px">Note:(If Not Required any Chapter Default Select NATS Global)</b>
+                    </div>
+                    <div class="col-xs-12 col-lg-4 col-sm-6" id="divAddTypes">
+                        <label>Parent Category </label>
+                        <select id="PageParentId" name="PageParentId" class="form-control">
+                            <option value="">---- Root Level ----</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Category Name <span class="red-t">*</span></label>
+                        <input type="text" class="form-control" id="DisplayName" name="DisplayName" />
+                    </div>
+
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Display Order </label>
+                        <input type="text" class="form-control" id="Position" name="Position" />
+                    </div>
+                    <div class="col-xs-12 col-lg-2 col-sm-6">
+                        <label style="display: block;">&nbsp;</label>
+                        <label class="checkbox-in">
+                            <input type="checkbox" name="IsMenuBar" id="IsMenuBar" class="flat-red" value="true" />
+                            Is Menu Bar
+                        </label>
+                    </div>
+                    @*<div class="col-xs-12 col-lg-2 col-sm-6">
+            <label style="display: block;">&nbsp;</label>
+            <label class="checkbox-in">
+                <input type="checkbox" name="IsQuickLinks" id="IsQuickLinks" class="flat-red" value="true" />
+                Is Quick Links</label>
+        </div>*@
+                    @*  <div class="col-xs-12 col-lg-2 col-sm-6">
+            <label style="display: block;">&nbsp;</label>
+            <label class="checkbox-in">
+                <input type="checkbox" name="IsFooterBar" id="IsFooterBar" class="flat-red" value="true" />
+                Is Footer Bar</label>
+        </div>*@
+                </div>
+            </div>  
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body text-right">
+                    <input type="submit" onclick="return ValidateInnerPageCategories()" class="btn btn-primary" id="add" value="Submit" name="add">
+                    <a class="btn btn-info" href="@Url.Action("Index", "InnerPageMaster")">Cancel</a>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        }
+        <!-- /.box-body -->
+    </div>
+    <!-- /.content -->
+</div>

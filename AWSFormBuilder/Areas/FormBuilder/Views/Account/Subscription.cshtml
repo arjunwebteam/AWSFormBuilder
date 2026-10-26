@@ -1,0 +1,150 @@
+﻿
+@{
+    Layout = null;
+    int status = 0;
+    AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = _AppInfo.GetAppInfoDetails(ref status);
+
+
+    string userName = ViewBag.UserName as string;
+    string userEmail = ViewBag.UserEmail as string;
+    string subscriptionDate = ViewBag.SubscriptionDate as string;
+    string message = ViewBag.Message as string;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Status</title>
+
+    <link rel="icon" href="~/Areas/FormBuilder/Content/Admin/images/favicon-32x32.png" type="image/png" />
+
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/Admin/css/zentic.css">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/Admin/css/zentic-icons.css">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/Admin/css/login.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <div class="sub-page-wrapper">
+        <div class="sub-card">
+            <h2>@userName</h2>
+            <div class="sub-user-email">(@userEmail)</div>
+
+            @if (!string.IsNullOrEmpty(subscriptionDate))
+            {
+                <div class="sub-date">@subscriptionDate</div>
+            }
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="sub-message">@message</div>
+            }
+
+            <div class="sub-admin-contact">
+                <span class="sub-contact-item"><i class="fa-solid fa-envelope"></i> @objAppInfo.CompanyEmail</span>
+                <span class="sub-contact-item"><i class="fa-solid fa-phone"></i> @objAppInfo.CompanyPhone</span>
+            </div>
+
+            <button type="button"
+                    class="fb-signin-btn"
+                    onclick="window.location.href='@Url.Action("LogOn", "Account")'">
+                <i class="icon-arrow-left"></i>
+                <span>Back to Login</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
+<style>
+    /* ============================================================
+           Subscription Status Page
+           ============================================================ */
+
+    .sub-page-wrapper {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #13458f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .sub-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        padding: 32px 36px;
+        max-width: 460px;
+        width: 100%;
+        text-align: center;
+    }
+
+        .sub-card h2 {
+            margin: 0 0 4px 0;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+    .sub-user-email {
+        color: #6c757d;
+        margin-bottom: 18px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .sub-date {
+        color: #d32f2f;
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+
+    .sub-message {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-bottom: 22px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .sub-admin-contact {
+        border-top: 1px solid #eee;
+        padding-top: 18px;
+        margin-bottom: 22px;
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .sub-contact-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f1f4fa;
+        color: #333;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+        .sub-contact-item i {
+            color: #13458f;
+        }
+
+    .sub-back-link {
+        margin-top: 4px;
+    }
+
+    a:hover {
+        color: none !important;
+    }
+</style>

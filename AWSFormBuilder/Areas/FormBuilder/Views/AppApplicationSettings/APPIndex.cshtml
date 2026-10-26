@@ -1,0 +1,278 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+    int status = 0;
+    AWSFormBuilder.Entities.MobileAppInfo objAppInfo = ViewBag.objMobileAppInfo;
+   AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfonew = _AppInfo.GetAppInfoDetails(ref status);
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wSettings').addClass('active');
+        $('#wApplicationSettings').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+    function ValidateApplication() {
+
+        var returnval = true;
+
+        if ($('#SiteName').val() == '') { $('#SiteName').focus().addClass("validate"); returnval = false; } else { $('#SiteName').focus().removeClass("validate"); }
+        if ($('#CompanyAddress').val() == '') { $('#CompanyAddress').focus().addClass("validate"); returnval = false; } else { $('#CompanyAddress').focus().removeClass("validate"); }
+        if ($('#CompanyWebSite').val() == '') { $('#CompanyWebSite').focus().addClass("validate"); returnval = false; } else { $('#CompanyWebSite').focus().removeClass("validate"); }
+        if ($('#CompanyEmail').val() == '') { $('#CompanyEmail').focus().addClass("validate"); returnval = false; }
+        else {
+            $('#CompanyEmail').focus().removeClass("validate");
+            if (!Common.CheckEmail($('#CompanyEmail').val())) { $('#CompanyEmail').val(''); document.getElementsByName('CompanyEmail')[0].placeholder = 'Please enter valid email.'; $('#CompanyEmail').focus().addClass("validate"); returnval = false; } else { $('#CompanyEmail').focus().removeClass("validate"); }
+        }
+
+        return returnval;
+    }
+
+    function ResetValidateClass() {
+        $('#SiteName').removeClass("validate");
+        $('#CompanyAddress').removeClass("validate");
+        $('#CompanyWebSite').removeClass("validate");
+        $('#CompanyEmail').removeClass("validate");
+        $('#CompanyPhone').removeClass("validate");
+    }
+
+    function phonenochange(event) {
+        if (event.keyCode == 8 || event.keyCode == 46) {
+        }
+        else {
+            var ph = $('#CompanyPhone').val();
+            if (ph.length == 3) { $('#CompanyPhone').val(ph + '-'); }
+            if (ph.length == 7) { $('#CompanyPhone').val(ph + '-'); }
+        }
+    }
+</script>
+
+
+@using (Html.BeginForm("APPUpdateAppInfo", "APPApplicationSettings", FormMethod.Post, new { enctype = "multipart/form-data", @id = "AppinfoForm", @name = "AppinfoForm" }))
+{
+
+    <input type="hidden" name="AppsettingId" id="AppsettingId" value="@(objAppInfo.AppsettingId)" />
+  
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">App Settings</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">IOS App link: </label>
+                                <input type="text" class="form-control" placeholder="IOS App link *" value="@objAppInfo.IOSApp" name="IOSApp" id="IOSApp" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Android app link  :</label>
+                                <input type="text" placeholder="Android app link *" class="form-control" value="@objAppInfo.Androidapp" name="Androidapp" id="Androidapp" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Android Version :</label>
+                                <input type="text" placeholder="Android Version *" class="form-control" value="@objAppInfo.AppAndroidVersion" name="AppAndroidVersion" id="AppAndroidVersion" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Ios version : </label>
+                                <input type="text" placeholder="Ios version *" class="form-control" value="@objAppInfo.Iosversion" name="Iosversion" id="Iosversion" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();">
+                            </div>
+                        </div>
+                     
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="box validation">
+                <div class="box-header">
+                    <h3 class="box-title dis-in">Company admin portal logos</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row  g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Splash Middle Logo
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (32*32)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+                                    @if (objAppInfo.SplashMiddle != null && objAppInfo.SplashMiddle != "")
+                                    {<a href="@objAppInfonew.BaseUrl/Content/SplashMiddle/normalphoto/@objAppInfo.SplashMiddle" target="_blank" class="red-t dis-inb" style="text-decoration:underline; padding-left:8px;">(View Image)</a>}
+                                   
+                                </label>
+                                <input type="file" id="SplashMiddle" name="SplashMiddle" class="form-control">
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Splash Bottom Logo
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (32*32)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+                                    @if (objAppInfo.SplashBottom != null && objAppInfo.SplashBottom != "")
+                                    {<a href="@objAppInfonew.BaseUrl/Content/SplashBottom/normalphoto/@objAppInfo.SplashBottom" target="_blank" class="red-t dis-inb" style="text-decoration:underline; padding-left:8px;">(View Image)</a>}
+
+                                </label>
+                                <input type="file" id="SplashBottom" name="SplashBottom" class="form-control">
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Home Top Header
+                                    @if (objAppInfo.HomeTopHeader != null && objAppInfo.HomeTopHeader != "")
+                                    {<a href="@objAppInfonew.BaseUrl/Content/HomeTopHeader/@objAppInfo.HomeTopHeader" target="_blank" class="red-t dis-inb" style="text-decoration:underline; padding-left:8px;">(View Image)</a>}
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (227*67)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+
+                                </label>
+                                <input type="file" id="HomeTopHeader" name="HomeTopHeader" class="form-control">
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Custom Loader
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (227*67)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+                                    @if (objAppInfo.Customloader != null && objAppInfo.Customloader != "")
+                                    {<a href="@objAppInfonew.BaseUrl/Content/Customloader/@objAppInfo.Customloader" target="_blank" class="red-t dis-inb" style="text-decoration:underline; padding-left:8px;">(View Image)</a>}
+
+                                </label>
+                                <input type="file" id="Customloader" name="Customloader" class="form-control">
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">
+                                    Other classs Header
+
+                                    <button type="button" data-bs-toggle="tooltip" title="Image size should be maintained width * height (227*67)" class="" style="border: 0;background: transparent;padding: 0px;"><i class="bi bi-info-circle"></i></button>
+                                    @if (objAppInfo.OtherclasssHeader != null && objAppInfo.OtherclasssHeader != "")
+                                    {<a href="@objAppInfonew.BaseUrl/Content/OtherclasssHeader/@objAppInfo.OtherclasssHeader" target="_blank" class="red-t dis-inb" style="text-decoration:underline; padding-left:8px;">(View Image)</a>}
+
+                                </label>
+                                <input type="file" id="OtherclasssHeader" name="OtherclasssHeader" class="form-control">
+
+                            </div>
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-3 text-end ms-auto">
+            <button type="submit" class="btn btn-success px-3">@*<i class="bi bi-plus-circle m-0"></i>*@ Submit</button>
+            @*<a class="btn btn-primary px-3" href="@Url.Action("Index", "ApplicationSettings", new { mid = ViewBag.mid })">Cancel</a>*@
+
+        </div>
+    </div>
+}
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#AppinfoForm").validate({
+            rules: {
+
+                SiteName: "required",
+                CompanyAddress: "required",
+                CompanyWebSite: "required",
+                CompanyEmail: "required",
+
+            },
+            messages: {
+
+                SiteName: "Please Enter Site Name",
+                CompanyAddress: "Please Enter Company Address",
+                CompanyWebSite: "Please Enter Company WebSite ",
+                CompanyEmail: "Please Enter Company Email",
+
+            },
+
+
+
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                // Add the `invalid-feedback` class to the error element
+                error.addClass("invalid-feedback");
+
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else {
+                    error.insertAfter(element);
+                }
+
+                // Move the error element after the fieldset element
+                if (element.closest(".input-box").length) {
+                    element.closest(".input-box").after(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                // Highlight the input, textarea, or select element with the `is-invalid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-invalid").removeClass("is-valid");
+                }
+
+
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                // Unhighlight the input, textarea, or select element by adding the `is-valid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-valid").removeClass("is-invalid");
+                }
+
+            },
+
+
+        });
+    });
+
+
+</script>

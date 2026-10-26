@@ -1,0 +1,3675 @@
+/* ================================================================
+   ZFB COLOR SYSTEM
+   All ZFB colors/backgrounds/borders/shadows use these variables.
+   Layout, spacing, sizing, typography and behavior are unchanged.
+   ================================================================ */
+:root {
+    --zfb-color-01: rgba(15, 15, 35, 0.02);
+    --zfb-color-02: rgba(15, 15, 35, 0.03);
+    --zfb-color-03: #fff;
+    --zfb-color-04: #e8ebf0;
+    --zfb-color-05: #000;
+    --zfb-color-06: #030712;
+    --zfb-color-07: rgba(255, 255, 255, 0.95);
+    --zfb-color-08: #3873eb;
+    --zfb-color-09: rgba(80, 70, 229, 0.30);
+    --zfb-color-10: rgba(80, 70, 229, 0.42);
+    --zfb-color-11: #16a34a;
+    --zfb-color-12: #188531;
+    --zfb-color-13: rgba(15, 15, 35, 0.04);
+    --zfb-color-14: #fdfdfe;
+    --zfb-color-15: rgba(0,0,0,0.15);
+    --zfb-color-16: rgba(15,15,35,0.02);
+    --zfb-color-17: rgba(15,15,35,0.03);
+    --zfb-color-18: rgba(255,255,255,0.08);
+    --zfb-color-19: #9e9e9e;
+    --zfb-color-20: #000000;
+    --zfb-color-21: rgba(255,255,255,0.15);
+    --zfb-color-22: rgba(255,255,255,0.12);
+    --zfb-color-23: #eef1f5;
+    --zfb-color-24: rgb(0 0 0);
+    --zfb-color-25: rgba(255,255,255,0.06);
+    --zfb-color-26: #003bcf;
+    --zfb-color-27: rgba(6, 182, 212, .25);
+    --zfb-color-28: rgba(255,255,255,0.1);
+    --zfb-color-29: rgba(255,255,255,0.3);
+    --zfb-color-30: rgba(0,0,0,0.08);
+    --zfb-color-31: rgba(255,255,255,.97);
+    --zfb-color-32: rgba(15,15,35,.04);
+    --zfb-color-33: rgba(255,255,255,.98);
+    --zfb-color-34: rgb(100 92 225);
+    --zfb-color-35: #ffff;
+    --zfb-color-36: #023cd0;
+    --zfb-color-37: rgba(15, 18, 35, .58);
+    --zfb-color-38: rgba(15,15,35,.22);
+    --zfb-color-39: #f7f7fb;
+    --zfb-color-40: #f7f8fb;
+    --zfb-color-41: #e2e6ec;
+    --zfb-color-42: #1f2937;
+    --zfb-color-43: #8a94a6;
+    --zfb-color-44: #374151;
+    --zfb-color-45: #4f46e5;
+    --zfb-color-46: #cfd5dc;
+    --zfb-color-47: #ffffff;
+    --zfb-color-48: #334155;
+    --zfb-color-49: #64748b;
+    --zfb-color-50: #33475b;
+    --zfb-color-51: #dc3545;
+    --zfb-color-52: #4a7cf6;
+    --zfb-color-53: rgba(74, 124, 246, 0.08);
+    --zfb-color-54: #222;
+    --zfb-color-55: #999;
+    --zfb-color-56: #333;
+    --zfb-color-57: rgba(0, 0, 0, 0.05);
+    --zfb-color-58: #e5e7eb;
+    --zfb-color-59: #ff000000;
+    --zfb-color-60: #ff0000;
+    --zfb-color-61: #0340da;
+    --zfb-color-62: #011258;
+    --zfb-color-63: #d0c908;
+    --zfb-color-64: #e4e7ec;
+    --zfb-color-65: #252525;
+    --zfb-color-66: rgba(255, 255, 255, 0.12);
+    --zfb-color-67: rgba(120, 8, 208, 0.15);
+    --zfb-color-68: rgba(120, 8, 208, 0.12);
+    --zfb-color-69: rgba(0, 0, 0, 0.15);
+    --zfb-color-70: #2864e8;
+    --zfb-color-71: #d8dee6;
+    --zfb-color-72: #3763d8;
+    --zfb-color-73: #9aa5b8;
+    --zfb-color-74: #1e2635;
+    --zfb-color-75: rgba(0,0,0,0.05);
+    --zfb-color-76: #fdfdfd;
+    --zfb-color-77: #eceff3;
+    --zfb-color-78: #f6f9ff;
+    --zfb-color-79: rgba(74,124,246,.12);
+    --zfb-color-80: #1c2b39;
+    --zfb-color-81: #2b3648;
+    --zfb-color-82: #e74c3c;
+    --zfb-color-83: #b5bcc7;
+    --zfb-color-84: #e3e7ed;
+    --zfb-color-85: rgba(74,124,246,.15);
+    --zfb-color-86: rgba(74,124,246,.3);
+    --zfb-color-87: #6b7a90;
+    --zfb-color-88: rgba(74,124,246,.2);
+    --zfb-color-89: #b9c3d1;
+    --zfb-color-90: #dbe1ea;
+    --zfb-color-91: #4a5772;
+    --zfb-color-92: #333f54;
+    --zfb-color-93: #ff7a1a;
+    --zfb-color-94: #edeef2;
+    --zfb-color-95: #3300ff;
+    --zfb-color-96: #ffb020;
+    --zfb-color-97: #e69d13;
+    --zfb-color-98: rgba(20, 26, 38, .5);
+    --zfb-color-99: rgba(0,0,0,.25);
+    --zfb-color-100: #e3e7ee;
+    --zfb-color-101: #fafbfc;
+    --zfb-color-102: #f2f3f5;
+    --zfb-color-103: #b9c0cc;
+    --zfb-color-104: #b9c6e6;
+    --zfb-color-105: #22c55e;
+    --zfb-color-106: #f2fbf5;
+    --zfb-color-107: rgba(15, 23, 42, 0.55);
+    --zfb-color-108: rgba(15, 23, 42, .25);
+    --zfb-color-109: #575599;
+    --zfb-color-110: #424181;
+    --zfb-color-111: #cbd5e1;
+    --zfb-color-112: #dde3ea;
+    --zfb-color-113: #1e293b;
+    --zfb-color-114: #f8fafc;
+    --zfb-color-115: #6366f1;
+    --zfb-color-116: rgba(99, 102, 241, .15);
+    --zfb-color-117: #4338ca;
+    --zfb-color-118: rgba(79, 70, 229, .25);
+    --zfb-color-119: #5457e0;
+    --zfb-color-120: #475569;
+    --zfb-color-121: #d7dce3;
+    --zfb-color-122: #f1f5f9;
+    --zfb-color-123: #dc2626;
+    --zfb-color-124: #fecaca;
+    --zfb-color-125: #fef2f2;
+    --zfb-color-126: #c7d2fe;
+    --zfb-color-127: rgba(79, 70, 229, .08);
+    --zfb-color-128: #f8faff;
+    --zfb-color-129: #f5f5ff;
+    --zfb-color-130: rgba(99, 102, 241, .12);
+    --zfb-color-131: #eee;
+    --zfb-color-132:#13458f;
+}
+/* ================================================================
+   ZFB FORM BUILDER â€” styles built on top of Zentic's design tokens
+   (colors, radii, shadows, typography all come from zentic.css :root)
+   ================================================================ */
+
+html, body.zfb-body {
+    height: 100%;
+    background: var(--zc-body-bg);
+    font-family: var(--zc-font-sans);
+}
+
+.zfb-app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ============================================================
+   LEFT â€” PALETTE SIDEBAR (mirrors .zentic-sidebar)
+   ============================================================ */
+.zfb-palette-sidebar {
+    width: var(--zc-sidebar-width);
+    flex-shrink: 0;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background: var(--zc-sidebar-bg);
+    border-right: 1px solid var(--zc-sidebar-border);
+    box-shadow: 1px 0 0 var(--zfb-color-01), 4px 0 24px var(--zfb-color-02);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.zfb-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 72px;
+    gap: 17px;
+    /* padding: 18px 20px; */
+    /* border-bottom: 1px solid var(--zc-sidebar-border); */
+    flex-shrink: 0;
+}
+
+.zfb-brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--zc-radius-sm);
+    background: linear-gradient(135deg, var(--zc-primary-light) 0%, var(--zc-primary) 55%, var(--zc-primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--zfb-color-03);
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.zfb-brand-text {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--zc-text-primary);
+    letter-spacing: -0.2px;
+}
+
+.zfb-brand-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--zc-sidebar-text-muted);
+    margin-top: 1px;
+}
+/* .zfb-back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 10px 0px;
+    font-size: 14px;
+  font-weight: 600;
+  color: var(--zc-sidebar-text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--zc-sidebar-border);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  flex-shrink: 0;
+} */
+/*  */
+
+.zfb-back-link:hover {
+    background: var(--zc-sidebar-hover);
+    color: var(--zc-primary);
+}
+
+/* Palette tabs â€” styled like zentic nav-section-label pills */
+.zfb-palette-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 0px 0px 0px;
+    /* background: var(--zc-sidebar-bg-2); */
+    /*  border-radius: var(--zc-radius-sm); */
+    padding: 4px;
+    padding-bottom: 0;
+    padding-inline: 0;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--zfb-color-04);
+}
+
+.zfb-palette-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 8px;
+    /*border-radius: var(--zc-radius-sm); */
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .2px;
+    cursor: pointer;
+    color: var(--zfb-color-05);
+    user-select: none;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+    .zfb-palette-tab.active {
+        /* background: var(--zc-primary); */
+        color: var(--zfb-color-132);
+        /* box-shadow: 0 2px 8px rgba(80, 70, 229, 0.30); */
+        border-bottom: 2px solid var(--zfb-color-132);
+        font-weight: 700;
+    }
+
+.zfb-palette-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 16px 24px;
+}
+
+.zfb-palette-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--zc-sidebar-section-color);
+    padding: 10px 4px 8px;
+}
+
+/* Draggable field chips â€” styled like .nav-link */
+.zfb-field-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-radius: var(--zc-radius-sm);
+    color: var(--zfb-color-06);
+    font-size: 14px;
+    font-weight: 400;
+    cursor: grab;
+    user-select: none;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+    .zfb-field-chip .zfb-chip-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: var(--zc-radius-sm);
+        background: var(--zc-sidebar-bg-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: var(--zfb-color-132);
+        flex-shrink: 0;
+    }
+
+    .zfb-field-chip:hover {
+        background: var(--zc-sidebar-hover);
+        color: var(--zc-primary);
+    }
+
+        .zfb-field-chip:hover .zfb-chip-icon {
+            background: var(--zc-primary-xlight);
+        }
+
+    .zfb-field-chip:active {
+        cursor: grabbing;
+    }
+
+.zfb-sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--zc-sidebar-border);
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   CENTER â€” TOPBAR + CANVAS
+   ============================================================ */
+.zfb-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.zfb-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--zfb-color-07);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--zc-border-color);
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.zfb-topbar-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.zfb-topbar-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--zc-text-primary);
+    margin: 0;
+    letter-spacing: -0.2px;
+}
+
+.zfb-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+.zfb-logo-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--zc-text-secondary);
+    white-space: nowrap;
+}
+
+.zfb-file-input {
+    width: 190px;
+    font-size: 12.5px;
+    border: 1px solid var(--zc-border-color);
+    border-radius: var(--zc-radius-sm);
+    padding: 5px 8px;
+    background: var(--zc-card-bg);
+}
+
+    .zfb-file-input::file-selector-button {
+        background: var(--zc-primary);
+        color: var(--zfb-color-03);
+        border: none;
+        border-radius: var(--zc-radius-sm);
+        padding: 5px 10px;
+        margin-right: 8px;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+.zfb-logo-preview {
+    max-height: 34px;
+    border-radius: var(--zc-radius-sm);
+    display: none;
+}
+
+.zfb-icon-btn-mini {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--zc-border-color);
+    background: var(--zfb-color-03);
+    color: var(--zc-danger);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.zfb-title-input {
+    width: 240px;
+}
+
+.zfb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: none;
+    border-radius: var(--zc-radius-sm);
+    padding: 9px 18px;
+    font-weight: 400;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    white-space: nowrap;
+}
+
+.zfb-btn-primary {
+    /* background: linear-gradient(135deg, var(--zfb-color-08) 0%, var(--zc-primary) 55%, var(--zfb-color-08) 100%); */
+    color: var(--zfb-color-06);
+    border: 1px solid var(--zfb-color-26);
+    background-color: var(--transition-fast);
+    overflow: hidden;
+    transition: all 0.2s ease-in;
+    position: relative;
+    z-index: 1;
+}
+
+    .zfb-btn-primary:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%) scaleY(1) scaleX(1.25);
+        top: 100%;
+        width: 140%;
+        height: 180%;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 50%;
+        display: block;
+        transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: -1;
+    }
+
+    .zfb-btn-primary:after {
+        content: "";
+        position: absolute;
+        left: 55%;
+        transform: translateX(-50%) scaleY(1) scaleX(1.45);
+        top: 180%;
+        width: 160%;
+        height: 190%;
+        background: linear-gradient(135deg, var(--zfb-color-08) 0%, var(--zc-primary) 55%, var(--zfb-color-08) 100%);
+        border-radius: 50%;
+        display: block;
+        transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: -1;
+    }
+
+    .zfb-btn-primary:hover {
+        color: #ffffff;
+        border: 1px solid var(--zfb-color-109);
+    }
+
+        .zfb-btn-primary:hover:before {
+            top: -35%;
+            background: linear-gradient(135deg, var(--zfb-color-08) 0%, var(--zc-primary) 55%, var(--zfb-color-08) 100%);
+            transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+
+        .zfb-btn-primary:hover:after {
+            top: -45%;
+            background: linear-gradient(135deg, var(--zfb-color-08) 0%, var(--zc-primary) 55%, var(--zfb-color-08) 100%);
+            transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+/* .zfb-btn-primary:hover {
+  box-shadow: 0 3px 5px var(--zfb-color-10);
+  transform: translateY(-1px);
+  color: var(--zfb-color-03);
+} */
+
+.zfb-btn-dark {
+    border: 1px solid var(--zfb-color-12);
+    overflow: hidden;
+    transition: all 0.2s ease-in;
+    position: relative;
+    z-index: 1;
+    color: var(--zfb-color-06);
+    background-color: var(--transition-fast);
+}
+
+
+    .zfb-btn-dark:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%) scaleY(1) scaleX(1.25);
+        top: 100%;
+        width: 140%;
+        height: 180%;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 50%;
+        display: block;
+        transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: -1;
+    }
+
+    .zfb-btn-dark:after {
+        content: "";
+        position: absolute;
+        left: 55%;
+        transform: translateX(-50%) scaleY(1) scaleX(1.45);
+        top: 180%;
+        width: 160%;
+        height: 190%;
+        background: var(--zfb-color-12);
+        border-radius: 50%;
+        display: block;
+        transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: -1;
+    }
+
+    .zfb-btn-dark:hover {
+        color: #ffffff;
+        border: 1px solid var(--zfb-color-109);
+    }
+
+        .zfb-btn-dark:hover:before {
+            top: -35%;
+            background: var(--zfb-color-12);
+            transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+
+        .zfb-btn-dark:hover:after {
+            top: -45%;
+            background: var(--zfb-color-12);
+            transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+/* .zfb-btn-dark:hover {
+  background: var(--zfb-color-12);
+  color: var(--zfb-color-03);
+  transform: translateY(-1px);
+} */
+
+.zfb-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--zc-border-color);
+    color: var(--zc-text-secondary);
+}
+
+    .zfb-btn-ghost:hover {
+        background: var(--zc-border-light);
+        color: var(--zc-text-primary);
+    }
+
+/* Canvas */
+.zfb-canvas-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px 60px;
+}
+
+.zfb-canvas {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--zc-card-bg);
+    border: 1px solid var(--zc-border-color);
+    border-radius: var(--zc-radius-xl);
+    box-shadow: 0 1px 3px var(--zfb-color-13), 0 8px 24px var(--zfb-color-13);
+    padding: 30px 32px;
+    min-height: 520px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0px !important;
+}
+
+.zfb-empty-hint {
+    color: var(--zc-text-muted);
+    text-align: center;
+    padding: 90px 0;
+    border: 2px dashed var(--zc-border-color);
+    border-radius: var(--zc-radius-sm);
+    flex: 0 0 100%;
+    font-size: 14px;
+}
+
+    .zfb-empty-hint .icon-panel-left {
+        display: block;
+        font-size: 26px;
+        margin-bottom: 10px;
+        color: var(--zfb-color-132);
+    }
+
+.zfb-field-item {
+    padding: 9px 9px 0px 9px;
+    border-radius: var(--zc-radius-sm);
+    background: var(--zfb-color-14);
+    border: 1px solid var(--zfb-color-03);
+    cursor: pointer;
+    position: relative;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+    .zfb-field-item:hover {
+        border-color: var(--zc-border-color);
+    }
+
+    .zfb-field-item.zfb-selected {
+        border-color: var(--zc-primary);
+        background: var(--zc-primary-xxlight);
+        box-shadow: 0 0 0 3px var(--zc-primary-xlight);
+    }
+
+    .zfb-field-item label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        color: var(--zc-text-primary);
+        font-size: 14px;
+    }
+
+    .zfb-field-item .zfb-preview-input {
+        pointer-events: none;
+        opacity: .65;
+    }
+
+    .zfb-field-item.zfb-width-half {
+        flex: 0 0 calc(50% - 7px);
+        max-width: calc(50% - 7px);
+    }
+
+    /* heading field */
+    .zfb-field-item.zfb-heading-item {
+        padding: 0;
+        overflow: hidden;
+    }
+
+        .zfb-field-item.zfb-heading-item .zfb-heading-section {
+            padding: 10px 16px 10px 16px;
+            border-radius: var(--zc-radius-sm);
+            position: relative;
+        }
+
+        .zfb-field-item.zfb-heading-item label {
+            margin-bottom: 0;
+        }
+
+.zfb-side-icons {
+    position: absolute;
+    top: 7px;
+    right: 10px;
+    display: none;
+    flex-direction: row;
+    gap: 6px;
+}
+
+.zfb-field-item.zfb-selected .zfb-side-icons,
+.zfb-field-item.zfb-heading-item.zfb-selected .zfb-side-icons {
+    display: flex !important;
+}
+
+.zfb-icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--zfb-color-03);
+    font-size: 12.5px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 4px var(--zfb-color-15);
+    transition: transform .15s ease, filter .15s ease;
+}
+
+    .zfb-icon-btn:hover {
+        transform: scale(1.1);
+        filter: brightness(1.08);
+    }
+
+.zfb-icon-delete {
+    background: var(--zc-danger);
+}
+
+/* logo banner in canvas */
+.zfb-canvas-logo-banner {
+    text-align: center;
+    padding: 10px 0 20px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--zc-border-light);
+    cursor: pointer;
+    border-radius: var(--zc-radius-sm);
+    transition: box-shadow var(--transition-fast);
+    flex: 0 0 100%;
+    display: none;
+}
+
+    .zfb-canvas-logo-banner:hover {
+        box-shadow: 0 0 0 2px var(--zc-primary-xlight);
+    }
+
+    .zfb-canvas-logo-banner.zfb-selected {
+        box-shadow: 0 0 0 3px var(--zc-primary-xlight);
+    }
+
+    .zfb-canvas-logo-banner img {
+        border-radius: var(--zc-radius-sm);
+    }
+
+/* submit button block */
+.zfb-canvas-submit {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 14px 0;
+    text-align: center;
+    /* border-top: 2px dashed var(--zc-border-color); */
+    margin-top: 8px;
+    cursor: grab;
+    /*  border-radius: var(--zc-radius-sm); */
+    position: relative;
+    transition: background var(--transition-fast);
+}
+
+    .zfb-canvas-submit .zfb-submit-btn {
+        border: none;
+        border-radius: var(--zc-radius-sm);
+        padding: 10px 28px;
+        font-weight: 700;
+        background: var(--zc-primary);
+        color: var(--zfb-color-03);
+        cursor: grab;
+        pointer-events: none;
+    }
+
+    .zfb-canvas-submit.zfb-selected {
+        border-color: var(--zc-primary);
+        background: var(--zc-primary-xxlight);
+        box-shadow: 0 0 0 3px var(--zc-primary-xlight);
+    }
+
+    .zfb-canvas-submit .zfb-side-icons {
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+    }
+
+    .zfb-canvas-submit.zfb-selected .zfb-side-icons {
+        display: flex !important;
+    }
+
+/* sortable drag ghost */
+.zfb-canvas .sortable-ghost {
+    opacity: 0.4;
+}
+
+.zfb-canvas .sortable-chosen {
+    box-shadow: 0 0 0 2px var(--zc-primary-light);
+}
+
+/* ============================================================
+   RIGHT â€” PROPERTIES SIDEBAR
+   ============================================================ */
+.zfb-props-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background: var(--zc-sidebar-bg);
+    border-left: 1px solid var(--zc-sidebar-border);
+    box-shadow: -1px 0 0 var(--zfb-color-16), -4px 0 24px var(--zfb-color-17);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.zfb-props-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--zc-sidebar-border);
+    flex-shrink: 0;
+}
+
+.zfb-props-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--zc-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zfb-props-close {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--zc-border-color);
+    background: var(--zfb-color-03);
+    color: var(--zc-text-secondary);
+    border-radius: var(--zc-radius-sm);
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .zfb-props-close:hover {
+        background: var(--zc-border-light);
+    }
+
+.zfb-props-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px 30px;
+}
+
+    .zfb-props-body .form-label {
+        font-size: 13px;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: var(--zfb-color-06);
+    }
+
+    .zfb-props-body .form-control,
+    .zfb-props-body .form-select,
+    .zfb-props-body textarea {
+        border-radius: var(--zc-radius-sm);
+        border: 1px solid var(--zc-border-color);
+        font-size: 13.5px;
+        padding: 8.4px .5rem;
+    }
+
+        .zfb-props-body .form-control[type="color"] {
+            padding: 3px;
+            height: 38px;
+        }
+
+.zfb-props-empty {
+    color: var(--zc-text-muted);
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 10px;
+}
+
+    .zfb-props-empty .icon-mouse-pointer-click {
+        display: block;
+        font-size: 22px;
+        margin-bottom: 8px;
+        color: var(--zc-sidebar-text-muted);
+    }
+
+
+
+.zfb-props-sidebar.zfb-props-dark .zfb-props-header {
+    border-bottom-color: var(--zfb-color-18);
+}
+
+/* .zfb-props-sidebar.zfb-props-dark .zfb-props-title {
+  color: var(--zc-on-dark-text);
+} */
+
+.zfb-props-sidebar.zfb-props-dark .form-label {
+    color: var(--zfb-color-06);
+}
+
+.zfb-props-sidebar.zfb-props-dark .zfb-props-body p,
+.zfb-props-sidebar.zfb-props-dark .text-muted {
+    color: var(--zc-on-dark-text-muted) !important;
+}
+
+.zfb-props-sidebar.zfb-props-dark .form-control,
+.zfb-props-sidebar.zfb-props-dark .form-select {
+    /* background: var(--zc-dark-surface-2);  */
+    border-color: var(--zfb-color-19);
+    color: var(--zfb-color-20);
+}
+
+.zfb-props-sidebar.zfb-props-dark .zfb-btn-ghost {
+    color: var(--zc-on-dark-text);
+    border-color: var(--zfb-color-21);
+}
+
+/* Gateway badge */
+.zfb-gateway-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--zc-sidebar-bg-2);
+    border-radius: var(--zc-radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--zc-text-primary);
+}
+
+.zfb-gateway-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--zc-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--zfb-color-03);
+    flex-shrink: 0;
+}
+
+/* Width toggle */
+.zfb-width-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.zfb-width-btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 6px;
+    border-radius: var(--zc-radius-sm);
+    border: 1px solid var(--zc-border-color);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--zfb-color-03);
+    color: var(--zc-text-secondary);
+}
+
+    .zfb-width-btn.active {
+        background: var(--zc-primary);
+        border-color: var(--zc-primary);
+        color: var(--zfb-color-03);
+    }
+
+.zfb-props-dark .zfb-width-btn {
+    background: var(--zc-dark-surface-2);
+    border-color: var(--zfb-color-22);
+    color: var(--zc-on-dark-text);
+}
+
+    .zfb-props-dark .zfb-width-btn.active {
+        background: var(--zc-secondary);
+        border-color: var(--zc-secondary);
+    }
+
+/* Align button group (logo) */
+.zfb-align-group {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.zfb-align-btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 6px;
+    border-radius: var(--zc-radius-sm);
+    border: 1px solid var(--zfb-color-22);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: var(--zfb-color-23) !important;
+    color: var(--zfb-color-24) !important;
+}
+
+    .zfb-align-btn.active {
+        background: var(--zc-secondary) !important;
+        border-color: var(--zc-secondary);
+        color: var(--zfb-color-03) !important;
+    }
+
+/* field label alignment toggle (captcha etc) */
+.zfb-fieldalign-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.zfb-fieldalign-btn {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 7px 4px;
+    border-radius: var(--zc-radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zc-sidebar-text);
+    background: var(--zc-sidebar-bg-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+    .zfb-fieldalign-btn.active {
+        background: var(--zc-primary);
+        color: var(--zfb-color-03);
+    }
+
+/* Captcha type swatches */
+.zfb-captcha-swatch {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 10px 4px;
+    border: 2px solid var(--zc-border-color);
+    border-radius: var(--zc-radius-sm);
+    cursor: pointer;
+    background: var(--zfb-color-03);
+    color: var(--zc-text-secondary);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+    .zfb-captcha-swatch.active {
+        border-color: var(--zc-primary);
+        background: var(--zc-primary-xxlight);
+        color: var(--zc-primary);
+    }
+
+/* ============================================================
+   FORM DESIGNER PANEL (right sidebar, dark, tabs)
+   ============================================================ */
+.zfb-design-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: var(--zfb-color-25);
+    border-radius: var(--zc-radius-sm);
+    padding: 4px;
+}
+
+
+
+.zfb-design-tab.active {
+    background: var(--zfb-color-26);
+    color: var(--zfb-color-03);
+}
+
+.zfb-scheme-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.zfb-scheme-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--zfb-color-21);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .15s ease, transform .1s ease;
+}
+
+    .zfb-scheme-swatch span {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: block;
+    }
+
+    .zfb-scheme-swatch:hover {
+        transform: scale(1.08);
+    }
+
+    .zfb-scheme-swatch.active {
+        border-color: var(--zc-secondary);
+        box-shadow: 0 0 0 2px var(--zfb-color-27);
+    }
+
+.zfb-theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.zfb-theme-card {
+    border: 2px solid var(--zfb-color-28);
+    border-radius: var(--zc-radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+    .zfb-theme-card:hover {
+        border-color: var(--zfb-color-29);
+    }
+
+    .zfb-theme-card.active {
+        border-color: var(--zc-secondary);
+        box-shadow: 0 0 0 2px var(--zfb-color-27);
+    }
+
+.zfb-theme-thumb {
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+}
+
+.zfb-theme-thumb-card {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--zc-radius-xs);
+    padding: 8px 6px;
+    box-shadow: 0 1px 4px var(--zfb-color-30);
+}
+
+    .zfb-theme-thumb-card span {
+        display: block;
+        height: 4px;
+        border-radius: 2px;
+        margin-bottom: 4px;
+        opacity: .8;
+    }
+
+.zfb-theme-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    padding: 5px 4px;
+    color: var(--zc-text-primary);
+    background: var(--zfb-color-03);
+}
+
+.zfb-btnstyle-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.zfb-btnstyle-tab {
+    padding: 5px 10px;
+    border-radius: var(--zc-radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zc-on-dark-text-muted);
+    background: var(--zfb-color-25);
+}
+
+    .zfb-btnstyle-tab.active {
+        background: var(--zc-secondary);
+        color: var(--zfb-color-03);
+    }
+
+.zfb-btnstyle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.zfb-btnstyle-swatch {
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: var(--zc-radius-sm);
+    color: var(--zfb-color-03);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+    .zfb-btnstyle-swatch.active {
+        border-color: var(--zfb-color-03);
+        box-shadow: 0 0 0 2px var(--zc-secondary);
+    }
+
+/* Product rows (payment field) */
+.zfb-product-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+/* Responsive: collapse side columns on small screens */
+@media (max-width: 1100px) {
+    .zfb-props-sidebar {
+        width: 260px;
+    }
+}
+
+@media (max-width: 900px) {
+    .zfb-app {
+        flex-direction: column;
+    }
+
+    .zfb-palette-sidebar, .zfb-props-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border: none;
+        border-bottom: 1px solid var(--zc-sidebar-border);
+    }
+}
+
+/* ================================================================
+   UPDATED ZFB LAYOUT â€” FULL WIDTH TOP BAR + RIGHT CUSTOMIZE PANEL
+   ================================================================ */
+.zfb-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.zfb-topbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    flex: 0 0 auto;
+    z-index: 100;
+    box-sizing: border-box;
+    padding: 10px 18px;
+    background: var(--zfb-color-31);
+    border-bottom: 1px solid var(--zc-border-color);
+    box-shadow: 0 1px 8px var(--zfb-color-32);
+}
+
+.zfb-topbar-row {
+    width: 100%;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.zfb-topbar-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+
+
+.zfb-logo-label {
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+
+
+.zfb-file-input::file-selector-button {
+    padding: 4px 8px;
+    margin-right: 5px;
+    font-size: 10.5px;
+}
+
+.zfb-title-input {
+    width: 190px;
+    height: 32px;
+    min-height: 32px;
+    padding: 5px 9px;
+    font-size: 12px;
+    flex: 0 0 auto;
+}
+
+.zfb-btn {
+    min-height: 32px;
+    padding: 6px 11px;
+    gap: 5px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+    .zfb-btn i {
+        font-size: 13px;
+    }
+
+.zfb-btn-customize {
+    background: var(--zfb-color-03);
+    color: var(--zc-text-primary);
+    border: 1px solid var(--zfb-color-109);
+}
+
+/* .zfb-btn-customize:hover,
+.zfb-btn-customize.active {
+  background: var(--zc-primary-xlight);
+  color: var(--zc-primary);
+  border-color: var(--zc-primary-light);
+} */
+
+.zfb-workspace {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: var(--zc-sidebar-width) minmax(0, 1fr) 0px;
+    overflow: hidden;
+}
+
+    .zfb-workspace.zfb-props-open {
+        grid-template-columns: var(--zc-sidebar-width) minmax(0, 1fr) 300px;
+    }
+
+    .zfb-workspace .zfb-palette-sidebar {
+        width: auto;
+        height: calc(100vh - 61px);
+        min-height: 0;
+        position: sticky;
+        top: 61px;
+    }
+
+.zfb-main {
+    min-width: 0;
+    width: auto;
+    height: calc(100vh - 61px);
+}
+
+.zfb-props-sidebar {
+    width: 0;
+    min-width: 0;
+    height: calc(100vh - 61px);
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    transition: width .22s ease, opacity .18s ease, visibility 0s linear .22s;
+}
+
+    .zfb-props-sidebar.zfb-props-visible {
+        width: 300px;
+        opacity: 1;
+        visibility: visible;
+        transition: width .22s ease, opacity .18s ease, visibility 0s linear 0s;
+    }
+
+.zfb-canvas-scroll {
+    padding: 15px 24px 45px;
+}
+
+@media (max-width: 1100px) {
+    .zfb-workspace.zfb-props-open {
+        grid-template-columns: 220px minmax(0, 1fr) 280px;
+    }
+
+    .zfb-props-sidebar.zfb-props-visible {
+        width: 280px;
+    }
+
+    .zfb-file-input {
+        width: 125px;
+    }
+
+    .zfb-title-input {
+        width: 165px;
+    }
+}
+
+@media (max-width: 900px) {
+    .zfb-topbar {
+        padding: 8px 12px;
+    }
+
+    .zfb-topbar-actions {
+        overflow-x: auto;
+        padding-bottom: 2px;
+    }
+
+    .zfb-workspace,
+    .zfb-workspace.zfb-props-open {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+        .zfb-workspace .zfb-palette-sidebar,
+        .zfb-main,
+        .zfb-props-sidebar,
+        .zfb-props-sidebar.zfb-props-visible {
+            width: 100%;
+            height: auto;
+            min-height: 0;
+            position: relative;
+        }
+
+    .zfb-props-sidebar {
+        display: none;
+    }
+
+        .zfb-props-sidebar.zfb-props-visible {
+            display: flex;
+        }
+}
+
+.zfb-brand-text img {
+    width: 100%;
+    height: 40px;
+}
+/* ================================================================
+   FINAL TOP NAV + FORM PREVIEW
+   ================================================================ */
+.zfb-topbar {
+    padding: 8px 24px;
+    min-height: 60px;
+    background: var(--zfb-color-33);
+}
+
+.zfb-topbar-row {
+    min-height: 44px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: nowrap;
+}
+
+.zfb-topbar-left {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    flex: 1 1 auto;
+}
+
+.zfb-back-link {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: inline-flex;
+    padding: 16px 20px 16px 20px;
+    align-items: center;
+    justify-content: center;
+    color: var(--zc-text-secondary);
+    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    /* 
+  border: 1px solid #e5e7eb !important; */
+}
+
+    .zfb-back-link:hover {
+        background: var(--zfb-color-34);
+        color: var(--zfb-color-35);
+        /* border: 1px solid red !important; */
+    }
+
+.zfb-header-brand {
+    flex: 0 0 auto;
+    margin-right: 12px;
+}
+
+    .zfb-header-brand .zfb-brand-text img {
+        width: 100%;
+        height: 42px;
+        object-fit: contain;
+        display: block;
+    }
+
+.zfb-title-input {
+    width: 238px;
+    height: 34px;
+    flex: 0 0 238px;
+    font-size: 12.5px;
+    padding: 6px 10px;
+}
+
+.zfb-logo-field {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 18px 10px;
+}
+
+    .zfb-logo-field .zfb-logo-label {
+        flex: 0 0 100%;
+        font-size: 12px;
+        color: var(--zfb-color-06);
+    }
+
+    .zfb-logo-field .zfb-file-input {
+        width: auto;
+        max-width: 160px;
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 34px;
+        font-size: 10.5px;
+        padding: 5px 6px;
+    }
+
+        .zfb-logo-field .zfb-file-input::file-selector-button {
+            padding: 4px 8px;
+            margin-right: 4px;
+            font-size: 10px;
+        }
+
+    .zfb-logo-field .zfb-logo-preview,
+    .zfb-logo-field .zfb-icon-btn-mini {
+        flex-shrink: 0;
+    }
+
+.zfb-topbar-actions {
+    flex: 0 0 auto;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.zfb-btn {
+    /* min-height: 38px; */
+    padding: 6px 9px;
+    gap: 5px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+    .zfb-btn i {
+        font-size: 12.5px;
+    }
+
+.zfb-btn-preview {
+    background: var(--zfb-color-03);
+    color: var(--zfb-color-06);
+    border: 1px solid var(--zfb-color-19);
+}
+
+    .zfb-btn-preview:hover {
+        background: var(--zfb-color-36);
+        border-color: var(--zfb-color-36);
+        /* color: rgb(242 242 242); */
+        color: var(--zfb-color-03);
+    }
+
+/* Preview modal */
+.zfb-preview-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+}
+
+    .zfb-preview-modal.is-open {
+        display: flex;
+    }
+
+.zfb-preview-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--zfb-color-37);
+    backdrop-filter: blur(3px);
+}
+
+.zfb-preview-dialog {
+    position: relative;
+    width: min(860px, 94vw);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--zfb-color-03);
+    border: 1px solid var(--zc-border-color);
+    border-radius: 12px;
+    box-shadow: 0 24px 70px var(--zfb-color-38);
+    overflow: hidden;
+}
+
+.zfb-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--zc-border-color);
+}
+
+.zfb-preview-eyebrow {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--zc-primary);
+}
+
+.zfb-preview-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.zfb-preview-close {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--zc-border-color);
+    border-radius: 7px;
+    background: var(--zfb-color-03);
+    color: var(--zc-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+    .zfb-preview-close:hover {
+        background: var(--zfb-color-39);
+        color: var(--zc-text-primary);
+    }
+
+.zfb-preview-body {
+    overflow: auto;
+    padding: 28px;
+    background: var(--zfb-color-40);
+}
+
+.zfb-preview-form-shell {
+    width: min(680px, 100%);
+    margin: 0 auto;
+    padding: 28px;
+    background: var(--zfb-color-03);
+    border: 1px solid var(--zc-border-color);
+    border-radius: 10px;
+}
+
+    .zfb-preview-form-shell .zfb-canvas-logo-banner {
+        margin-bottom: 18px;
+    }
+
+    .zfb-preview-form-shell .zfb-field-item,
+    .zfb-preview-form-shell .zfb-canvas-submit {
+        cursor: default !important;
+    }
+
+    .zfb-preview-form-shell .zfb-side-icons,
+    .zfb-preview-form-shell .zfb-field-actions,
+    .zfb-preview-form-shell .zfb-field-drag-handle,
+    .zfb-preview-form-shell .zfb-field-delete,
+    .zfb-preview-form-shell .zfb-selected {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .zfb-preview-form-shell .zfb-side-icons,
+    .zfb-preview-form-shell .zfb-field-actions {
+        display: none !important;
+    }
+
+@media (max-width: 1100px) {
+    .zfb-topbar {
+        padding: 8px 14px;
+    }
+
+    .zfb-topbar-row {
+        gap: 12px;
+    }
+
+    .zfb-title-input {
+        width: 180px;
+        flex-basis: 180px;
+    }
+
+    .zfb-file-input {
+        width: 125px;
+    }
+
+    .zfb-header-brand {
+        margin-right: 4px;
+    }
+}
+
+@media (max-width: 900px) {
+    .zfb-topbar-row {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .zfb-topbar-left {
+        flex: 0 0 auto;
+    }
+
+    .zfb-topbar-actions {
+        margin-left: auto;
+    }
+}
+
+.zfb-field-search {
+    position: relative;
+    margin: 0px 0px 4px;
+}
+
+    .zfb-field-search input {
+        width: 100%;
+        height: 38px;
+        padding: 0 38px 0 36px;
+        border: 1px solid var(--zfb-color-41);
+        /* border-radius: 7px; */
+        background: var(--zfb-color-03);
+        color: var(--zfb-color-42);
+        font-size: 13px;
+        outline: none;
+    }
+
+    .zfb-field-search .zfb-search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 15px;
+        color: var(--zfb-color-43);
+        pointer-events: none;
+    }
+
+.zfb-search-clear {
+    display: none;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border: 0;
+    background: transparent;
+    color: var(--zfb-color-43);
+    padding: 0;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+    .zfb-search-clear:hover {
+        color: var(--zfb-color-44);
+    }
+
+    .zfb-search-clear .icon-x {
+        font-size: 14px;
+    }
+
+.zfb-design-tab {
+    flex: 1;
+    text-align: center;
+    padding: 5px 8px;
+    border-radius: var(--zc-radius-sm);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zc-on-dark-text-muted);
+}
+
+.zfb-design-tab {
+    border: 1px solid var(--zfb-color-26);
+    color: var(--zfb-color-24);
+}
+
+.zfb-design-tab {
+    border: 1px solid var(--zfb-color-26);
+    color: var(--zfb-color-24);
+}
+
+.zfb-field-item {
+    position: relative;
+    /* border: none !important; */
+    background: transparent;
+    box-shadow: none !important;
+}
+
+    .zfb-field-item.zfb-selected {
+        /* border: none !important; */
+        background: transparent;
+        box-shadow: none !important;
+    }
+
+.zfb-icon-edit {
+    background: var(--zfb-color-45) !important;
+    color: var(--zfb-color-03) !important;
+}
+/* ----------------------- */
+/* ============================================================
+   RIGHT SIDE PROPERTIES PANEL
+   ============================================================ */
+
+.zfb-workspace {
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* FIX: this made #fbPropsPanel an absolutely-positioned slide-in drawer
+   (position:absolute + transform:translateX), competing with the grid
+   column layout that .zfb-workspace / .zfb-props-sidebar already use to
+   show the panel. Because an ID selector always outranks the .zfb-*
+   classes, this quietly took the panel out of normal grid flow while the
+   grid still reserved space for it â€” that reserved-but-empty column is
+   the gap seen when opening Field Properties / Form Designer.
+   Nothing in the app ever toggled .zfb-props-visible on this ID, so this
+   block was dead weight fighting the layout underneath it. Removed;
+   .zfb-props-sidebar's own width/opacity transition (further up this
+   file) is what actually shows/hides the panel. */
+#fbPropsPanel {
+    overflow-y: auto;
+}
+
+
+
+
+
+/* Keep smooth canvas resize */
+.zfb-workspace {
+    transition: padding-right 0.3s ease;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    #fbPropsPanel {
+        width: 320px;
+        max-width: 90vw;
+    }
+
+    .zfb-workspace.zfb-props-open {
+        padding-right: 0;
+    }
+}
+/* =========================================================
+   ZFB FLOATING OUTLINE INPUT STYLE
+   ========================================================= */
+
+.zfb-floating-field {
+    position: relative;
+    width: 100%;
+    margin: 8px 0 8px;
+}
+
+    .zfb-floating-field .zfb-preview-input {
+        width: 100%;
+        padding: 16px 16px 10px;
+        border: 1px solid var(--zfb-color-46);
+        border-radius: 8px;
+        background: var(--zfb-color-47);
+        color: var(--zfb-color-48);
+        font-size: 14px;
+        outline: none;
+        box-shadow: none;
+    }
+
+        .zfb-floating-field .zfb-preview-input::placeholder {
+            color: var(--zfb-color-49);
+            opacity: 1;
+        }
+
+.zfb-floating-label {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    padding: 0 6px;
+    background: var(--zfb-color-47);
+    color: var(--zfb-color-50);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 16px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Required star */
+.zfb-required {
+    color: var(--zfb-color-51);
+}
+
+/* Focus */
+.zfb-floating-field .zfb-preview-input:focus {
+    border-color: var(--zfb-color-52);
+    box-shadow: 0 0 0 2px var(--zfb-color-53);
+}
+
+/* Disabled editor inputs should still look normal */
+.zfb-floating-field .zfb-preview-input:disabled {
+    opacity: 1;
+    background: var(--zfb-color-47);
+    cursor: default;
+}
+
+/* =========================================================
+   FULL NAME
+   ========================================================= */
+
+.zfb-fullname-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+    .zfb-fullname-row .zfb-floating-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.zfb-floating-textarea .zfb-preview-input {
+    min-height: 110px;
+    height: 110px;
+    resize: vertical;
+    padding-top: 18px;
+}
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.zfb-floating-field select.zfb-preview-input {
+    appearance: auto;
+    padding-top: 17px;
+    padding-bottom: 10px;
+}
+
+/* =========================================================
+   ADDRESS
+   ========================================================= */
+
+.zfb-address-fields {
+    width: 100%;
+}
+
+.zfb-address-row {
+    display: flex;
+    gap: 12px;
+}
+
+    .zfb-address-row .zfb-floating-field {
+        flex: 1;
+    }
+
+/* =========================================================
+   DATE / TIME / DATETIME
+   ========================================================= */
+
+.zfb-floating-field input[type="date"],
+.zfb-floating-field input[type="time"],
+.zfb-floating-field input[type="datetime-local"] {
+    padding-top: 17px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .zfb-fullname-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .zfb-address-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+.zfb-field-item > label {
+    display: none !important;
+}
+
+/* =========================================
+   FORM TITLE - TEXT MODE
+========================================= */
+
+.zfb-title-editor {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* margin-left: 139px; */
+    justify-content: center;
+}
+
+.zfb-title-text {
+    display: flex;
+    padding: 6px 12px;
+    font-size: 18px;
+    justify-content: flex-start;
+    align-items:center;
+    border-radius: 4px;
+    width: 100%;
+    height: 32px;
+    align-items: center;
+    min-width: 540px;
+    max-width: 540px;
+    margin: 6px 144px 6px;
+    overflow: scroll;
+    font-weight: 500;
+    color: #000000;
+    cursor: text;
+    overflow: scroll;
+    white-space: nowrap;
+    border: 1px solid #dfdfdf;
+}
+
+/* =========================================
+   FORM TITLE - INPUT MODE
+========================================= */
+
+.zfb-title-input {
+ display: none;
+    width: 100%;
+    min-width: 540px;
+    height: 42px;
+    /* padding: 8px 12px; */
+    border: 1px solid var(--zfb-color-55);
+    border-radius: 8px;
+    background: var(--zfb-color-03);
+    color: var(--zfb-color-54);
+    font-family: Inter, sans-serif;
+    font-size: 15px;
+    outline: none;
+    box-sizing: border-box;
+    margin: 6px 0px 6px;
+}
+
+/* When editing */
+.zfb-title-editor.editing .zfb-title-text {
+    display: none;
+}
+
+.zfb-title-editor.editing .zfb-title-input {
+    display: block;
+}
+
+.zfb-title-input:focus {
+    border-color: var(--zfb-color-56);
+    box-shadow: 0 0 0 2px var(--zfb-color-57);
+}
+/* ==========================================
+   PREVIEW - KEEP FORM FIELD GRID
+   ========================================== */
+
+.zfb-preview-modal .zfb-canvas,
+.zfb-preview-modal #previewCanvas {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Keep the same field grid in Preview */
+.zfb-preview-modal .zfb-field-item {
+    box-sizing: border-box;
+}
+
+    /* Two-column fields */
+    .zfb-preview-modal .zfb-field-item[data-width="50"],
+    .zfb-preview-modal .zfb-field-item.zfb-col-6 {
+        width: 50% !important;
+    }
+
+    /* Full-width fields */
+    .zfb-preview-modal .zfb-field-item[data-width="100"],
+    .zfb-preview-modal .zfb-field-item.zfb-col-12 {
+        width: 100% !important;
+    }
+
+    /* Three-column fields */
+    .zfb-preview-modal .zfb-field-item[data-width="33"],
+    .zfb-preview-modal .zfb-field-item.zfb-col-4 {
+        width: 33.333333% !important;
+    }
+
+/* Preview field container */
+.zfb-preview-modal .zfb-form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+    /* Prevent preview from forcing every field to full width */
+    .zfb-preview-modal .zfb-form-grid > .zfb-field-item {
+        flex: 0 0 auto;
+    }
+
+/* Mobile Preview */
+@media (max-width: 700px) {
+    .zfb-preview-modal .zfb-field-item[data-width="50"],
+    .zfb-preview-modal .zfb-field-item.zfb-col-6,
+    .zfb-preview-modal .zfb-field-item[data-width="33"],
+    .zfb-preview-modal .zfb-field-item.zfb-col-4 {
+        width: 100% !important;
+    }
+}
+
+.reset-btn {
+    display: block;
+    height: 40px;
+}
+
+.aws-formlist-nav-btn {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 13px;
+    border: 1px solid var(--zfb-color-58);
+    border-radius: 7px;
+    background: var(--zfb-color-47);
+    color: var(--zfb-color-44);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .aws-formlist-nav-btn:hover {
+        background: var(--zfb-color-59);
+        border-color: var(--zfb-color-60);
+        color: var(--zfb-color-60);
+    }
+
+    .aws-formlist-nav-btn i {
+        font-size: 15px;
+    }
+
+@media (max-width: 575px) {
+    .aws-formlist-nav-btn {
+        padding: 0 10px;
+    }
+
+        .aws-formlist-nav-btn span {
+            display: none;
+        }
+}
+
+.zfb-btn-customize {
+    border-radius: .25rem;
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: 400;
+    padding-left: 12px;
+    padding-right: 12px;
+    color: var(--zfb-color-06);
+    /* height: 38px; */
+    font-size: 0.7rem;
+    line-height: 14px;
+    letter-spacing: 1.2px;
+    background-color: transparent;
+    /* background-image: linear-gradient(90deg, var(--zfb-color-61), var(--zfb-color-62)); */
+    border: 1px solid var(--zfb-color-109);
+    overflow: hidden;
+    transition: all 0.2s ease-in;
+    position: relative;
+    z-index: 1;
+}
+
+    .zfb-btn-customize:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%) scaleY(1) scaleX(1.25);
+        top: 100%;
+        width: 140%;
+        height: 180%;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 50%;
+        display: block;
+        transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: -1;
+    }
+
+    .zfb-btn-customize:after {
+        content: "";
+        position: absolute;
+        left: 55%;
+        transform: translateX(-50%) scaleY(1) scaleX(1.45);
+        top: 180%;
+        width: 160%;
+        height: 190%;
+        background-color: var(--zfb-color-109);
+        border-radius: 50%;
+        display: block;
+        transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+        z-index: -1;
+    }
+
+    .zfb-btn-customize:hover {
+        color: #ffffff;
+        border: 1px solid var(--zfb-color-109);
+    }
+
+        .zfb-btn-customize:hover:before {
+            top: -35%;
+            background-color: var(--zfb-color-109);
+            transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+
+        .zfb-btn-customize:hover:after {
+            top: -45%;
+            background-color: var(--zfb-color-109);
+            transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+        }
+/* 
+.zfb-btn-customize:hover {
+  cursor: pointer;
+  transition: all .3s ease-in;
+   padding-left: 12px;
+  padding-right: 12px;
+  background-image: linear-gradient(90deg, var(--zfb-color-62), var(--zfb-color-61));
+} */
+/* =========================================
+   Thank You Page Button
+   ========================================= */
+
+.aws-formlist-nav-btn.thank-you-btn {
+    --thankyou-clr: var(--zfb-color-08);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    /* justify-content: center; */
+    gap: 0;
+    height: 32px;
+    /* min-width: 190px; */
+    padding: 0;
+    border: 1px solid var(--zfb-color-64);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--zfb-color-47);
+    color: var(--zfb-color-65);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 5px 10px var(--zfb-color-57);
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+    /* Purple hover background */
+    .aws-formlist-nav-btn.thank-you-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--zfb-color-08);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+
+    /* Icon area */
+    .aws-formlist-nav-btn.thank-you-btn i {
+        width: 34px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--zfb-color-08);
+        color: var(--zfb-color-47);
+        font-size: 13px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Text */
+    .aws-formlist-nav-btn.thank-you-btn span {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 6px 9px;
+        white-space: nowrap;
+        color: var(--zfb-color-65);
+        transition: color 0.25s ease;
+    }
+
+    /* Hover */
+    .aws-formlist-nav-btn.thank-you-btn:hover {
+        /* border-color: var(--thankyou-clr); */
+        background: var(--zfb-color-08);
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+        .aws-formlist-nav-btn.thank-you-btn:hover::before {
+            transform: translateX(0);
+        }
+
+        .aws-formlist-nav-btn.thank-you-btn:hover span {
+            color: var(--zfb-color-47);
+        }
+
+        /* Keep icon visible on hover */
+        .aws-formlist-nav-btn.thank-you-btn:hover i {
+            background: var(--zfb-color-66);
+            color: var(--zfb-color-47);
+        }
+
+    /* Click */
+    .aws-formlist-nav-btn.thank-you-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 10px var(--zfb-color-67);
+    }
+
+    /* Focus */
+    .aws-formlist-nav-btn.thank-you-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--zfb-color-68), 0 5px 15px var(--zfb-color-57);
+    }
+
+
+/* =========================================
+   Responsive
+   ========================================= */
+
+@media (max-width: 768px) {
+    .aws-formlist-nav-btn.thank-you-btn {
+        min-width: 170px;
+        height: 44px;
+    }
+
+        .aws-formlist-nav-btn.thank-you-btn i {
+            width: 44px;
+            height: 42px;
+            font-size: 17px;
+        }
+
+        .aws-formlist-nav-btn.thank-you-btn span {
+            padding-left: 10px;
+            padding-right: 14px;
+            font-size: 13px;
+        }
+}
+
+
+
+/* Back to List Button */
+.aws-formlist-btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 39px;
+    height: 39px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 2px 2px 10px var(--zfb-color-69);
+    background-color: var(--zfb-color-132);
+    color: var(--zfb-color-03);
+    padding: 0;
+}
+
+    /* Arrow */
+    .aws-formlist-btn-back .sign {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        /* padding-left: 4px; */
+    }
+
+        .aws-formlist-btn-back .sign i {
+            font-size: 18px;
+            color: var(--zfb-color-03);
+        }
+
+    /* Text */
+    .aws-formlist-btn-back .text {
+        width: 0;
+        opacity: 0;
+        white-space: nowrap;
+        color: var(--zfb-color-03);
+        font-size: 13px;
+        font-weight: 600;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    /* Hover */
+    .aws-formlist-btn-back:hover {
+        /* width: 126px; */
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        box-shadow: 2px 2px 10px var(--zfb-color-69);
+        background-color: var(--zfb-color-123);
+    }
+
+        .aws-formlist-btn-back:hover .sign {
+            width: 42px;
+            min-width: 42px;
+            justify-content: center;
+        }
+
+        .aws-formlist-btn-back:hover .text {
+            width: auto;
+            opacity: 1;
+            margin-left: 0;
+            padding-right: 15px;
+        }
+
+    /* Click */
+    .aws-formlist-btn-back:active {
+        transform: translate(2px, 2px);
+    }
+
+.aws-formlist-btn-back {
+    gap: 0;
+}
+
+.fb-logo-inline .form-control[type="file"] {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--zfb-color-71);
+    font-size: 13px;
+}
+
+    .fb-logo-inline .form-control[type="file"]::file-selector-button {
+        background: var(--zfb-color-52);
+        color: var(--zfb-color-03);
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        margin-right: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .fb-logo-inline .form-control[type="file"]::file-selector-button:hover {
+            background: var(--zfb-color-72);
+        }
+
+body {
+    background: var(--zfb-color-23);
+}
+
+.fb-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    /* padding-top: 2px; */
+}
+
+.fb-palette h6, .fb-props h6 {
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.fb-palette h6 {
+    color: var(--zfb-color-73);
+}
+
+/* Tabs at the top of the left palette: Labels vs Payments */
+.fb-palette-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+    background: var(--zfb-color-74);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.fb-palette-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zfb-color-73);
+    user-select: none;
+}
+
+
+
+
+
+/* âœ… CHANGED â€” canvas now owns its own scrollbar (capped to viewport height)
+               so dragging/building a long form scrolls just this middle panel. */
+.fb-canvas {
+    flex: 1;
+    background: var(--zfb-color-03);
+    border-radius: 10px;
+    padding: 25px 30px;
+    min-height: 500px;
+    max-height: calc(100vh - 168px);
+    overflow-y: auto;
+    box-shadow: 0 2px 12px var(--zfb-color-75);
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 14px;
+}
+
+
+
+.fb-field-type:active {
+    cursor: grabbing;
+}
+
+.fb-canvas-item {
+    padding: 16px 60px 16px 16px;
+    margin-bottom: 0;
+    border-radius: 8px;
+    background: var(--zfb-color-76);
+    border: 1px solid var(--zfb-color-77);
+    cursor: pointer;
+    position: relative;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+    .fb-canvas-item:hover {
+        border-color: var(--zfb-color-71);
+    }
+
+    .fb-canvas-item.selected {
+        border-color: var(--zfb-color-52);
+        background: var(--zfb-color-78);
+        box-shadow: 0 0 0 3px var(--zfb-color-79);
+    }
+
+    .fb-canvas-item label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        color: var(--zfb-color-80);
+    }
+
+    .fb-canvas-item .fb-preview-input {
+        pointer-events: none;
+        opacity: .65;
+    }
+
+    /* Heading field renders as a full-bleed colored section inside the card */
+    .fb-canvas-item.fb-heading-item {
+        padding: 0;
+        overflow: hidden;
+    }
+
+        .fb-canvas-item.fb-heading-item .fb-heading-section {
+            padding: 16px 60px 16px 16px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .fb-canvas-item.fb-heading-item label {
+            margin-bottom: 0;
+        }
+
+        /* âœ… FIXED: Heading delete icon now visible */
+        .fb-canvas-item.fb-heading-item .fb-side-icons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            flex-direction: row;
+            gap: 6px;
+        }
+
+        .fb-canvas-item.fb-heading-item.selected .fb-side-icons {
+            display: flex !important;
+        }
+
+.fb-side-icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+    flex-direction: row;
+    gap: 6px;
+}
+
+.fb-canvas-item.selected .fb-side-icons {
+    display: flex !important;
+}
+
+.fb-canvas-item:not(.selected) .fb-side-icons {
+    display: none !important;
+}
+
+.fb-icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--zfb-color-03);
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 4px var(--zfb-color-15);
+    transition: transform 0.15s ease;
+}
+
+    .fb-icon-btn:hover {
+        transform: scale(1.1);
+    }
+
+.fb-icon-settings {
+    background: var(--zfb-color-81);
+}
+
+.fb-icon-delete {
+    background: var(--zfb-color-82);
+}
+
+.fb-icon-paint {
+    background: var(--zfb-color-52);
+}
+
+.fb-icon-btn:hover {
+    filter: brightness(1.1);
+}
+
+.fb-empty-hint {
+    color: var(--zfb-color-83);
+    text-align: center;
+    padding: 80px 0;
+    border: 2px dashed var(--zfb-color-84);
+    border-radius: 8px;
+    flex: 0 0 100%;
+}
+
+.fb-props .form-label {
+    font-size: 13px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.fb-props .form-control, .fb-props textarea {
+    border-radius: 6px;
+}
+
+    .fb-props .form-control[type="color"] {
+        padding: 3px;
+        height: 38px;
+    }
+
+/* Payment gateway badge shown at the top of the Payment field's properties panel */
+.fb-gateway-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--zfb-color-23);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    color: var(--zfb-color-80);
+}
+
+    .fb-gateway-badge .fb-gateway-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: var(--zfb-color-03);
+        flex-shrink: 0;
+    }
+
+.fb-toolbar {
+    margin-bottom: 18px;
+}
+
+.fb-title-input {
+    border-radius: 8px;
+}
+
+.btn-save-form {
+    background: var(--zfb-color-52);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 22px;
+    font-weight: 600;
+    color: var(--zfb-color-03);
+}
+
+    .btn-save-form:hover {
+        background: var(--zfb-color-72);
+        color: var(--zfb-color-03);
+    }
+
+.fb-logo-box {
+    background: var(--zfb-color-03);
+    border: 1px solid var(--zfb-color-84);
+    border-radius: 10px;
+    padding: 16px;
+    max-width: 420px;
+    margin-bottom: 20px;
+}
+
+    .fb-logo-box label {
+        font-weight: 700;
+        color: var(--zfb-color-80);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+/* Live logo banner shown at the top of the canvas, mirrors RenderForm.cshtml's .form-logo-wrap */
+.fb-canvas-logo-banner {
+    text-align: center;
+    padding: 10px 0 20px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--zfb-color-77);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: box-shadow .15s ease;
+    flex: 0 0 100%;
+}
+
+    .fb-canvas-logo-banner:hover {
+        box-shadow: 0 0 0 2px var(--zfb-color-85);
+    }
+
+    .fb-canvas-logo-banner.selected {
+        box-shadow: 0 0 0 3px var(--zfb-color-86);
+    }
+
+    .fb-canvas-logo-banner img {
+        border-radius: 8px;
+    }
+
+/* ===================== FORM DESIGNER PANEL ===================== */
+.fb-props-header {
+    border-bottom: 1px solid var(--zfb-color-84);
+    padding-bottom: 10px;
+    margin-bottom: 12px !important;
+}
+
+.btn-design-toggle {
+    background: var(--zfb-color-81);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-weight: 600;
+    color: var(--zfb-color-03);
+}
+
+    .btn-design-toggle:hover {
+        background: var(--zfb-color-74);
+        color: var(--zfb-color-03);
+    }
+
+.fb-design-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.fb-design-tab {
+    flex: 1;
+    text-align: center;
+    padding: 7px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zfb-color-87);
+    user-select: none;
+}
+
+    .fb-design-tab.active {
+        background: var(--zfb-color-26);
+        color: var(--zfb-color-03) !IMPORTANT;
+    }
+
+.fb-scheme-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.fb-scheme-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--zfb-color-84);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .15s ease, transform .1s ease;
+}
+
+    .fb-scheme-swatch span {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: block;
+    }
+
+    .fb-scheme-swatch:hover {
+        transform: scale(1.08);
+    }
+
+    .fb-scheme-swatch.active {
+        border-color: var(--zfb-color-52);
+        box-shadow: 0 0 0 2px var(--zfb-color-88);
+    }
+
+.fb-theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.fb-theme-card {
+    border: 2px solid var(--zfb-color-84);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .15s ease;
+}
+
+    .fb-theme-card:hover {
+        border-color: var(--zfb-color-89);
+    }
+
+    .fb-theme-card.active {
+        border-color: var(--zfb-color-52);
+        box-shadow: 0 0 0 2px var(--zfb-color-88);
+    }
+
+.fb-theme-thumb {
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+}
+
+.fb-theme-thumb-card {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    padding: 8px 6px;
+    box-shadow: 0 1px 4px var(--zfb-color-30);
+}
+
+    .fb-theme-thumb-card span {
+        display: block;
+        height: 4px;
+        border-radius: 2px;
+        margin-bottom: 4px;
+        opacity: .8;
+    }
+
+.fb-theme-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    padding: 5px 4px;
+    color: var(--zfb-color-50);
+    background: var(--zfb-color-03);
+}
+
+/* ===================== FORM DESIGNER â€” DARK PANEL ===================== */
+.fb-props.fb-props-dark {
+    color: !important;
+}
+
+
+
+
+    .fb-props.fb-props-dark .text-muted {
+        color: var(--zfb-color-20) !important;
+    }
+
+
+
+    .fb-props.fb-props-dark .btn-outline-secondary {
+        color: var(--zfb-color-90);
+        border-color: var(--zfb-color-91);
+    }
+
+        .fb-props.fb-props-dark .btn-outline-secondary:hover {
+            background: var(--zfb-color-92);
+            color: var(--zfb-color-03);
+        }
+
+
+
+    .fb-props.fb-props-dark .fb-design-tab {
+        border: 1px solid var(--zfb-color-26);
+        color: var(--zfb-color-24);
+    }
+
+
+/* ===================== FIELD WIDTH TOGGLE ===================== */
+.fb-width-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.fb-width-btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--zfb-color-71);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--zfb-color-03);
+    color: var(--zfb-color-50);
+}
+
+    .fb-width-btn.active {
+        background: var(--zfb-color-52);
+        border-color: var(--zfb-color-52);
+        color: var(--zfb-color-03);
+    }
+
+.fb-props-dark .fb-width-btn {
+    background: var(--zfb-color-81);
+    border-color: var(--zfb-color-92);
+    color: var(--zfb-color-90);
+}
+
+    .fb-props-dark .fb-width-btn.active {
+        background: var(--zfb-color-93);
+        border-color: var(--zfb-color-93);
+    }
+
+/* ===================== ALIGN BUTTON GROUP ===================== */
+.fb-align-group {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.fb-align-btn {
+    flex: 1;
+    text-align: center;
+    padding: 7px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--zfb-color-47);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: var(--zfb-color-94);
+    color: var(--zfb-color-81);
+}
+
+    .fb-align-btn.active {
+        border-color: var(--zfb-color-95);
+        background: var(--zfb-color-26);
+        color: var(--zfb-color-03);
+    }
+
+/* ===================== CANVAS â€” FLEX ROW LAYOUT ===================== */
+.fb-canvas-item.fb-width-half {
+    flex: 0 0 calc(50% - 7px);
+    max-width: calc(50% - 7px);
+    padding-right: 16px;
+}
+
+    .fb-canvas-item.fb-width-half .fb-side-icons {
+        top: 8px;
+        right: 8px;
+    }
+
+    .fb-canvas-item.fb-width-half .fb-icon-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+#canvasLogoBanner, #emptyHint, #canvasSubmitPreview {
+    flex: 0 0 100%;
+}
+
+/* ===================== SUBMIT BUTTON IN CANVAS (DRAGGABLE) ===================== */
+.fb-canvas-submit {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    border-top: 2px dashed var(--zfb-color-84);
+    margin-top: 10px;
+    cursor: grab;
+    transition: background 0.15s ease;
+    border-radius: 8px;
+}
+
+    .fb-canvas-submit.dragging {
+        opacity: 0.5;
+    }
+
+    .fb-canvas-submit .fb-submit-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 28px;
+        font-weight: 700;
+        background: var(--zfb-color-52);
+        color: var(--zfb-color-03);
+        cursor: grab;
+        pointer-events: none;
+    }
+
+    .fb-canvas-submit.selected {
+        border-color: var(--zfb-color-52);
+        background: var(--zfb-color-78);
+        box-shadow: 0 0 0 3px var(--zfb-color-79);
+    }
+
+    .fb-canvas-submit .fb-side-icons {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        display: none;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .fb-canvas-submit.selected .fb-side-icons {
+        display: flex !important;
+    }
+
+/* ===================== BUTTON STYLE GRID ===================== */
+.fb-btnstyle-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.fb-btnstyle-tab {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zfb-color-47);
+    background: var(--zc-secondary);
+}
+
+/*  .fb-btnstyle-tab.active {
+        background: #ff7a1a;
+        color: #fff;
+    }*/
+
+.fb-btnstyle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.fb-btnstyle-swatch {
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 6px;
+    color: var(--zfb-color-03);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+    .fb-btnstyle-swatch.active {
+        border-color: var(--zfb-color-03);
+        box-shadow: 0 0 0 2px var(--zfb-color-93);
+    }
+
+.fb-captcha-swatch {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 10px 4px;
+    border: 2px solid var(--zc-border-color);
+    border-radius: var(--zc-radius-sm);
+    cursor: pointer;
+    background: var(--zfb-color-03);
+    color: var(--zc-text-secondary);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+    .fb-captcha-swatch.active {
+        border-color: var(--zc-primary);
+        background: var(--zc-primary-xxlight);
+        color: var(--zc-primary);
+    }
+
+    .fb-captcha-swatch:hover {
+        border-color: var(--zfb-color-52);
+    }
+
+/* ===================== FIELD LABEL ALIGNMENT TOGGLE ===================== */
+.fb-fieldalign-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.fb-fieldalign-btn {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 7px 4px;
+    border-radius: var(--zc-radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--zc-sidebar-text);
+    background: var(--zc-sidebar-bg-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+    .fb-fieldalign-btn.active {
+        background: var(--zc-primary);
+        color: var(--zfb-color-03);
+    }
+/* ============================================================
+           âœ… ADDED â€” CONDITIONS BUTTON + MODAL
+           ============================================================ */
+.btn-conditions-toggle {
+    background: var(--zfb-color-96);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-weight: 600;
+    color: var(--zfb-color-80);
+}
+
+    .btn-conditions-toggle:hover {
+        background: var(--zfb-color-97);
+        color: var(--zfb-color-80);
+    }
+
+.fb-cond-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--zfb-color-98);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fb-cond-modal {
+    background: var(--zfb-color-03);
+    width: 640px;
+    max-width: 92vw;
+    max-height: 86vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 10px 40px var(--zfb-color-99);
+}
+
+.fb-cond-header {
+    margin-bottom: 14px;
+}
+
+.fb-cond-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fb-cond-row {
+    border: 1px solid var(--zfb-color-100);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.fb-cond-editor .form-label {
+    font-weight: 600;
+    color: var(--zfb-color-80);
+    margin-top: 8px;
+}
+
+.fb-cond-target-list {
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid var(--zfb-color-100);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+/* ============================================================
+           âœ… ADDED â€” "Hide" field property (Required/Hide toggle row + canvas badge)
+           ============================================================ */
+.fb-toggle-switch .form-check-input {
+    cursor: pointer;
+}
+
+.fb-hidden-badge {
+    font-weight: 500;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+.fb-canvas-item.fb-field-hidden {
+    opacity: .55;
+    background: repeating-linear-gradient(45deg, var(--zfb-color-101), var(--zfb-color-101) 10px, var(--zfb-color-102) 10px, var(--zfb-color-102) 20px);
+    border: 1px dashed var(--zfb-color-103);
+}
+
+/* ============================================================
+           âœ… ADDED â€” CONDITION CATEGORY PICKER (Show/Hide, Enable/Require/Mask, Update)
+           ============================================================ */
+.fb-cond-back-link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--zfb-color-52);
+    text-decoration: none;
+    margin-bottom: 6px;
+}
+
+    .fb-cond-back-link:hover {
+        text-decoration: underline;
+    }
+
+.fb-cond-category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.fb-cond-category-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 2px solid var(--zfb-color-100);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+}
+
+    .fb-cond-category-card:hover {
+        border-color: var(--zfb-color-104);
+    }
+
+    .fb-cond-category-card.active {
+        border-color: var(--zfb-color-105);
+        background: var(--zfb-color-106);
+    }
+
+    .fb-cond-category-card input[type="radio"] {
+        margin-top: 4px;
+    }
+
+.fb-cond-category-title {
+    font-weight: 700;
+    color: var(--zfb-color-80);
+}
+
+.fb-cond-category-desc {
+    margin-top: 2px;
+}
+
+
+
+/* ---- Conditions Modal ---- */
+.fb-cond-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    background: var(--zfb-color-107);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fbCondFadeIn .15s ease-out;
+}
+
+@keyframes fbCondFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fbCondPopIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.fb-cond-modal {
+    background: var(--zfb-color-03);
+    width: 100%;
+    max-width: 560px;
+    max-height: 88vh;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px var(--zfb-color-108);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fbCondPopIn .18s ease-out;
+}
+
+.fb-cond-header {
+    padding: 18px 22px;
+    background: linear-gradient(135deg, var(--zfb-color-109), var(--zfb-color-110));
+    color: var(--zfb-color-03);
+    flex: 0 0 auto;
+}
+
+    .fb-cond-header h5 {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .fb-cond-header .btn-close {
+        filter: invert(1) grayscale(1) brightness(2);
+        opacity: .85;
+        border-radius: 50%;
+        transition: opacity .15s ease, background .15s ease;
+        padding: 6px;
+    }
+
+        .fb-cond-header .btn-close:hover {
+            opacity: 1;
+            background: var(--zfb-color-109)(255, 255, 255, .12);
+        }
+
+.fb-cond-body {
+    padding: 22px 24px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+    .fb-cond-body::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .fb-cond-body::-webkit-scrollbar-thumb {
+        background: var(--zfb-color-111);
+        border-radius: 8px;
+    }
+
+    .fb-cond-body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* Labels & inputs inside the modal */
+    .fb-cond-body .form-label {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--zfb-color-48);
+        margin-bottom: 6px;
+        margin-top: 14px;
+    }
+
+        .fb-cond-body .form-label:first-child {
+            margin-top: 0;
+        }
+
+    .fb-cond-body .form-select,
+    .fb-cond-body .form-control {
+        border: 1px solid var(--zfb-color-112);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: var(--zfb-color-113);
+        background-color: var(--zfb-color-114);
+        transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+
+        .fb-cond-body .form-select:focus,
+        .fb-cond-body .form-control:focus {
+            border-color: var(--zfb-color-115);
+            background-color: var(--zfb-color-03);
+            box-shadow: 0 0 0 3px var(--zfb-color-116);
+            outline: none;
+        }
+
+.fb-cond-back-link {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--zfb-color-45);
+    text-decoration: none;
+    margin-bottom: 14px;
+}
+
+    .fb-cond-back-link:hover {
+        text-decoration: underline;
+        color: var(--zfb-color-117);
+    }
+
+/* Target field checklist */
+.fb-cond-target-list {
+    border: 1px solid var(--zfb-color-58);
+    border-radius: 10px;
+    background: var(--zfb-color-114);
+    padding: 6px 14px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+    .fb-cond-target-list .form-check {
+        padding: 8px 0 8px 1.75em;
+        border-bottom: 1px solid var(--zfb-color-23);
+    }
+
+        .fb-cond-target-list .form-check:last-child {
+            border-bottom: none;
+        }
+
+    .fb-cond-target-list .form-check-input {
+        accent-color: var(--zfb-color-115);
+        width: 16px;
+        height: 16px;
+        margin-top: 2px;
+    }
+
+    .fb-cond-target-list .form-check-label {
+        font-size: 14px;
+        color: var(--zfb-color-48);
+    }
+
+/* Footer action buttons (Cancel / Save / Continue) */
+.fb-cond-body .btn {
+    border-radius: 10px;
+    padding: 9px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+}
+
+.fb-cond-body .btn-primary {
+    background: linear-gradient(135deg, var(--zfb-color-115), var(--zfb-color-45));
+    color: var(--zfb-color-03);
+    box-shadow: 0 4px 10px var(--zfb-color-118);
+}
+
+    .fb-cond-body .btn-primary:hover {
+        background: linear-gradient(135deg, var(--zfb-color-119), var(--zfb-color-117));
+    }
+
+.fb-cond-body .btn-outline-secondary {
+    background: var(--zfb-color-03);
+    color: var(--zfb-color-120);
+    border: 1px solid var(--zfb-color-121);
+}
+
+    .fb-cond-body .btn-outline-secondary:hover {
+        background: var(--zfb-color-122);
+    }
+
+.fb-cond-body .btn-sm {
+    padding: 6px 12px;
+    font-size: 12.5px;
+    border-radius: 8px;
+}
+
+.fb-cond-body .btn-outline-danger {
+    background: var(--zfb-color-03);
+    color: var(--zfb-color-123);
+    border: 1px solid var(--zfb-color-124);
+}
+
+    .fb-cond-body .btn-outline-danger:hover {
+        background: var(--zfb-color-125);
+    }
+
+/* List view rows */
+.fb-cond-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fb-cond-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--zfb-color-58);
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: var(--zfb-color-114);
+    transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+    .fb-cond-row:hover {
+        border-color: var(--zfb-color-126);
+        box-shadow: 0 2px 8px var(--zfb-color-127);
+    }
+
+    .fb-cond-row strong {
+        color: var(--zfb-color-113);
+    }
+
+/* Category (action type) picker */
+.fb-cond-category-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fb-cond-category-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border: 1.5px solid var(--zfb-color-58);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+    .fb-cond-category-card:hover {
+        border-color: var(--zfb-color-126);
+        background: var(--zfb-color-128);
+    }
+
+    .fb-cond-category-card.active {
+        border-color: var(--zfb-color-115);
+        background: var(--zfb-color-129);
+        box-shadow: 0 0 0 3px var(--zfb-color-130);
+    }
+
+    .fb-cond-category-card input[type="radio"] {
+        accent-color: var(--zfb-color-115);
+        margin-top: 3px;
+        width: 16px;
+        height: 16px;
+    }
+
+.fb-cond-category-title {
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--zfb-color-113);
+}
+
+.fb-cond-category-desc {
+    margin-top: 2px;
+}
+
+@media (max-width: 576px) {
+    .fb-cond-modal {
+        max-width: 100%;
+        max-height: 92vh;
+    }
+
+    .fb-cond-body {
+        padding: 18px;
+    }
+}
+
+.fb-mail-dropdown-status {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--zfb-color-131);
+    font-size: 14px;
+    color: var(--zfb-color-56);
+    white-space: nowrap;
+}
+
+    .fb-mail-dropdown-status .zentic-switch {
+        flex-shrink: 0;
+    }
+
+.zfb-title-editor.zfb-title-editor-top-nav .zfb-title-text {
+    margin: 6px 0px 6px;
+}
+
+
+.zfb-field-chip {
+    display: flex;
+    align-items: center;
+}
+
+.zfb-field-chip .zfb-chip-icon:last-child {
+    margin-left: auto;
+}
+
+

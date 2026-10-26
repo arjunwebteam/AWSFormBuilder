@@ -1,0 +1,40 @@
+-------------------START-------------2/25/2025 11:01:31 AM
+Page :/member-registration
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250528.26597157609@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 11:01:31 AM
+-------------------START-------------2/25/2025 11:01:32 AM
+Page :/member-registration
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250528.44327849999@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 11:01:32 AM
+-------------------START-------------2/25/2025 12:00:06 PM
+Page :/Members/Acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250627.41199925576@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 12:00:06 PM
+-------------------START-------------2/25/2025 12:00:06 PM
+Page :/Members/Acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250627.75559156709@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 12:00:06 PM
+-------------------START-------------2/25/2025 12:03:18 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250630.21724424234@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 12:03:18 PM
+-------------------START-------------2/25/2025 12:03:19 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250630.95349065177@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 12:03:19 PM
+-------------------START-------------2/25/2025 12:05:09 PM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250632.86850819936@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 12:05:09 PM
+-------------------START-------------2/25/2025 12:05:11 PM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502250632.79631246437@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/25/2025 12:05:11 PM

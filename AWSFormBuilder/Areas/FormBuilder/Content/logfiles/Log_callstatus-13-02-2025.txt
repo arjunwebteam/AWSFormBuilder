@@ -1,0 +1,25 @@
+-------------------START-------------2/13/2025 3:39:46 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502131010.65650305911@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/13/2025 3:39:46 PM
+-------------------START-------------2/13/2025 3:40:48 PM
+Page :/Admin/Account/UserValidate
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502131011.18070044278@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/13/2025 3:40:48 PM
+-------------------START-------------2/13/2025 3:42:34 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502131013.55968350340@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/13/2025 3:42:34 PM
+-------------------START-------------2/13/2025 3:43:10 PM
+Page :/Admin/Account/UserValidate
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502131013.76728029821@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/13/2025 3:43:10 PM
+-------------------START-------------2/13/2025 5:03:46 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502131134.35305289186@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/13/2025 5:03:46 PM

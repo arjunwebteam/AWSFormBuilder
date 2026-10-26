@@ -1,0 +1,231 @@
+﻿@using System.Security.Claims
+@{
+    Layout = null;
+}
+@{
+    string sortcolumn = (string)ViewBag.sortcolumn;
+    string sortorder = (string)ViewBag.sortorder;
+    Int64 Total = (Int64)ViewBag.total;
+    var PageNo = (Int64)ViewBag.pageno;
+    var Items = (Int64)ViewBag.items;
+
+    List<AWSFormBuilder.Entities.FormBuilder> lstForms = ViewBag.lstForms;
+
+    // ADDED - Access icon only for SuperAdmin/DeveloperAdmin
+    string currentRole = Context.User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    bool canManageAccess = currentRole.Contains("SuperAdmin") || currentRole.Contains("DeveloperAdmin");
+
+
+    bool IsEdit = Convert.ToBoolean(Context.Session.GetString("IsEdit"));
+    bool IsView = Convert.ToBoolean(Context.Session.GetString("IsView"));
+    bool IsDelete = Convert.ToBoolean(Context.Session.GetString("IsDelete"));
+    bool IsExport = Convert.ToBoolean(Context.Session.GetString("IsExport"));
+    Int64 Mid = ViewBag.Mid;
+    string userRole = Context.Session.GetString("userrole") ?? string.Empty;
+}
+
+<div class="zentic-table-wrapper">
+    <table class="zentic-table" id="bt1">
+        <thead>
+            <tr>
+                <th style="text-align:center">S.No</th>
+                <th>
+                    <a class="cursor-pointer" style="color:inherit;" onclick="sortresult('Title');">
+                        Form Title @if (sortcolumn == "Title")
+                        {
+                            <img alt="@sortorder" src="Areas/FormBuilder/Content/images/sort_@(sortorder).gif" />
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a class="cursor-pointer" style="color:inherit;" onclick="sortresult('Title');">
+                        Registrations @if (sortcolumn == "Registrations")
+                        {
+                            <img alt="@sortorder" src="Areas/FormBuilder/Content/images/sort_@(sortorder).gif" />
+                        }
+                    </a>
+                </th>
+                @if (canManageAccess)
+                {
+                    <th style="text-align:center">Form Access</th>
+                }
+                @*     <th>
+                    <a class="cursor-pointer" style="color:inherit;" onclick="sortresult('Title');">
+                        Thank You Page @if (sortcolumn == "Registrations")
+                        {
+                            <img alt="@sortorder" src="Content/Admin/images/sort_@(sortorder).gif" />
+                        }
+                    </a>
+                </th> *@
+                @*    <th>Mail</th> *@
+                @*   <th style="text-align:center">
+                    <a class="cursor-pointer" style="color:inherit;" onclick="sortresult('IsActive');">
+                        Email Status @if (sortcolumn == "IsActive")
+                        {
+                            <img alt="@sortorder" src="Content/Admin/images/sort_@(sortorder).gif" />
+                        }
+                    </a>
+                </th> *@
+                <th style="text-align:center">
+                    <a class="cursor-pointer" style="color:inherit;" onclick="sortresult('IsActive');">
+                        Form Status @if (sortcolumn == "IsActive")
+                        {
+                            <img alt="@sortorder" src="Areas/FormBuilder/Content/images/sort_@(sortorder).gif" />
+                        }
+                    </a>
+                </th>
+                <th style="text-align:center">
+                    <a class="cursor-pointer" style="color:inherit;" onclick="sortresult('CreatedDate');">
+                        Created Date @if (sortcolumn == "CreatedDate")
+                        {
+                            <img alt="@sortorder" src="Areas/FormBuilder/Content/images/sort_@(sortorder).gif" />
+                        }
+                    </a>
+                </th>
+                <th style="text-align:left">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (lstForms.Count != 0)
+            {
+                foreach (var item in lstForms)
+                {
+                    <tr>
+                        <td style="text-align:center">@item.RId</td>
+                        <td>
+                            <a href="@Url.Action("FormBuilder", "Form", new { id = AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(item.FormId), mid = ViewBag.Mid  })" target="_blank" class="fw-700 text-primary form-title-cell">
+                                @item.Title
+                            </a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("FormSubmissions", "Form", new { formId = AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(item.FormId), mid = ViewBag.Mid })" class="text-success btn btn-sm form-access-btn" title="Registrations">
+                                Registrations (@item.SubmissionCount)
+                            </a>
+                        </td>
+                        @if (canManageAccess)
+
+                        {
+                            <td style="text-align:center">
+
+                                <a onclick="openFormAccessModal(@item.FormId, '@Html.Raw(item.Title.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\"", "&quot;"))');"
+                                   class="btn btn-sm form-access-btn" title="Manage who can see this form">
+                                    <i class="fa-solid fa-user-lock"></i> Access
+                                </a>
+                            </td>
+
+                        }
+
+                        <td style="text-align:center">
+                            @{
+                                var isCheckedD = item.IsFormEnable ? "checked" : "";
+                                var titleValue2 = item.IsFormEnable ? "Active" : "Disabled";
+                            }
+                            <label class="zentic-switch small-switch" title="@titleValue2">
+                                <input type="checkbox" onclick="UpdateFormEnable(@item.FormId)" @isCheckedD>
+                                <span class="zentic-slider"></span>
+                            </label>
+                        </td>
+                        <td class="created-date" style="text-align:center">
+                            <span>@item.CreatedDate.ToString("dd/MM/yyyy") @item.CreatedDate.ToString("hh:mm tt")</span>
+                            <span></span>
+                        </td>
+                        <td style="text-align:center">
+                            <div class="table-actions">
+                                @if (IsEdit == true)
+                                {
+                                    <a href="@Url.Action("FormBuilder", "Form", new { id = AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(item.FormId), mid = ViewBag.Mid })"
+                                       class="btn p-0 text-warning table-action-btn" title="Edit">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                }
+                                @if (IsView == true)
+
+                                {
+
+                                    <a href="@Url.Action("RenderForm", "Form", new { id = AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(item.FormId) })" target="_blank"
+                                    class="btn p-0 text-primary table-action-btn" title="PreView">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+
+                                }
+                                <a onclick="openPublishModal('@AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(item.FormId)', '@Html.Raw(item.Title.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\"", "&quot;"))');"
+                                   class="btn p-0 text-info table-action-btn aws-table-share-btn" title="Share">
+                                    <i class="fa-regular fa-share-from-square"></i>
+                                </a>
+                                <a onclick="openCopyFormModal(@item.FormId);"
+                                   class="btn p-0 text-secondary table-action-btn" title="Copy Form">
+                                    <i class="fa-regular fa-copy"></i>
+                                </a>
+                                @if (IsDelete == true)
+
+                                {
+
+                                    if (item.SubmissionCount == 0)
+
+                                    {
+
+                                        <a onclick="DeleteForm(@item.FormId);"
+                                           class="btn p-0 text-danger table-action-btn" title="Delete">
+                                            <i class="fa-solid fa-x"></i>
+                                        </a>
+
+                                    }
+
+                                    else
+
+                                    {
+
+                                        <a class="btn p-0 table-action-btn" style="color:#79818b !important;" title="Delete unavailable — form has submissions">
+                                            <i class="fa-solid fa-x"></i>
+                                        </a>
+
+                                    }
+
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">No Records found</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="zentic-card-footer">
+    <div class="dataTables_info">
+        Showing @((PageNo * Items) - (Items - 1)) - @((PageNo * Items) > Total ? Total : (PageNo * Items)) of @Total entries
+    </div>
+    <div>
+        @Html.Raw(AWSFormBuilder.Areas.FormBuilder.BLL.Common.SetPaging((Int64)ViewBag.items, ref Total, (Int64)ViewBag.pageno, "pagination pb-0"))
+    </div>
+</div>
+<style>
+    .form-access-btn {
+        padding: 4px 14px !important;
+        font-size: 12px;
+        font-weight: 600;
+        color: #0b3d91;
+        background: #e8f0fe;
+        border: 1px solid #c5d6f7;
+        border-radius: 6px;
+    }
+
+        .form-access-btn:hover {
+            background: #d5e3fd;
+            color: #0b3d91;
+        }
+
+    .form-title-cell {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        max-width: none !important;
+        word-break: break-word;
+    }
+</style>

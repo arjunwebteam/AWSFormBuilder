@@ -1,0 +1,911 @@
+@{
+    string mailTypeCtx = ViewBag.MailType as string;
+    string formTitleCtx = ViewBag.FormTitle as string;
+    Int64 formIdCtx = ViewBag.FormId != null ? (Int64)ViewBag.FormId : 0;
+    List<string> formFields = ViewBag.FormFields as List<string> ?? new List<string>();
+    string headingLabel = (mailTypeCtx == "Admin" ? "Admin Mail" : "User Mail");
+    bool isEmbed = ViewBag.IsEmbed != null && (bool)ViewBag.IsEmbed;
+
+    // ✅ ADDED — "Active" status pill next to the heading: User Mail reflects Form.IsActive,
+    // Admin Mail reflects the separate Form.IsAdminMail flag.
+    bool isFormActiveCtx = ViewBag.IsFormActive != null && (bool)ViewBag.IsFormActive;
+    bool isFormAdminMailCtx = ViewBag.IsFormAdminMail != null && (bool)ViewBag.IsFormAdminMail;
+    bool mailStatusOnCtx = (mailTypeCtx == "Admin") ? isFormAdminMailCtx : isFormActiveCtx;
+
+    ViewBag.Title = "AddMailTemplate";
+    Layout = isEmbed ? "~/Areas/FormBuilder/Views/Shared/_EmbedLayout.cshtml" : "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+    // ViewBag.Pageheading = !string.IsNullOrEmpty(formTitleCtx) ? headingLabel + " - " + formTitleCtx : "Add MailTemplate";
+    List<AWSFormBuilder.Entities.FormListItem> lstForms = ViewBag.lstForms;
+}
+
+<link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/mail.css">
+
+<style>
+    /* ✅ ADDED — safety net so "Text Mail" visibly grays out and stops being
+           clickable while Email Description is empty, even if mail.css only had
+           a disabled rule for .aws-mt-sample-btn before. Matches that same look. */
+    .aws-mt-sendmail-btn:disabled,
+    .aws-mt-sendmail-btn[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        filter: grayscale(60%);
+    }
+
+    .ck-content strong,
+    .ck-content b,
+    .ck-content strong span,
+    .ck-content b span,
+    .ck-editor__editable strong,
+    .ck-editor__editable strong span,
+    .aws-mt-preview-frame strong,
+    .aws-mt-preview-frame b,
+    .aws-mt-preview-frame strong span,
+    .aws-mt-preview-frame b span {
+        font-weight: 700 !important;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ckeditor5-classic-plus@41.3.0/build/ckeditor.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wOthers,#wMailTemplates').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+</script>
+
+
+
+<!-- Sample Send Mail result banner (page-level, shown after the modal closes) -->
+<div id="awsSampleSendPageMsg" class="aws-sendmail-page-msg" style="display:none;">
+    <i class="bi"></i>
+    <span class="aws-sendmail-page-msg-text"></span>
+    <button type="button" class="aws-sendmail-page-msg-close" onclick="hideSampleSendPageMsg()">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+<div class="container-my">
+    <div class="aws-mail-page">
+        <div class="aws-mail-content">
+
+            @using (Html.BeginForm("AddMailTemplate", "MailTemplates", FormMethod.Post, new { enctype = "multipart/form-data", @id = "SponsorForm", @name = "SponsorForm" }))
+            {
+                <input id="mid" name="mid" value="@ViewBag.mid" type="hidden" />
+                <input name="ContextFormId" value="@formIdCtx" type="hidden" />
+                <input type="hidden" name="Heading" id="Heading" />
+                <input type="hidden" name="embed" value="@(isEmbed ? "1" : "")" />
+
+                <!-- Hidden — kept exactly as before, just not visually rendered -->
+                <div style="display:none;">
+                    <select name="MailType" id="MailType">
+                        <option value="">Selct Mail Type</option>
+                        <option @(mailTypeCtx == "Admin" ? "" : "selected=selected") value="User">User</option>
+                        <option @(mailTypeCtx == "Admin" ? "selected=selected" : "") value="Admin">Admin</option>
+                    </select>
+                    <input type="file" name="Logo" id="Logo" />
+                </div>
+
+                @if (lstForms != null && lstForms.Count > 0)
+                {
+                    <div style="display:none;">
+                        @foreach (var frm in lstForms)
+                        {
+                            <input type="checkbox" name="SelectedFormIds" value="@frm.FormId" id="frm_@frm.FormId" @(frm.IsSelected ? "checked=checked" : "") />
+                        }
+                    </div>
+                }
+
+                <!-- Page Header -->
+                <div class="aws-mail-page-header">
+                    <div class="aws-mail-header-left">
+                        <div class="aws-mail-header-icon">
+                            <i class="icon-mail"></i>
+                        </div>
+
+                        <div>
+                            <h1>@headingLabel Configuration</h1>
+                            @if (!string.IsNullOrEmpty(formTitleCtx))
+                            {
+                                <p>Configure the email template for <strong>@formTitleCtx</strong>.</p>
+                            }
+                            else
+                            {
+                                <p>Configure the basic details of your email template.</p>
+                            }
+                        </div>
+
+                        @if (formIdCtx > 0)
+                        {
+                            <div class="aws-mail-status-toggle @(mailStatusOnCtx ? "is-active" : "is-inactive")"
+                                 id="awsMailStatusToggle"
+                                 data-form-id="@formIdCtx"
+                                 data-mail-type="@mailTypeCtx"
+                                 title="@(mailStatusOnCtx ? "Active" : "Inactive")"
+                                 onclick="toggleFormMailStatus(this)">
+
+                                <span class="aws-status-switch">
+                                    <span class="aws-status-knob">
+                                        <i class="bi @(mailStatusOnCtx ? "bi-check" : "bi-dash")"></i>
+                                    </span>
+                                </span>
+
+                                <span class="aws-status-text">Active</span>
+                            </div>
+                        }
+                    </div>
+
+                    @if (!isEmbed)
+                    {
+                        <button type="button" class="aws-mail-back-btn"
+                                onclick="window.location.href='@Url.Action("Index", "Form")'">
+                            <i class="icon-arrow-left"></i>
+                            <span>Back to Form List</span>
+                        </button>
+                    }
+                </div>
+
+
+                <!-- Configuration Card -->
+                <section class="aws-mail-config-card">
+
+                    <div class="aws-mail-section-heading">
+                        <div>
+                            <h2>Email Configuration</h2>
+                            <p>Configure the basic details of your email template.</p>
+                        </div>
+                    </div>
+
+                    <div class="aws-mail-config-grid">
+
+                        <div class="aws-mail-field">
+                            <label for="Subject">Subject <span>*</span></label>
+                            <input type="text" class="aws-mail-input" name="Subject" id="Subject" placeholder="Enter email subject" onkeypress="return Common.isChar(event)">
+                        </div>
+
+                        @if (headingLabel != "User Mail")
+                        {
+                            <div class="aws-mail-field">
+                                <label for="BCC">Admin Email'(s)</label>
+                                <input type="text" class="aws-mail-input" name="BCC" id="BCC" placeholder="e.g. someone@example.com, another@example.com">
+                                <small>Comma-separated email addresses.</small>
+                            </div>
+                        }
+
+                    </div>
+
+                </section>
+
+                <!-- Description Card -->
+                <section class="aws-mail-editor-card">
+
+                    <div class="aws-mail-editor-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2>Email Description <span>*</span></h2>
+                            <p>Write the email content that will be sent to the @(headingLabel == "User Mail" ? "applicant" : "administrator").</p>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="aws-mt-view-btn" onclick="openMailPreview()">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                            <button type="button" class="aws-mt-view-btn aws-mt-sendmail-btn" onclick="openSampleSendMail()" disabled title="Please enter some content in the editor first">
+                                <i class="bi bi-send"></i> Sample Send Mail
+                            </button>
+                            @if (formFields.Count > 0)
+                            {
+                                <button type="button" id="awsApplicantFieldsBtn" class="aws-mail-fields-btn">
+                                    <i class="icon-list"></i>
+                                    Show Applicant Fields
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Editor -->
+                    <div class="input-box">
+                        <!-- Hidden field posted to the server; kept in sync with the CKEditor content -->
+                        <textarea rows="10" placeholder="Description *" name="Description" id="Description" cols="80" class="aws-mail-editor" style="display:none;"></textarea>
+                        <span class="field-validation-error" id="DescriptionError"></span>
+
+                        <div id="DescriptionEditor"></div>
+
+                        <div class="aws-mail-editor-footer">
+                            <span>You can insert applicant fields using the button above.</span>
+                            <span id="awsMailCharCount">0 characters</span>
+                        </div>
+                    </div>
+
+                    <!-- Sample mail template designs -->
+                    <div class="aws-mt-samples">
+                        <p class="aws-mt-samples-label">Need inspiration? Use a sample mail template — it's pasted in as ready-made content:</p>
+                        <div class="aws-mt-samples-btns">
+                            <button type="button" class="aws-mt-sample-btn" id="awsMailSampleBtn1" onclick="openMailSamplePreview(1)">
+                                <i class="bi bi-file-earmark-text"></i> Sample 1 — Simple Confirmation
+                            </button>
+                            <button type="button" class="aws-mt-sample-btn" id="awsMailSampleBtn2" onclick="openMailSamplePreview(2)">
+                                <i class="bi bi-file-earmark-text"></i> Sample 2 — Detailed Notification
+                            </button>
+                            <button type="button" class="aws-mt-sample-btn" id="awsMailSampleBtn3" onclick="openMailSamplePreview(3)">
+                                <i class="bi bi-file-earmark-text"></i> Sample 3 — Formal Acknowledgement
+                            </button>
+                            <button type="button" class="aws-mt-sample-btn" id="awsMailSampleBtn4" onclick="openMailSamplePreview(4)">
+                                <i class="bi bi-file-earmark-text"></i> Sample 4 — Friendly Welcome
+                            </button>
+                            <button type="submit" class="aws-mail-submit-btn adminsubmit" value="submit">
+                                <i class="icon-check"></i>
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Bottom Actions
+                <div class="aws-mail-actions">
+                    if (!isEmbed)
+                    {
+                        <a class="aws-mail-cancel-btn" href="@Url.Action("Index", "MailTemplates", new { mid = ViewBag.mid })">Cancel</a>
+                    }
+
+                    </div>-->
+                <!-- =====================================================
+                     APPLICANT FIELDS DRAWER
+                ====================================================== -->
+                @if (formFields.Count > 0)
+                {
+                    <div id="awsApplicantDrawerOverlay" class="aws-applicant-overlay"></div>
+
+                    <aside id="awsApplicantDrawer" class="aws-applicant-drawer">
+
+                        <div class="aws-applicant-header">
+                            <div>
+                                <h3>Available Applicant Fields</h3>
+                                <p>Click a field to insert it into the email.</p>
+                            </div>
+                            <button type="button" id="awsApplicantClose" class="aws-applicant-close">
+                                <i class="icon-x"></i>
+                            </button>
+                        </div>
+
+                        <div class="aws-applicant-search">
+                            <i class="icon-search"></i>
+                            <input type="text" id="awsApplicantSearch" placeholder="Search applicant fields...">
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(formTitleCtx))
+                        {
+                            <div class="aws-applicant-form-info">
+                                <span>Fields from</span>
+                                <strong>@formTitleCtx</strong>
+                            </div>
+                        }
+
+                        <div id="awsApplicantFieldsList" class="aws-applicant-fields-list">
+                            @foreach (var f in formFields)
+                            {
+                                <button type="button" class="aws-applicant-field" data-field="@f">
+                                    <span>[@f]</span>
+                                    <i class="icon-plus"></i>
+                                </button>
+                            }
+                        </div>
+
+                    </aside>
+                }
+            }
+        </div>
+    </div>
+</<div>
+        <!-- View / Live Preview Modal -->
+        <div class="aws-mt-overlay" id="awsMailPreviewModal">
+            <div class="aws-mt-modal">
+                <div class="aws-mt-modal-header">
+                    <h4><i class="bi bi-eye"></i> Email Preview</h4>
+                    <button type="button" class="aws-mt-modal-close" onclick="closeMailPreview()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="aws-mt-modal-body">
+                    <div class="aws-mt-preview-frame" id="awsMailPreviewContent"></div>
+                </div>
+                <div class="aws-mt-modal-footer">
+                    <button type="button" class="aws-mt-btn-cancel" onclick="closeMailPreview()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Template Preview Modal -->
+        <div class="aws-mt-overlay" id="awsMailSampleModal">
+            <div class="aws-mt-modal">
+                <div class="aws-mt-modal-header">
+                    <h4 id="awsMailSampleTitle"><i class="bi bi-file-earmark-text"></i> Sample Send Mail</h4>
+                    <button type="button" class="aws-mt-modal-close" onclick="closeMailSamplePreview()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="aws-mt-modal-body">
+                    <div class="aws-mt-preview-frame" id="awsMailSampleContent"></div>
+                </div>
+                <div class="aws-mt-modal-footer">
+                    <button type="button" class="aws-mt-btn-cancel" onclick="closeMailSamplePreview()" style="margin-right: auto;">Cancel</button>
+                    <button type="button" class="aws-mt-btn-copy" id="awsMailSampleCopyBtn" onclick="useMailSampleContent()">
+                        <i class="bi bi-clipboard-check"></i> Copy
+                    </button>
+                    <button type="button" class="aws-mt-btn-cancel" id="awsMailSamplePrevBtn" onclick="navigateMailSample(-1)" style="display:none;">
+                        <i class="bi bi-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="aws-mt-btn-cancel" id="awsMailSampleNextBtn" onclick="navigateMailSample(1)" style="display:none;">
+                        Next <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Send Mail Modal -->
+        <div class="aws-mt-overlay" id="awsSampleSendMailModal">
+            <div class="aws-mt-modal">
+                <div class="aws-mt-modal-header">
+                    <h4><i class="bi bi-send"></i> Sample Send Mail</h4>
+                    <button type="button" class="aws-mt-modal-close" onclick="closeSampleSendMail()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="aws-mt-modal-body">
+
+                    <div id="awsSampleSendMsg" class="aws-sendmail-msg" style="display:none;"></div>
+
+                    <div class="aws-mail-field">
+                        <label for="awsSampleSubject">Subject <span>*</span></label>
+                        <input type="text" class="aws-mail-input" id="awsSampleSubject" placeholder="Enter email subject">
+                    </div>
+
+                    <div class="aws-mail-field" style="margin-top:16px;">
+                        <label for="awsSampleToEmail">Send Email <span>*</span></label>
+                        <input type="email" class="aws-mail-input" id="awsSampleToEmail" placeholder="e.g. someone@example.com">
+                        <small>The email content currently in the editor above will be sent to this address.</small>
+                    </div>
+
+                </div>
+                <div class="aws-mt-modal-footer">
+                    <button type="button" class="aws-mt-btn-cancel" id="awsSampleSendCancelBtn" onclick="closeSampleSendMail()">Cancel</button>
+                    <button type="button" class="aws-mt-btn-copy" id="awsSampleSendBtn" onclick="sendSampleMail()">
+                        <i class="bi bi-send"></i> Send Email
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var mailEditorInstance;
+
+            $(document).ready(function () {
+                if (typeof ClassicEditor === 'undefined') {
+                    document.getElementById('DescriptionEditor').innerHTML =
+                        '<div style="padding:14px;border:1.5px dashed #ef4444;border-radius:8px;color:#b91c1c;font-size:13px;">' +
+                        'The content editor library failed to load (likely blocked by network/CDN access). ' +
+                        'Please check your internet connection or network settings and refresh the page.' +
+                        '</div>';
+                    return;
+                }
+
+                ClassicEditor
+                    .create(document.querySelector('#DescriptionEditor'), {
+                        toolbar: [
+                            'bold', 'italic', 'underline', 'strikethrough', '|',
+                            'fontSize', 'fontColor', '|',
+                            'blockQuote', 'codeBlock', '|',
+                            'numberedList', 'bulletedList', '|',
+                            'heading', '|',
+                            'removeFormat', 'link', 'imageUpload'
+                        ],
+                        fontSize: {
+                            options: [9, 11, 13, 'default', 17, 19, 21, 24, 28, 32]
+                        },
+                        fontColor: {
+                            colors: [
+                                { color: '#000000', label: 'Black' },
+                                { color: '#4b5563', label: 'Dim grey' },
+                                { color: '#9ca3af', label: 'Grey' },
+                                { color: '#ef4444', label: 'Red' },
+                                { color: '#f97316', label: 'Orange' },
+                                { color: '#eab308', label: 'Yellow' },
+                                { color: '#22c55e', label: 'Green' },
+                                { color: '#3b82f6', label: 'Blue' },
+                                { color: '#6366f1', label: 'Indigo' },
+                                { color: '#a855f7', label: 'Purple' }
+                            ]
+                        },
+                        heading: {
+                            options: [
+                                { model: 'paragraph', title: 'Normal', class: 'ck-heading_paragraph' },
+                                { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                                { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                                { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                            ]
+                        }
+                    })
+                    .then(function (editor) {
+                        mailEditorInstance = editor;
+
+                        // Load existing content (if any)
+                        var existingContent = $('#Description').val();
+                        if (existingContent) {
+                            editor.setData(existingContent);
+                        }
+                        updateSampleButtonsState();   // ✅ ADDED — set initial gray/enabled state
+
+                        // Custom upload adapter -> POST to the existing file manager endpoint
+                        editor.plugins.get('FileRepository').createUploadAdapter = function (loader) {
+                            return {
+                                upload: function () {
+                                    return loader.file.then(function (file) {
+                                        return new Promise(function (resolve, reject) {
+                                            var formData = new FormData();
+                                            formData.append('upload', file);
+
+                                            $.ajax({
+                                                url: '/api/filemanager/upload',
+                                                type: 'POST',
+                                                data: formData,
+                                                processData: false,
+                                                contentType: false,
+                                                success: function (response) {
+                                                    // adjust "response.url" per meeru upload API response shape
+                                                    var url = response.url || response;
+                                                    resolve({ default: url });
+                                                },
+                                                error: function () {
+                                                    reject('Image upload failed');
+                                                }
+                                            });
+                                        });
+                                    });
+                                }
+                            };
+                        };
+
+                        updateMailCharCount();
+                        editor.model.document.on('change:data', function () {
+                            updateMailCharCount();
+                            updateSampleButtonsState();   // ✅ ADDED — re-check on every keystroke
+                        });
+
+                        initApplicantFieldsDrawer(editor);
+                    })
+                    .catch(function (error) {
+                        console.error(error);
+                        document.getElementById('DescriptionEditor').innerHTML =
+                            '<div style="padding:14px;border:1.5px dashed #ef4444;border-radius:8px;color:#b91c1c;font-size:13px;">' +
+                            'The content editor failed to initialize. Please refresh the page and try again.' +
+                            '</div>';
+                    });
+            });
+
+            // ---------- Content helper ----------
+            function getCurrentMailContent() {
+                return mailEditorInstance ? mailEditorInstance.getData() : $('#Description').val();
+            }
+
+            function updateMailCharCount() {
+                var $charCount = $('#awsMailCharCount');
+                if (!$charCount.length || !mailEditorInstance) return;
+                var data = mailEditorInstance.getData();
+                var temporaryDiv = document.createElement('div');
+                temporaryDiv.innerHTML = data;
+                var text = (temporaryDiv.textContent || temporaryDiv.innerText || '')
+                    .replace(/\u00a0/g, ' ')
+                    .trim();
+                var count = text.length;
+                $charCount.text(count + (count === 1 ? ' character' : ' characters'));
+            }
+
+            // ---------- View (live) preview ----------
+            function openMailPreview() {
+                document.getElementById('awsMailPreviewContent').innerHTML = getCurrentMailContent();
+                document.getElementById('awsMailPreviewModal').classList.add('show');
+                document.body.classList.add('aws-mt-open');
+            }
+
+            function closeMailPreview() {
+                document.getElementById('awsMailPreviewModal').classList.remove('show');
+                document.body.classList.remove('aws-mt-open');
+            }
+
+            // ---------- Sample mail templates ----------
+            var mailSamples = {
+                1: {
+                    title: 'Sample 1 — Simple Confirmation',
+                    html: '<p>Dear <strong>[First_Name]</strong> <strong>[Last_Name]</strong>,</p>\n<p>Thank you for submitting your application. We have received your response and will get back to you shortly.</p>\n<p>Best regards,<br>The Team</p>'
+                },
+                2: {
+                    title: 'Sample 2 — Detailed Notification',
+                    html: '<p>Dear <strong>[First_Name]</strong> <strong>[Last_Name]</strong>,</p>\n<p>Thank you for submitting your application. We are pleased to confirm receipt of your submission.</p>\n<p><strong>What happens next?</strong></p>\n<ul>\n<li>Our team will review your submission carefully</li>\n<li>You will receive a confirmation email within 24 hours</li>\n<li>We may reach out if additional information is needed</li>\n</ul>\n<p>If you have any questions, feel free to reach out to us.</p>\n<p>Best regards,<br>The Team</p>'
+                },
+                3: {
+                    title: 'Sample 3 — Formal Acknowledgement',
+                    html: '<h2><span style="color:#3b82f6;">Submission Received</span></h2>\n<p>Dear <strong>[First_Name]</strong> <strong>[Last_Name]</strong>,</p>\n<p>This email confirms that we have successfully received your submission.</p>\n<h3>Submission Details</h3>\n<ul>\n<li><strong>Reference No:</strong> [SubmissionId]</li>\n<li><strong>Submitted On:</strong> [SubmittedDate]</li>\n</ul>\n<blockquote><p>Please keep this reference number for your records. You will need it if you contact us about this submission.</p></blockquote>\n<p>Regards,<br><strong>Customer Support Team</strong></p>'
+                },
+                4: {
+                    title: 'Sample 4 — Friendly Welcome',
+                    html: '<h2><span style="color:#6366f1;">Welcome, [First_Name]!</span></h2>\n<p><span style="font-size:17px;">Thanks so much for filling out our form. We are excited to hear from you!</span></p>\n<p><strong>Here is what you can expect:</strong></p>\n<ol>\n<li>We review your details (usually within 1-2 business days)</li>\n<li>A member of our team gets in touch with you</li>\n<li>We help you with your next steps</li>\n</ol>\n<p><span style="color:#4b5563;">In the meantime, if anything needs updating, just reply to this email and we will sort it out.</span></p>\n<p>Warm wishes,<br><strong>The Team</strong></p>'
+                }
+            };
+
+            var currentMailSampleId = null;
+
+            function openMailSamplePreview(id) {
+                currentMailSampleId = id;
+                var sample = mailSamples[id];
+                document.getElementById('awsMailSampleTitle').innerHTML = '<i class="bi bi-file-earmark-text"></i> ' + sample.title;
+                document.getElementById('awsMailSampleContent').innerHTML = sample.html;
+                document.getElementById('awsMailSampleModal').classList.add('show');
+                document.body.classList.add('aws-mt-open');
+                updateMailSampleNavButtons();
+            }
+
+            function updateMailSampleNavButtons() {
+                var ids = Object.keys(mailSamples).map(Number).sort(function (a, b) { return a - b; });
+                var currentIndex = ids.indexOf(currentMailSampleId);
+
+                var $prevBtn = $('#awsMailSamplePrevBtn');
+                var $nextBtn = $('#awsMailSampleNextBtn');
+
+                if (currentIndex > 0) { $prevBtn.show(); } else { $prevBtn.hide(); }
+                if (currentIndex < ids.length - 1) { $nextBtn.show(); } else { $nextBtn.hide(); }
+            }
+
+            function navigateMailSample(direction) {
+                var ids = Object.keys(mailSamples).map(Number).sort(function (a, b) { return a - b; });
+                var currentIndex = ids.indexOf(currentMailSampleId);
+                var newIndex = currentIndex + direction;
+                if (newIndex < 0 || newIndex >= ids.length) return;
+                openMailSamplePreview(ids[newIndex]);
+            }
+
+            function updateSampleButtonsState() {
+                var hasContent = false;
+                if (mailEditorInstance) {
+                    var data = mailEditorInstance.getData();
+                    var tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data;
+                    var text = (tempDiv.textContent || tempDiv.innerText || '').trim();
+                    hasContent = text.length > 0;
+                }
+                // ✅ CHANGED — only the "Text Mail" button is gated on content (it sends
+                // a test of what's currently in the editor, so it needs something there).
+                // Sample buttons are left alone here — they're meant to fill an EMPTY
+                // editor with ready-made content, so they must stay clickable regardless.
+                $('.aws-mt-sendmail-btn').each(function () {
+                    if (hasContent) {
+                        $(this).prop('disabled', false).removeAttr('title');
+                    } else {
+                        $(this).prop('disabled', true).attr('title', 'Please enter some content in the editor first');
+                    }
+                });
+            }
+
+            function closeMailSamplePreview() {
+                document.getElementById('awsMailSampleModal').classList.remove('show');
+                document.body.classList.remove('aws-mt-open');
+                currentMailSampleId = null;
+            }
+
+            function useMailSampleContent() {
+                if (!currentMailSampleId || !mailEditorInstance) return;
+                var sample = mailSamples[currentMailSampleId];
+
+                // Set the sample markup as the editor's live content, so it appears
+                // fully rendered in CKEditor rather than as raw HTML tags.
+                mailEditorInstance.setData(sample.html);
+                updateMailCharCount();
+
+                var btn = document.getElementById('awsMailSampleCopyBtn');
+                var original = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check2"></i> Copied';
+
+                setTimeout(function () {
+                    btn.innerHTML = original;
+                    closeMailSamplePreview();
+                }, 700);
+            }
+
+            // ---------- Sample Send Mail ----------
+            function showSampleSendMsg(type, text) {
+                var $msg = $('#awsSampleSendMsg');
+                $msg.removeClass('aws-sendmail-success aws-sendmail-error')
+                    .addClass(type === 'success' ? 'aws-sendmail-success' : 'aws-sendmail-error')
+                    .html(text)
+                    .show();
+            }
+
+            var awsSampleSendPageMsgTimer = null;
+
+            function showSampleSendPageMsg(type, text) {
+                var $pageMsg = $('#awsSampleSendPageMsg');
+
+                $pageMsg.removeClass('aws-sendmail-page-success aws-sendmail-page-error')
+                    .addClass(type === 'success' ? 'aws-sendmail-page-success' : 'aws-sendmail-page-error')
+                    .find('i').first().attr('class', 'bi ' + (type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'));
+
+                $pageMsg.find('.aws-sendmail-page-msg-text').html(text);
+                $pageMsg.show();
+
+                // Scroll it into view in case the page is long
+                $pageMsg[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                clearTimeout(awsSampleSendPageMsgTimer);
+                awsSampleSendPageMsgTimer = setTimeout(hideSampleSendPageMsg, 6000);
+            }
+
+            function hideSampleSendPageMsg() {
+                clearTimeout(awsSampleSendPageMsgTimer);
+                $('#awsSampleSendPageMsg').hide();
+            }
+
+            // ---------- Active/Inactive status pill (User Mail = Form.IsActive, Admin Mail = Form.IsAdminMail) ----------
+             function setMailStatusPillState($el, isOn) {
+                var $icon = $el.find('.aws-status-knob i');
+                var $text = $el.find('.aws-status-text');
+
+                if (isOn) {
+                    $el.removeClass('is-inactive').addClass('is-active');
+                    $icon.removeClass('bi-dash').addClass('bi-check');
+                    $text.text('Active');
+                    $el.attr('title', 'Active');
+                } else {
+                    $el.removeClass('is-active').addClass('is-inactive');
+                    $icon.removeClass('bi-check').addClass('bi-dash');
+                    $text.text('Inactive');
+                    $el.attr('title', 'Inactive');
+                }
+            }
+
+                function toggleFormMailStatus(el) {
+                var $el = $(el);
+                if ($el.hasClass('aws-status-updating')) return;
+
+                var formId = $el.data('form-id');
+                var mailType = $el.data('mail-type');
+                if (!formId) return;
+
+                var url = (mailType === 'Admin')
+                    ? '@Url.Action("AdminMailStatus", "MailTemplates")'
+                    : '@Url.Action("FormStatus", "Form")';
+
+                var wasOn = $el.hasClass('is-active');   // ✅ correct source of truth
+
+                // optimistic update
+                setMailStatusPillState($el, !wasOn);
+                $el.addClass('aws-status-updating');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: { FormId: formId },
+                    success: function (res) {
+                        if (!res || !res.ok) {
+                            setMailStatusPillState($el, wasOn); // revert
+                            showSampleSendPageMsg('error', (res && res.message) || 'Failed to Email update status.');
+                        } else {
+                            showSampleSendPageMsg('success', res.message || 'Email Status updated successfully.');
+                        }
+                    },
+                    error: function () {
+                        setMailStatusPillState($el, wasOn); // revert
+                        showSampleSendPageMsg('error', 'Failed to Email update status. Please try again.');
+                    },
+                    complete: function () {
+                        $el.removeClass('aws-status-updating');
+                    }
+                });
+            }
+            function openSampleSendMail() {
+                $('#awsSampleSubject').val($('#Subject').val() || '');
+                $('#awsSampleToEmail').val('');
+                $('#awsSampleSendMsg').hide().removeClass('aws-sendmail-success aws-sendmail-error').html('');
+                hideSampleSendPageMsg();
+                document.getElementById('awsSampleSendMailModal').classList.add('show');
+                document.body.classList.add('aws-mt-open');
+            }
+
+            function closeSampleSendMail() {
+                document.getElementById('awsSampleSendMailModal').classList.remove('show');
+                document.body.classList.remove('aws-mt-open');
+            }
+
+            function sendSampleMail() {
+                var subject = $.trim($('#awsSampleSubject').val());
+                var toEmail = $.trim($('#awsSampleToEmail').val());
+                var body = getCurrentMailContent();
+
+                if (!toEmail) {
+                    showSampleSendMsg('error', 'Please enter the email address to send the sample to.');
+                    return;
+                }
+                if (!subject) {
+                    showSampleSendMsg('error', 'Please enter a subject.');
+                    return;
+                }
+                if (!body || !$.trim(body.replace(/<[^>]*>/g, ''))) {
+                    showSampleSendMsg('error', 'Please write the email content before sending a sample.');
+                    return;
+                }
+
+                var $sendBtn = $('#awsSampleSendBtn');
+                var originalHtml = $sendBtn.html();
+                $sendBtn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Sending...');
+                $('#awsSampleSendCancelBtn').prop('disabled', true);
+
+                $.ajax({
+                    url: '@Url.Action("SendSampleMail", "MailTemplates")',
+                    type: 'POST',
+                    data: {
+                        ToEmail: toEmail,
+                        Subject: subject,
+                        Description: body
+                    },
+                    success: function (res) {
+                        // ✅ CHANGED — close the modal first, then show the result on the page itself
+                        closeSampleSendMail();
+                        if (res && res.ok) {
+                            showSampleSendPageMsg('success', res.message || 'Sample email sent successfully.');
+                        } else {
+                            showSampleSendPageMsg('error', (res && res.message) || 'Sample email not sent.');
+                        }
+                    },
+                    error: function () {
+                        closeSampleSendMail();
+                        showSampleSendPageMsg('error', 'Sample email not sent. Please try again.');
+                    },
+                    complete: function () {
+                        $sendBtn.prop('disabled', false).html(originalHtml);
+                        $('#awsSampleSendCancelBtn').prop('disabled', false);
+                    }
+                });
+            }
+
+            // ---------- Shared modal close behaviour ----------
+            document.addEventListener('click', function (event) {
+                var previewModal = document.getElementById('awsMailPreviewModal');
+                var sampleModal = document.getElementById('awsMailSampleModal');
+                var sendMailModal = document.getElementById('awsSampleSendMailModal');
+                if (previewModal && previewModal.classList.contains('show') && event.target === previewModal) {
+                    closeMailPreview();
+                }
+                if (sampleModal && sampleModal.classList.contains('show') && event.target === sampleModal) {
+                    closeMailSamplePreview();
+                }
+                if (sendMailModal && sendMailModal.classList.contains('show') && event.target === sendMailModal) {
+                    closeSampleSendMail();
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    closeMailPreview();
+                    closeMailSamplePreview();
+                    closeSampleSendMail();
+                }
+            });
+
+            /* ===================================================
+               APPLICANT FIELDS DRAWER (CKEditor 5 version — inserts
+               the placeholder at the editor's current model selection)
+            =================================================== */
+            function initApplicantFieldsDrawer(editor) {
+                var $fieldsBtn = $('#awsApplicantFieldsBtn');
+                var $drawer = $('#awsApplicantDrawer');
+                var $overlay = $('#awsApplicantDrawerOverlay');
+                var $closeBtn = $('#awsApplicantClose');
+                var $searchInput = $('#awsApplicantSearch');
+
+                function openApplicantDrawer() {
+                    $drawer.addClass('aws-drawer-open');
+                    $overlay.addClass('aws-drawer-visible');
+                    $('body').css('overflow', 'hidden');
+                    setTimeout(function () {
+                        $searchInput.trigger('focus');
+                    }, 150);
+                }
+
+                function closeApplicantDrawer() {
+                    $drawer.removeClass('aws-drawer-open');
+                    $overlay.removeClass('aws-drawer-visible');
+                    $('body').css('overflow', '');
+                }
+
+                $fieldsBtn.on('click', openApplicantDrawer);
+                $closeBtn.on('click', closeApplicantDrawer);
+                $overlay.on('click', closeApplicantDrawer);
+
+                $(document).on('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        closeApplicantDrawer();
+                    }
+                });
+
+                $searchInput.on('input', function () {
+                    var searchValue = $(this).val().toLowerCase().trim();
+                    $('.aws-applicant-field').each(function () {
+                        var fieldText = $(this).find('span').text().toLowerCase();
+                        $(this).toggle(fieldText.indexOf(searchValue) !== -1);
+                    });
+                });
+
+                $(document).on('mousedown', '.aws-applicant-field', function (e) {
+                    e.preventDefault();
+                });
+
+                $(document).on('click', '.aws-applicant-field', function () {
+                    var placeholder = '[' + $(this).data('field') + ']';
+
+                    // CKEditor 5 keeps its model selection even when the DOM editable
+                    // loses focus, so inserting at the current selection works without
+                    // having to manually save/restore ranges (unlike CKEditor 4).
+                    editor.model.change(function (writer) {
+                        editor.model.insertContent(writer.createText(placeholder, { bold: true }), editor.model.document.selection);
+                    });
+
+                    updateMailCharCount();
+                });
+            }
+        </script>
+
+        <script>
+            $(document).ready(function () {
+
+                $('#SponsorForm').on('submit', function () {
+                    $('#Heading').val($('#Subject').val());
+                    $('#Description').val(getCurrentMailContent());
+                });
+
+                $("#SponsorForm").validate({
+                    rules: {
+                        Subject: "required",
+                        Description: "required"
+                    },
+                    messages: {
+                        Subject: "Subject  Is Required",
+                        Description: "Description  Is Required"
+
+                    },
+
+                    errorElement: "div",
+                    errorPlacement: function (error, element) {
+                        error.addClass("invalid-feedback");
+
+                        if (element.prop("type") === "checkbox") {
+                            error.insertAfter(element.parent("label"));
+                        } else {
+                            error.insertAfter(element);
+                        }
+
+                        if (element.closest(".input-box").length) {
+                            element.closest(".input-box").after(error);
+                        }
+                    },
+                    highlight: function (element, errorClass, validClass) {
+                        var $element = $(element);
+                        if ($element.is('input, textarea, select')) {
+                            $element.addClass("is-invalid").removeClass("is-valid");
+                        }
+
+
+                    },
+                    unhighlight: function (element, errorClass, validClass) {
+                        var $element = $(element);
+                        if ($element.is('input, textarea, select')) {
+                            $element.addClass("is-valid").removeClass("is-invalid");
+                        }
+
+                    },
+
+
+                });
+            });
+
+        </script>
+
+

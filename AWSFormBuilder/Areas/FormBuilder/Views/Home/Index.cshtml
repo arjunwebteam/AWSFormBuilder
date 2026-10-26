@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    int status = 0;
+
+   AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _appinfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppinfo = _appinfo.GetAppInfoDetails(ref status);
+}
+<!-- breadcumb -->
+<div class="content-header">
+    <h1>Home  </h1>
+    <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-dashboard"></i> Home </li>
+    </ol>
+</div>
+<!--end breadcumb -->
+<div class="content">
+    <div class="box">
+        <div style="padding:10px;">
+            <h1 style="color: #00a7b3;text-align: center;font-weight: bold;font-size: 25px;">WELCOME TO @objAppinfo.SiteName</h1>
+
+            <div class="cus-about-sec">
+                <style type="text/css">
+                    .president-box.grid-gap.text-center {
+                        display: none !important;
+                    }
+                </style>
+                <div class="clearfix t-c">
+                    <span class="text-start">
+                        <a href="http://association.arjunweb.com/content/User/images/logofor-presedent-mesg.png"><img alt="" src="http://association.arjunweb.com/content/User/images/logofor-presedent-mesg.png" style="width:195px; height:162px;overflow: hidden;"></a>
+                    </span>
+                    <h4 class="pres-name mt-2 mb-0 text-start">
+                        Dr.President Name
+                    </h4>
+                    <h6 class="pres-desg text-start">
+                        President, Association Name
+                    </h6>
+                    
+                </div>
+                <p style="padding-top:10px;"><b>Dear Friends, Namaskara!</b></p>
+                <p>
+
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                </p>
+                <p>
+                    It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                </p>
+                <p>
+                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                </p>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+                <p>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+                <br>
+                <h4 class="pres-name mt-2 mb-0 text-start">
+                    Dr.President Name
+                </h4>
+                <h6 class="pres-desg text-start">
+                    President, Association Name
+                </h6>
+            </div>
+        </div>
+    </div>
+</div>

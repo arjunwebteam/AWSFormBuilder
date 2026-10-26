@@ -1,0 +1,322 @@
+﻿@{ 
+    Layout = null;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories = ViewBag.lstInnerPageCategories;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories2 = ViewBag.lstInnerPageCategories2;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories3 = ViewBag.lstInnerPageCategories3;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories4 = ViewBag.lstInnerPageCategories4; 
+}
+@{
+    if (ViewBag.total != null)
+    {
+        Int64 total = (Int64)ViewBag.total;    
+
+    <table width="100%" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th style="padding-left: 20px">Category Name</th> 
+                <th width="20%" style="text-align:center;">#</th>
+                <th width="10%" style="text-align:center;">Status</th>
+                <th width="10%" style="text-align:center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (total != 0)
+            {
+                if (lstInnerPageCategories != null && lstInnerPageCategories.Count != 0)
+                {
+                    foreach (var item in lstInnerPageCategories)
+                    {
+                <tr>
+                    <td><span style="display: inline-block; padding-left: 10px;">@item.DisplayName</span></td> 
+                    <td style="text-align:center;">@if (item.InnerPageId != 0)
+                        {
+                            <a href="@Url.Action("EditDetails", "InnerPages", new { InnerPageId = item.InnerPageId })" class="red-t" style="text-decoration:underline;">Edit Page Details</a><span> </span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("AddDetails", "InnerPages", new { Heading = item.DisplayName ,InnerPageCategoryId = item.InnerPageCategoryId})" class="red-t" style="text-decoration:underline;">Add Page to Item</a>
+                        }
+                    </td>
+                    <td>
+                        @{
+                        var isactive = "";
+                        var active = "";
+                        var disable = "";
+                        if (item.IsActive == true)
+                        {
+                            isactive = "Active";
+                            disable = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item.InnerPageCategoryId + ");\"";
+                        }
+                        else
+                        {
+                            isactive = "Disabled";
+                            active = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item.InnerPageCategoryId + ");\"";
+                        }
+                            <div class="admin-active">@isactive
+                                <ul>
+                                    <li><a @Html.Raw(active)>Active</a></li>
+                                    <li><a @Html.Raw(disable)>Disabled</a></li>
+                                </ul>
+                            </div>        
+                        }
+                    </td>
+                    <td  style="text-align:center;">
+                        <a title="Edit" class="sepV_a" href="@Url.Action("EditInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item.InnerPageCategoryId })"><i class="fa fa-pencil-square-o"></i></a>
+                        <a title="View" class="sepV_a" href="@Url.Action("ViewInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item.InnerPageCategoryId })" ><i class="fa fa-eye"></i></a>
+                        @if (item.SubMenuItemCount == 0)
+                        {
+                            <a title="Delete" class="sepV_a" onclick="javascript:InnerPageCategoriesDelete(@item.InnerPageCategoryId);"><i class="fa fa-trash-o"></i></a>     
+                        }
+                        else
+                        {
+                            <a class="sepV_a disable-alpha"><i class="fa fa-trash-o"></i></a>
+                        }
+                    </td>
+                </tr>
+                        if (lstInnerPageCategories2 != null && lstInnerPageCategories2.Count != 0)
+                        {
+                            foreach (var item2 in lstInnerPageCategories2)
+                            {
+                                if (item2.PageParentId == item.InnerPageCategoryId)
+                                {
+                <tr>
+                    <td><span style="display: inline-block; padding-left: 20px;">
+                        <img src="Content/Admin/images/indicater.gif" />
+                        @item2.DisplayName</span></td> 
+                    <td style="text-align:center;">@if (item2.InnerPageId != 0)
+                        {
+                            <a href="@Url.Action("EditDetails", "InnerPages", new { InnerPageId = item2.InnerPageId })" class="red-t" style="text-decoration:underline;">Edit Page Details</a><span> </span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("AddDetails", "InnerPages", new { Heading = item2.DisplayName ,InnerPageCategoryId = item2.InnerPageCategoryId})" class="red-t" style="text-decoration:underline;">Add Page to Item</a>
+                        }
+                    </td>
+                    <td>
+                        @{
+                        var isactive2 = "";
+                        var active2 = "";
+                        var disable2 = "";
+                        if (item2.IsActive == true)
+                        {
+                            isactive2 = "Active";
+                            disable2 = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item2.InnerPageCategoryId + ");\"";
+                        }
+                        else
+                        {
+                            isactive2 = "Disabled";
+                            active2 = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item2.InnerPageCategoryId + ");\"";
+                        }
+                            <div class="admin-active">@isactive2
+                                @if (item2.ParentActive)
+                                {
+                                    <ul>
+                                        <li><a @Html.Raw(active2)>Active</a></li>
+                                        <li><a @Html.Raw(disable2)>Disabled</a></li>
+                                    </ul>     
+                                }
+                            </div>        
+                        }
+                    </td>
+                    <td width="10%" style="text-align:center;">
+                        <a title="Edit" class="sepV_a" href="@Url.Action("EditInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item2.InnerPageCategoryId })"><i class="fa fa-pencil-square-o"></i></a>
+                        <a title="View" class="sepV_a" href="@Url.Action("ViewInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item2.InnerPageCategoryId })" ><i class="fa fa-eye"></i></a>
+                        @if (item2.SubMenuItemCount == 0)
+                        {
+                            <a title="Delete" class="sepV_a" onclick="javascript:InnerPageCategoriesDelete(@item2.InnerPageCategoryId);"><i class="fa fa-trash-o"></i></a>     
+                        }
+                        else
+                        {
+                            <a class="sepV_a disable-alpha"><i class="fa fa-trash-o"></i></a>
+                        }
+                    </td>
+                </tr>
+                        if (lstInnerPageCategories3 != null && lstInnerPageCategories3.Count != 0)
+                        {
+                            foreach (var item3 in lstInnerPageCategories3)
+                            {
+                                if (item3.PageParentId == item2.InnerPageCategoryId)
+                                {
+                <tr>
+                    <td><span style="display: inline-block; padding-left: 40px;">
+                        <img src="Content/Admin/images/indicater.gif" />
+                        @item3.DisplayName</span></td> 
+                    <td style="text-align:center;">@if (item3.InnerPageId != 0)
+                        {
+                            <a href="@Url.Action("EditDetails", "InnerPages", new { InnerPageId = item3.InnerPageId })" class="red-t" style="text-decoration:underline;">Edit Page Details</a><span> </span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("AddDetails", "InnerPages", new { Heading = item3.DisplayName, InnerPageCategoryId = item3.InnerPageCategoryId })" class="red-t" style="text-decoration:underline;">Add Page to Item</a>
+                        }
+                    </td>
+                    <td>
+                        @{
+                        var isactive3 = "";
+                        var active3 = "";
+                        var disable3 = "";
+                        if (item3.IsActive == true)
+                        {
+                            isactive3 = "Active";
+                            disable3 = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item3.InnerPageCategoryId + ");\"";
+                        }
+                        else
+                        {
+                            isactive3 = "Disabled";
+                            active3 = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item3.InnerPageCategoryId + ");\"";
+                        }
+                            <div class="admin-active">@isactive3
+                                @if (item3.ParentActive)
+                                {
+                                    <ul>
+                                        <li><a @Html.Raw(active3)>Active</a></li>
+                                        <li><a @Html.Raw(disable3)>Disabled</a></li>
+                                    </ul>     
+                                }
+                            </div>        
+                        }
+                    </td>
+                    <td width="10%" style="text-align:center;">
+                        <a title="Edit" class="sepV_a" href="@Url.Action("EditInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item3.InnerPageCategoryId })"><i class="fa fa-pencil-square-o"></i></a>
+                        <a title="View" class="sepV_a" href="@Url.Action("ViewInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item3.InnerPageCategoryId })" ><i class="fa fa-eye"></i></a>
+                        @if (item3.SubMenuItemCount == 0)
+                        {
+                            <a title="Delete" class="sepV_a" onclick="javascript:InnerPageCategoriesDelete(@item3.InnerPageCategoryId);"><i class="fa fa-trash-o"></i></a>     
+                        }
+                        else
+                        {
+                            <a class="sepV_a disable-alpha"><i class="fa fa-trash-o"></i></a>
+                        }
+                    </td>
+                </tr>
+                        if (lstInnerPageCategories4 != null && lstInnerPageCategories4.Count != 0)
+                        {
+                            foreach (var item4 in lstInnerPageCategories4)
+                            {
+                                if (item4.PageParentId == item3.InnerPageCategoryId)
+                                {
+                <tr>
+                    <td><span style="display: inline-block; padding-left: 60px;">
+                        <img src="Content/Admin/images/indicater.gif" />
+                        @item4.DisplayName</span></td> 
+                    <td style="text-align:center;">@if (item4.InnerPageId != 0)
+                        {
+                            <a href="@Url.Action("EditDetails", "InnerPages", new { InnerPageId = item4.InnerPageId })" class="red-t" style="text-decoration:underline;">Edit Page Details</a><span> </span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("AddDetails", "InnerPages", new { Heading = item4.DisplayName, InnerPageCategoryId = item4.InnerPageCategoryId })" class="red-t" style="text-decoration:underline;">Add Page to Item</a>
+                        }
+                    </td>
+                    <td>
+                        @{
+                        var isactive4 = "";
+                        var active4 = "";
+                        var disable4 = "";
+                        if (item4.IsActive == true)
+                        {
+                            isactive4 = "Active";
+                            disable4 = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item4.InnerPageCategoryId + ");\"";
+                        }
+                        else
+                        {
+                            isactive4 = "Disabled";
+                            active4 = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageCategoriesStatus(" + item4.InnerPageCategoryId + ");\"";
+                        }
+                            <div class="admin-active">@isactive4
+                                @if (item2.ParentActive)
+                                {
+                                    <ul>
+                                        <li><a @Html.Raw(active4)>Active</a></li>
+                                        <li><a @Html.Raw(disable4)>Disabled</a></li>
+                                    </ul>     
+                                }
+                            </div>        
+                        }
+                    </td>
+                    <td width="10%" style="text-align:center;">
+                        <a title="Edit" class="sepV_a" href="@Url.Action("EditInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item4.InnerPageCategoryId })"><i class="fa fa-pencil-square-o"></i></a>
+                        <a title="View" class="sepV_a" href="@Url.Action("ViewInnerPageCategories", "InnerPageMaster", new { InnerPageCategoryId = item4.InnerPageCategoryId })" ><i class="fa fa-eye"></i></a>
+                        @if (item4.SubMenuItemCount == 0)
+                        {
+                            <a title="Delete" class="sepV_a" onclick="javascript:InnerPageCategoriesDelete(@item4.InnerPageCategoryId);"><i class="fa fa-trash-o"></i></a>     
+                        }
+                        else
+                        {
+                            <a class="sepV_a disable-alpha"><i class="fa fa-trash-o"></i></a>
+                        }
+                    </td>
+                </tr>
+                                }
+                            }
+                        }
+                                }
+                            }
+                        }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="norecords">No Web Page Categories found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+    <script type="text/javascript">
+        function InnerPageCategoriesStatus(InnerPageCategoryId) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("InnerPageCategoriesStatus", "InnerPageMaster")', // the URL of the controller action method
+                data: { InnerPageCategoryId: InnerPageCategoryId }, // optional data
+                datatype: "JSON",
+                success: function (result) {
+                    if (result.ok) {
+                        $('#divmessage').html(result.data);
+                        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                        InnerPageCategoriesBind();
+                    }
+                    else {
+                        $('#divmessage').html(result.data);
+                        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                    }
+                }
+            });
+        }
+
+        function InnerPageCategoriesDelete(InnerPageCategoryId) {
+
+            var conf = confirm('Do you want to delete InnerPage Category?');
+
+            if (conf) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InnerPageCategoriesDelete", "InnerPageMaster")', // the URL of the controller action method
+                    data: { InnerPageCategoryId: InnerPageCategoryId }, // optional data
+                    datatype: "JSON",
+                    success: function (result) {
+                        if (result.ok) {
+                            $('#divmessage').html(result.data);
+                            $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                            $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                            InnerPageCategoriesBind();
+                        }
+                        else {
+                            $('#divmessage').html(result.data);
+                            $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                            $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    }
+}

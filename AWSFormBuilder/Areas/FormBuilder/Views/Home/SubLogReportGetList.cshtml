@@ -1,0 +1,118 @@
+﻿@using System.Configuration
+@{ Layout = null;}
+@{
+    string sortcolumn = (string)ViewBag.sortcolumn;
+    string sortorder = (string)ViewBag.sortorder;
+    Int64 Total = (Int64)ViewBag.total;
+    var PageNo = (Int64)ViewBag.pageno;
+    var Items = (Int64)ViewBag.items;
+
+
+
+    List<AWSFormBuilder.Entities.LogSubReport> lstSUbLogReport = ViewBag.lstSUbLogReport;
+
+  
+
+    decimal amount = 0;
+}
+
+
+
+<style>
+    .aws-h-a {
+        text-decoration: none;
+        position: relative;
+    }
+
+        .aws-h-a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            border-bottom: 2px solid #0756ca;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .aws-h-a:hover::after {
+            transform: scaleX(1);
+        }
+</style>
+
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+
+            <thead class="table-light">
+                <tr>
+                    <th width="5%">S.No.</th>
+                    <th width="15%">
+                        Form Type
+                    </th>
+                    <th width="55%">
+                        Log Description
+                    </th>
+                    <th width="8%">Name</th>
+                    <th width="8%">Updated By</th>
+                    <th width="11%">
+                        Log Date
+                    </th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (lstSUbLogReport.Count != 0)
+                {
+                    int i = 0;
+                    var location = Context.Session.GetString("UserSiteUrl");
+                    foreach (var item in lstSUbLogReport)
+                    {
+                        <tr>
+                            <td style="text-align: center">@item.RId</td>
+                            <td style="text-align: left" class="t-t-c">@item.LogTitle</td>
+                            <td style="text-align: left" class="t-t-c"> @(item.LogDescription == "" ? "N/A" : item.LogDescription)</td>
+                            <td style="text-align: left" class="t-t-c">@(item.InsertedBy == "" ? "N/A" : item.InsertedBy)</td>
+                            <td style="text-align: left" class="t-t-c">@(item.UpdatedBy == "" ? "N/A" : item.UpdatedBy)</td>
+                            <td style="padding:4px!important; font-size:12px!important">@(item.LogDate.ToString())</td>
+
+                        </tr>
+                        i++;
+                    }
+                }
+                else
+                {
+                    <tr class="odd"><td valign="top" colspan="10" class="font-14 text-center">No  Records found</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="row pt-3">
+        <div class="col-sm-4 col-md-5">
+            <div class="dataTables_info" id="example_info" role="status" aria-live="polite">
+                Showing @((PageNo * Items) - (Items - 1)) - @((PageNo * Items) > Total ? Total : (PageNo * Items)) of @Total entries
+            </div>
+        </div>
+        <div class="col-sm-3 col-md-7 " @(Total > 0 ? "" : "disable")>
+            <div class="d-flex flex-wrap gap-4 justify-content-end">
+                <div class="dataTables_length d-none" id="example_length">
+                    <div class="d-flex align-items-center gap-2 pt-1">
+                        <span>Show Items</span>
+                        <select id="txtitems" name="txtitems" aria-controls="example" onchange="Onload();" class="form-select form-select-sm w-auto">
+                            <!option value="25" @(Items == 25 ? "selected" : "")>25</!option>
+                            <!option value="50" @(Items == 50 ? "selected" : "")>50</!option>
+                            <!option value="75" @(Items == 75 ? "selected" : "")>75</!option>
+                            <!option value="100" @(Items == 100 ? "selected" : "")>100</!option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    @Html.Raw(AWSFormBuilder.Areas.FormBuilder.BLL.Common.SetPaging((Int64)ViewBag.items, ref Total, (Int64)ViewBag.pageno, "pagination pb-0"))
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

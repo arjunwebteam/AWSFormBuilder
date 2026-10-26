@@ -1,0 +1,106 @@
+﻿@using System.Configuration
+@{
+    ViewBag.Title = "Sub Log Report";
+    ViewBag.Pageheading = "Sub Logs";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    Int64 LogId = ViewBag.LogId;
+}
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type : "GET",
+            url  : '@Url.Action("SubLogReportGetList", "Home")',
+            data : {
+                LogId    : '@LogId'
+
+            },
+            success: function (data) {
+                $("#divLogReportList").html(data);
+            },
+            error: function () {
+                $("#divLogReportList").html('<p class="text-danger">Failed to load.</p>');
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wLogs, #LogsMenu').addClass('active');
+
+        PagerClickBind();
+        SubLogBind();
+    });
+
+    function sortresult(sortcolumn) {
+        $('#hdnsortorder').val(($('#hdnsortorder').val() == 'ASC' ? 'DESC' : 'ASC'));
+        $('#hdnsortcolumn').val(sortcolumn);
+        SubLogBind(1);
+    }
+
+    function SubLogBind(Pageno) {
+        var pageno    = Common.Pageno(Pageno);
+        var sortcolumn = $('#hdnsortcolumn').val();
+        var sortorder  = $('#hdnsortorder').val();
+        var items      = $('#txtitems').val();
+
+        $.ajax({
+            url: '@Url.Action("SubLogReportGetList", "Home")',
+            type: 'GET',
+            cache: false,
+            data: {
+                LogId:      '@LogId',
+                PageNo:     pageno,
+                SortColumn: sortcolumn,
+                SortOrder:  sortorder,
+                Items:      items
+            },
+            success: function (result) {
+                $('#divLogReportList').html(result);
+                PagerClickBind();
+            },
+            error: function () {
+                $('#divLogReportList').html('<p class="text-danger">Failed to load.</p>');
+            }
+        });
+    }
+
+    function PagerClickBind() {
+        $(document).off("click", ".pagination .page-link").on("click", ".pagination .page-link", function () {
+            var id = $(this).attr("id");
+            var pageNo;
+            if (id === "Previous" || id === "Next") {
+                pageNo = parseInt($(this).data("page"));
+            } else {
+                pageNo = parseInt(id);
+            }
+            if (!pageNo || isNaN(pageNo) || pageNo < 1) return;
+            SubLogBind(pageNo);
+        });
+    }
+
+</script>
+
+<input id="hdnPageNo" type="hidden" value="1" />
+<input id="hdnsortorder" name="hdnsortorder" value="ASC" type="hidden" />
+<input id="hdnsortcolumn" name="hdnsortcolumn" value="InsertedDate" type="hidden" />
+
+<div class="card">
+
+    <div class="card-header py-3 mb-3">
+        <div class="row gx-2 align-items-end">
+
+            <div class="col-12">
+                <a href="@Url.Action("LogReport", "Home")" class="btn btn-secondary px-3" style="background: #13458f !important">
+                    <i class="fa fa-arrow-left"></i> Back to Logs
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="divLogReportList" class="clearfix">
+        {{-- sub log table loads here via AJAX --}}
+    </div>
+
+</div>

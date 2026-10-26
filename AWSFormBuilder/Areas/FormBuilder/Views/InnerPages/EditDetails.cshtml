@@ -1,0 +1,153 @@
+﻿@{
+    ViewBag.Title = "EditDetails";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    AWSFormBuilder.Entities.InnerPages objDetails = ViewBag.objDetails;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories = ViewBag.lstInnerPageCategories;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories2 = ViewBag.lstInnerPageCategories2;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories3 = ViewBag.lstInnerPageCategories3;
+    List<AWSFormBuilder.Entities.InnerPageCategories> lstInnerPageCategories4 = ViewBag.lstInnerPageCategories4;
+    var cssloc = System.Configuration.ConfigurationManager.AppSettings["usersiteurl"] + "Content/Admin/front-end-style.css";
+
+    var imglocNormal = System.Configuration.ConfigurationManager.AppSettings["adminimageurl"] + "innerpages/";
+
+    var Type = ViewBag.Type;
+}
+
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckfinder/ckfinder.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#WebPages').addClass('active');
+        $('#wInnerPages').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+   
+    function Validate() {
+
+        if ($.trim($('#Heading').val()) == '') { document.getElementsByName('Heading')[0].placeholder = 'Page Name Required'; $('#Heading').focus().addClass("validate"); return false; } else { $('#Heading').focus().removeClass("validate"); }
+        if ($.trim($('#InnerPageCategoryId').val()) == '') { document.getElementsByName('InnerPageCategoryId')[0].placeholder = 'Category Required'; $('#InnerPageCategoryId').focus().addClass("validate"); return false; } else { $('#InnerPageCategoryId').focus().removeClass("validate"); }
+        if (CKEDITOR.instances.Description.getData() == "") { $('#Description').focus().addClass("red-border"); $('#lblDescription').html('Description Required.'); return false; } else { $('#Description').val(CKEDITOR.instances.Description.getData()); $('#lblDescription').html(''); }
+
+        return true;
+    }
+
+    function ResetValidateClass() {
+        $('#Heading').removeClass("validate");
+        $('#InnerPageCategoryId').removeClass("validate");
+    }
+</script>
+
+<!-- breadcumb -->
+<div class="content-header">
+    <h1>Edit Web Pages </h1>
+    <ol class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>Home</a></li>
+        <li><a href="@Url.Action("Index", "InnerPages")"><i class="fa fa-list-alt"></i>Web Pages</a></li>
+        <li class="active">Edit Web Page</li>
+    </ol>
+</div>
+<!--end breadcumb -->
+<div class="content">
+    <!-- Main content -->
+    <div id="divmessage">
+        @if (TempData["message"] != null)
+        { @Html.Raw(TempData["message"].ToString())}
+
+        @if (ViewBag.message != null)
+        { @Html.Raw(ViewBag.message.ToString())}
+    </div>
+    <div class="clearfix sepH_b"></div>
+    @using (Html.BeginForm("AddDetails", "InnerPages", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {    
+        <input type="hidden" name="InnerPageId" id="InnerPageId" value="@objDetails.InnerPageId" />
+        <div class="box validation">
+            <div class="box-header">
+                <h3 class="box-title dis-in">Web Page Details </h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Page Name : <span class="red-t">*</span></label>
+                        <input type="text" id="Heading" onkeypress="ResetValidateClass();" value="@objDetails.Heading" onclick="ResetValidateClass();" name="Heading" class="form-control">
+                    </div>
+                    <div class="col-xs-12 col-lg-2 col-sm-6">
+                        <label>Display Order : </label>
+                        <input type="text" onkeypress="return Common.isNumberKey(event)" value="@objDetails.DisplayOrder" id="DisplayOrder" onclick="ResetValidateClass();" name="DisplayOrder" class="form-control">
+                    </div>
+                    <div class="col-xs-12 col-lg-4 col-sm-6">
+                        <label>Category : <span class="red-t">*</span></label>
+                        <select id="InnerPageCategoryId" class="form-control" name="InnerPageCategoryId" onclick="ResetValidateClass();">
+                            <option value="">- Select Category -</option>
+                            @if (lstInnerPageCategories != null && lstInnerPageCategories.Count != 0)
+                            {
+                                foreach (var item in lstInnerPageCategories)
+                                { 
+                                <option @(item.InnerPageCategoryId == objDetails.InnerPageCategoryId ? "selected=selected" : "") value="@(item.InnerPageCategoryId)">@item.DisplayName</option> 
+                                    if (lstInnerPageCategories2 != null && lstInnerPageCategories2.Count != 0)
+                                    {
+                                        foreach (var item2 in lstInnerPageCategories2)
+                                        {
+                                            if (item2.PageParentId == item.InnerPageCategoryId)
+                                            {
+                                                <option @(item2.InnerPageCategoryId == objDetails.InnerPageCategoryId ? "selected=selected" : "") value="@(item2.InnerPageCategoryId)">| @item2.DisplayName</option> 
+                                                if (lstInnerPageCategories3 != null && lstInnerPageCategories3.Count != 0)
+                                                {
+                                                    foreach (var item3 in lstInnerPageCategories3)
+                                                    {
+                                                        if (item3.PageParentId == item2.InnerPageCategoryId)
+                                                        {
+                                                            <option @(item3.InnerPageCategoryId == objDetails.InnerPageCategoryId ? "selected=selected" : "") value="@item3.InnerPageCategoryId">| | @item3.DisplayName</option> 
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>  
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-lg-12 col-sm-6">
+                        <label>Description : <span class="red-t">*</span></label>
+                        <textarea rows="10" name="Description" id="Description" cols="80" style="visibility: hidden; display: none;">@objDetails.Description</textarea><br />
+                        <label id="lblDescription" class="field-validation-error"></label>
+                        <script type="text/javascript">
+                            var editor = CKEDITOR.replace('Description', { contentsCss: '@(cssloc)' });
+                            CKFinder.setupCKEditor(editor, '@(System.Configuration.ConfigurationManager.AppSettings["baseurl"])ckfinder/');
+                        </script>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6 col-sm-6">
+                        <label>Page Title : </label>
+                        <input type="text" id="PageTitle" value="@objDetails.PageTitle" name="PageTitle" class="form-control">
+                    </div>
+                </div>
+                  <div class="row">
+                    <div class="col-xs-12 col-lg-6 col-sm-6">
+                        <label>MetaKey words : </label>
+                        <textarea  id="MetaKeywords"  name="MetaKeywords" class="form-control">@objDetails.MetaKeywords</textarea>
+                    </div>
+                    <div class="col-xs-12 col-lg-6 col-sm-6">
+                        <label>Meta Description : </label>
+                        <textarea  id="MetaDescription"   name="MetaDescription" class="form-control">@objDetails.MetaDescription</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body text-right">
+                <input type="submit" value="Submit" class="btn btn-primary" onclick="return Validate();" />
+                <a class="btn btn-info" href="@Url.Action("Index", "InnerPages")">Cancel</a>
+            </div>
+            <!-- /.box-body -->
+        </div> 
+    }
+</div>

@@ -1,0 +1,196 @@
+﻿@{
+    ViewBag.Title = "SendMail";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    ViewBag.Pageheading = "Send Mail";
+}
+
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckfinder/ckfinder.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wSendMail').addClass('active');
+
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+    function Validate() {
+        if ($('#EmailFrom').val() == '') { document.getElementsByName('EmailFrom')[0].placeholder = 'Required'; $('#EmailFrom').focus().addClass("validate"); return false; } else { $('#EmailFrom').focus().removeClass("validate"); }
+        if ($('#EmailTo').val() == '') { document.getElementsByName('EmailTo')[0].placeholder = 'Required'; $('#EmailTo').focus().addClass("validate"); return false; } else { $('#EmailTo').focus().removeClass("validate"); }
+        if ($('#MailTemplateId').val() == '') { document.getElementsByName('MailTemplateId')[0].placeholder = 'Required'; $('#MailTemplateId').focus().addClass("validate"); return false; } else { $('#MailTemplateId').focus().removeClass("validate"); }
+        if ($('#Subject').val() == '') { document.getElementsByName('Subject')[0].placeholder = 'Required'; $('#Subject').focus().addClass("validate"); return false; } else { $('#Subject').focus().removeClass("validate"); }
+        if (CKEDITOR.instances.description.getData() == "") { $('#description').focus(); $('#spandescription').html('Required.'); return false; } else { $('#description').val(CKEDITOR.instances.description.getData()); $('#spandescription').html(''); }
+        return true;
+    }
+
+    function ResetValidateClass() {
+        $('#EmailFrom').removeClass("validate");
+        $('#EmailTo').removeClass("validate");
+        $('#MailTemplateId').removeClass("validate");
+        $('#Subject').removeClass("validate");
+    }
+
+    function MailTemplate() {
+        $.ajax({
+            url: '@Url.Action("MailTemplate", "Home")',
+            type: 'POST',
+            data: { MailTemplateName: $('#MailTemplateName').val() },
+            datatype: "JSON",
+            success: function (result) {
+                if (result.ok) {
+                    var objMailTemplate = result.data;
+                    $('#description').val(objMailTemplate.Description);
+                    CKEDITOR.instances.description.setData(objMailTemplate.Description)
+                }
+                else {
+                    alert(result.data);
+                }
+            }
+        });
+    }
+</script>
+
+<div class="content">
+    @using (Html.BeginForm("Send", "Home", FormMethod.Post, new { enctype = "multipart/form-data", @id = "Sendmailform", @name = "Sendmailform" }))
+    {
+        <input id="mid" name="mid" value="@ViewBag.mid" type="hidden" />
+        <div class="box validation">
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Email From : <span class="text-danger">*</span></label>
+                                <span class="b-p5"><b>@System.Configuration.ConfigurationManager.AppSettings["adminemailid"]</b></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Email To : <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="EmailTo" id="EmailTo" value="@ViewBag.Email" placeholder="Email To">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Subject : <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="Subject" id="Subject" value="@ViewBag.Email" placeholder="Subject">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="box validation">
+                        <div class="box-header">
+                            <h3 class="box-title dis-in"> Description <span class="text-danger">*</span></h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row  g-3">
+                                <div class="col-lg-12">
+                                    <div class="input-box">
+                                        <textarea rows="10" placeholder="Description *" name="Description" id="Description" cols="80" style="visibility: hidden; display: none;"></textarea><br />
+                                        <span class="field-validation-error" id="Description"></span>
+                                        <script type="text/javascript">
+                                            var editor = CKEDITOR.replace('Description', { contentsCss: '../css/editor.css' });
+                                            CKFinder.setupCKEditor(editor, 'ckfinder/');
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-3 text-end ms-auto">
+                <button type="submit" class="btn btn-success px-3 " value="submit">Submit</button>
+                <a class="btn btn-primary px-3" href="javascript:history.back()">Cancel</a>
+            </div>
+        </div>
+     }
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#Sendmailform").validate({
+            rules: {
+                EmailTo: {
+                    required: true,
+                    email: true
+                },
+                Subject:
+                {
+                    required: true,
+                },
+            },
+            messages: {
+                EmailTo: {
+                    required: "Please enter email address",
+                    email: "Please enter valid email address",
+                },
+                Subject: {
+                    required: "Please enter subject here",
+                },
+            },
+
+
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                // Add the `invalid-feedback` class to the error element
+                error.addClass("invalid-feedback");
+
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else {
+                    error.insertAfter(element);
+                }
+
+                // Move the error element after the fieldset element
+                if (element.closest(".input-box").length) {
+                    element.closest(".input-box").after(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                // Highlight the input, textarea, or select element with the `is-invalid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-invalid").removeClass("is-valid");
+                }
+
+
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                // Unhighlight the input, textarea, or select element by adding the `is-valid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-valid").removeClass("is-invalid");
+                }
+
+            },
+
+
+        });
+    });
+
+</script>
+
+
+
+

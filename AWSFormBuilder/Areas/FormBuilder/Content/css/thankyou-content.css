@@ -1,0 +1,176 @@
+/* ============================================================
+   Thank You page sample-design styles.
+   SINGLE SOURCE OF TRUTH — loaded by BOTH:
+     - Areas/Admin/.../EditThankYouPage.cshtml  (editor + preview modals)
+     - Views/Form/ThankYou.cshtml               (the live public page)
+   Editing colors/spacing here updates both places at once, so the
+   editor and the real page can never drift apart again.
+   ============================================================ */
+
+.aws-thankyou-icon {
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e9f9ef;
+    color: #16a34a;
+    font-size: 42px;
+}
+
+.aws-thankyou-icon-blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.aws-thankyou-icon-purple {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.aws-thankyou-title {
+    margin-bottom: 12px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: center;
+}
+
+.aws-thankyou-message {
+    max-width: 500px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #6b7280;
+    text-align: center;
+}
+
+.aws-thankyou-success-box {
+    margin-top: 28px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.aws-thankyou-steps {
+    margin-top: 28px;
+    padding: 18px 20px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.aws-thankyou-steps-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1d4ed8;
+    margin-bottom: 10px;
+}
+
+.aws-thankyou-steps ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #1e3a8a;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.aws-thankyou-banner {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: #ede9fe;
+    color: #6d28d9;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 auto 18px auto;
+}
+
+.aws-thankyou-divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 24px 0 16px;
+}
+
+.aws-thankyou-footer {
+    margin-top: 28px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.aws-checkmark {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    color: inherit;
+}
+
+
+
+.thank-you-custom-content .image,
+.aws-thankyou-preview-scope .image {
+    display: table;
+    clear: both;
+    text-align: center;
+    margin: 0.9em auto;
+}
+
+    .thank-you-custom-content .image img,
+    .aws-thankyou-preview-scope .image img {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+    }
+
+    .thank-you-custom-content .image.image_resized,
+    .aws-thankyou-preview-scope .image.image_resized {
+        max-width: 100%;
+        display: block;
+        box-sizing: border-box;
+    }
+
+        .thank-you-custom-content .image.image_resized img,
+        .aws-thankyou-preview-scope .image.image_resized img {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .thank-you-custom-content .image.image_resized > figcaption,
+        .aws-thankyou-preview-scope .image.image_resized > figcaption {
+            display: block;
+        }
+
+
+/* ------------------------------------------------------------
+   Content written in the editor (plain p / h1 / ul + inline styles).
+   Keeps lists tidy on the centred Thank You page and in the previews.
+   ------------------------------------------------------------ */
+.thank-you-custom-content ul,
+.thank-you-custom-content ol,
+.aws-thankyou-preview-scope ul,
+.aws-thankyou-preview-scope ol {
+    display: table;
+    margin: 0 auto 1em;
+    text-align: left;
+}
+
+.ck-content strong,
+.ck-content b,
+.ck-content strong span,
+.ck-content b span,
+.ck-editor__editable strong,
+.ck-editor__editable strong span {
+    font-weight: 700 !important;
+}
+

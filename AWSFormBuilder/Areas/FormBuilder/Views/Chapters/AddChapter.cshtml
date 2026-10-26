@@ -1,0 +1,413 @@
+﻿@{
+    ViewBag.Title = "AddChapter";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    var cssloc = System.Configuration.ConfigurationManager.AppSettings["usersiteurl"] + "Content/Admin/front-end-style.css";
+
+    List<AWSFormBuilder.Entities.Chapters> lstChapters = ViewBag.lstChapters;
+
+    AWSFormBuilder.Entities.Chapters objChapters = ViewBag.objChapters;
+
+    ViewBag.Pageheading = "Add Chapter";
+}
+
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckfinder/ckfinder.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#Chapters').addClass('active');
+        $('#wChapters').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+   
+    function CheckChapterAvailability(cname) {
+
+        var returnval = null;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CheckChapterNameAvailability", "Chapters")', // the URL of the controller action method
+            data: { cname: cname }, // optional data
+            datatype: "JSON",
+            async: false,
+            success: function (result) {
+                if (result.ok) {
+                    returnval = result.data;
+                }
+            }
+        });
+        return returnval;
+    }
+
+    function Validate() {
+        if ($.trim($('#ChapterName').val()) == '') { document.getElementsByName('ChapterName')[0].placeholder = 'Chapter Name Required'; $('#ChapterName').focus().addClass("validate"); return false; } else { $('#ChapterName').focus().removeClass("validate"); }
+        if (!CheckChapterAvailability($.trim($('#ChapterName').val()))) { $('#spanChapterName').html(' Chapter Already available.'); $('#ChapterName').focus().addClass("red-border"); return false; } else { $('#spanChapterName').html(''); $('#ChapterName').focus().removeClass("red-border"); }
+
+        if ($.trim($('#ShortName').val()) == '') { document.getElementsByName('ShortName')[0].placeholder = 'Short Name Required'; $('#ShortName').focus().addClass("validate"); return false; } else { $('#ShortName').focus().removeClass("validate"); }
+        if ($.trim($('#City').val()) == '') { document.getElementsByName('City')[0].placeholder = 'City Required'; $('#City').focus().addClass("validate"); return false; } else { $('#City').focus().removeClass("validate"); }
+        if ($.trim($('#State').val()) == '') { document.getElementsByName('State')[0].placeholder = 'State Required'; $('#State').focus().addClass("validate"); return false; } else { $('#State').focus().removeClass("validate"); }
+        //if ($.trim($('#ZipCode').val()) == '') { document.getElementsByName('ZipCode')[0].placeholder = 'ZipCode Required'; $('#ZipCode').focus().addClass("validate"); return false; } else { $('#ZipCode').focus().removeClass("validate"); }
+        if (CKEDITOR.instances.Description.getData() == "") { $('#Description').focus().addClass("red-border"); $('#lblDescription').html('Description Required.'); return false; } else { $('#Description').val(CKEDITOR.instances.Description.getData()); $('#lblDescription').html(''); }
+
+        return true;
+    }
+    function ResetValidateClass() {
+        $('#ChapterName').removeClass("validate");
+        $('#ShortName').removeClass("validate");
+        $('#City').removeClass("validate");
+        $('#State').removeClass("validate");
+        $('#ZipCode').removeClass("validate");
+    }
+    isNumberKey: function (evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    },
+
+    isChar: function isAlphaKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if ((charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122)) {
+            return true;
+        }
+        return false;
+    },
+</script>
+
+
+<div class="content">
+    @using (Html.BeginForm("AddChapter", "Chapters", FormMethod.Post, new { enctype = "multipart/form-data", @id = "ChaptersForm", @name = "ChaptersForm" }))
+    {
+        <input type="hidden" name="ChapterId" id="ChapterId" value="@objChapters.ChapterId" />
+
+
+
+
+
+
+        <input type="hidden" value="@ViewBag.mid" name="mid" id="mid" />
+        <div class="box validation">
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Chapter Name : <span class="text-danger">*</span></label>
+                                <input type="text" id="ChapterName" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" name="ChapterName" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label>Previous Chapters to Clone </label>
+                                <select class="single-select" id="ShortDescription" name="ShortDescription">
+                                    <option value="" selected="selected">-- select --</option>
+                                    @if (lstChapters != null && lstChapters.Count != 0)
+                                    {
+                                        foreach (var item in lstChapters)
+                                        {
+                                            <option value="@item.ChapterId">@item.ChapterName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Clone Type </label>
+                                <select class="single-select" id="Address" name="Address">
+                                    <option value="" selected="selected">-- select --</option>
+                                    <option value="Menu Items Only">Menu Items Only</option>
+                                    <option value="Menu Items With Pages">Menu Items With Pages</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Short Name : <span class="text-danger">*</span></label>
+                                <input type="text" id="ShortName" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" name="ShortName" class="form-control">
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">City</label>
+                                    <input type="text" id="City" onkeypress="ResetValidateClass();" onclick="ResetValidateClass();" name="City" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">State : </label>
+                                    <select class="single-select" id="State" name="State">
+                                        <option value="" selected="selected">--Select--</option>
+                                        <option value="AK"> AK - Alaska</option>
+                                        <option value="AL"> AL - Alabama</option>
+                                        <option value="AR"> AR - Arkansas</option>
+                                        <option value="AZ"> AZ - Arizona</option>
+                                        <option value="CA"> CA - California</option>
+                                        <option value="CO"> CO - Colorado</option>
+                                        <option value="CT"> CT - Connecticut</option>
+                                        <option value="DC"> DC - District of Columbia</option>
+                                        <option value="DE"> DE - Delaware</option>
+                                        <option value="FL"> FL - Florida</option>
+                                        <option value="GA"> GA - Georgia</option>
+                                        <option value="HI"> HI - Hawaii</option>
+                                        <option value="IA"> IA - Iowa</option>
+                                        <option value="ID"> ID - Idaho</option>
+                                        <option value="IL"> IL - Illinois</option>
+                                        <option value="IN"> IN - Indiana</option>
+                                        <option value="KS"> KS - Kansas</option>
+                                        <option value="KY"> KY - Kentucky</option>
+                                        <option value="LA"> LA - Louisiana</option>
+                                        <option value="MA"> MA - Massachusetts</option>
+                                        <option value="MD"> MD - Maryland</option>
+                                        <option value="ME"> ME - Maine</option>
+                                        <option value="MI"> MI - Michigan</option>
+                                        <option value="MN"> MN - Minnesota</option>
+                                        <option value="MO"> MO - Missouri</option>
+                                        <option value="MS"> MS - Mississippi</option>
+                                        <option value="MT"> MT - Montana</option>
+                                        <option value="NC"> NC - North Carolina</option>
+                                        <option value="ND"> ND - North Dakota</option>
+                                        <option value="NE"> NE - Nebraska</option>
+                                        <option value="NH"> NH - New Hampshire</option>
+                                        <option value="NJ"> NJ - New Jersey</option>
+                                        <option value="NM"> NM - New Mexico</option>
+                                        <option value="NV"> NV - Nevada</option>
+                                        <option value="NY"> NY - New York</option>
+                                        <option value="OH"> OH - Ohio</option>
+                                        <option value="OK"> OK - Oklahoma</option>
+                                        <option value="OR"> OR - Oregon</option>
+                                        <option value="PA"> PA - Pennsylvania</option>
+                                        <option value="RI"> RI - Rhode Island</option>
+                                        <option value="SC"> SC - South Carolina</option>
+                                        <option value="SD"> SD - South Dakota</option>
+                                        <option value="TN"> TN - Tennessee</option>
+                                        <option value="TX"> TX - Texas</option>
+                                        <option value="UT"> UT - Utah</option>
+                                        <option value="VA"> VA - Virginia</option>
+                                        <option value="VT"> VT - Vermont</option>
+                                        <option value="WA"> WA - Washington</option>
+                                        <option value="WI"> WI - Wisconsin</option>
+                                        <option value="WV"> WV - West Virginia</option>
+                                        <option value="WY"> WY - Wyoming</option>
+                                        <option value="AS"> AS - American Samoa</option>
+                                        <option value="FM"> FM - Federated States of Micronesia</option>
+                                        <option value="GU"> GU - Guam</option>
+                                        <option value="MH"> MH - Marshall Islands</option>
+                                        <option value="MP"> MP - Northern Mariana Islands</option>
+                                        <option value="PR"> PR - Puerto Rico</option>
+                                        <option value="PW"> PW - Palau</option>
+                                        <option value="VI"> VI - Virgin Islands</option>
+                                        <option value="AA"> AA - Armed Forces Americas</option>
+                                        <option value="AE"> AE - Armed Forces</option>
+                                        <option value="AP"> AP - Armed Forces Pacific</option>
+                                        <option value="AB"> AB - Alberta</option>
+                                        <option value="BC"> BC - British Columbia</option>
+                                        <option value="MB"> MB - Manitoba</option>
+                                        <option value="NB"> NB - New Brunswick</option>
+                                        <option value="NL"> NL - Newfoundland and Labrador</option>
+                                        <option value="NS"> NS - Nova Scotia</option>
+                                        <option value="NT"> NT - Northwest Territories</option>
+                                        <option value="NU"> NU - Nunavut</option>
+                                        <option value="ON"> ON - Ontario</option>
+                                        <option value="PE"> PE - Prince Edward Island</option>
+                                        <option value="QC"> QC - Quebec</option>
+                                        <option value="SK"> SK - Saskatchewan</option>
+                                        <option value="YT"> YT - Yukon</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">ZipCode</label>
+                                    <input type="text" onkeypress="return Common.isNumberKey(event)" maxlength="6" id="ZipCode" onclick="ResetValidateClass();" name="ZipCode" class="form-control">
+                                </div>
+                            </div>*@
+                        <div class="col-lg-3 col-md-6">
+                            <div class="input-box">
+                                <label class="form-label">Display Order</label>
+                                <input type="text" onkeypress="return Common.isNumberKey(event)" value="@(objChapters.OrderNo + 1)" id="OrderNo" onclick="ResetValidateClass();" name="OrderNo" class="form-control">
+                            </div>
+                        </div>
+                        @*<div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">Subject</label>
+                                    <input type="text" class="form-control" name="Subject" id="Subject" placeholder="Subject">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label">Mail Type : </label>
+                                    <select class="single-select" name="Target">
+                                        <option value="">Selct Mail Type</option>
+                                        <option selected="selected" value="Auto">Auto</option>
+                                        <option value="Manual">Manual</option>
+                                    </select>
+                                </div>
+                            </div>*@
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="box validation">
+                        <div class="box-header">
+
+
+                            <h3 class="box-title dis-in"> Coordinator Details </h3>
+                            <label>&nbsp;</label>
+                        </div>
+                        <div class="box-body">
+                            <div class="row  g-3">
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="input-box">
+                                        <label class="form-label">First Name </label>
+                                        <input type="text" class="form-control" id="CoordinatorName" name="CoordinatorName" placeholder=" First Name">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="input-box">
+                                        <label class="form-label">Mobile Phone </label>
+                                        <input type="text" class="form-control" id="CoordinatorPhone" name="CoordinatorPhone" onkeypress="return Common.isNumberKey(event)" maxlength="12" placeholder="Mobile Phone" onpaste="handlePaste(event);" autocomplete="off" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="input-box">
+                                        <label class="form-label">Email</label>
+                                        <input type="text" class="form-control" id="CoordinatorEmail" name="CoordinatorEmail" placeholder=" Email">
+                                    </div>
+                                </div>
+
+                                <!--</div>-->
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label">Is Notification</label>
+                                    <div class="menu-hover">
+                                        @{ var titleValue = objChapters.IsNotification == "Yes" ? "Yes" : "No"; }
+
+                                        <div>
+                                            <label class="switch" title="@titleValue">
+                                                <input type="checkbox" name="IsNotification" value="Yes" id="IsNotification"
+                                                       @if (objChapters.IsNotification == "Yes") { <text> checked</text> }>
+                                                <span class="slider"></span>
+                                            </label>
+                                            <input type="hidden" name="IsNotification" value="No">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="box validation">
+                        <div class="box-header">
+                            <h3 class="box-title dis-in"> Description</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row  g-3">
+                                <div class="col-lg-12">
+                                    <div class="input-box">
+                                        <textarea rows="10" placeholder="Description *" name="Description" id="Description" cols="80" style="visibility: hidden; display: none;"></textarea><br />
+                                        <span class="field-validation-error" id="Description"></span>
+                                        <script type="text/javascript">
+                                            var editor = CKEDITOR.replace('Description', { contentsCss: '@(cssloc)' });
+                                            CKFinder.setupCKEditor(editor, '@(System.Configuration.ConfigurationManager.AppSettings["baseurl"])ckfinder/');
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-3 text-end ms-auto">
+                <button type="submit" class="btn btn-success px-3 " value="submit">Submit</button>
+                <a class="btn btn-primary px-3" href="@Url.Action("Index", "Chapters", new { mid = ViewBag.mid })">Cancel</a>
+            </div>
+        </div>
+    }
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("#ChaptersForm").validate({
+            rules: {
+                ChapterName: "required",
+                ShortName: "required",
+                CoordinatorEmail: {
+                    required: function () {
+                        return $("input[name='IsNotification']:checked").val() === "Yes";
+                    },
+                    email: true,
+                }
+               
+            },
+            messages: {
+                ChapterName: "Chapter Name Required",
+                ShortName: "Short Name Required",
+
+                CoordinatorEmail: {
+                    required: "Please Enter Email Address",
+
+                    email: "Please Enter Valid Email Address",
+
+                },
+            },
+
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                // Add the `invalid-feedback` class to the error element
+                error.addClass("invalid-feedback");
+
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else {
+                    error.insertAfter(element);
+                }
+
+                // Move the error element after the fieldset element
+                if (element.closest(".input-box").length) {
+                    element.closest(".input-box").after(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                // Highlight the input, textarea, or select element with the `is-invalid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-invalid").removeClass("is-valid");
+                }
+
+
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                // Unhighlight the input, textarea, or select element by adding the `is-valid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-valid").removeClass("is-invalid");
+                }
+
+            },
+
+
+        });
+    });
+      
+
+</script>

@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "ViewMailTemplate";
+    Layout = null;
+
+    AWSFormBuilder.Entities.MailTemplates objTemplates = ViewBag.objTemplates;
+
+    int status = 0;
+   AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _appinfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = _appinfo.GetAppInfoDetails(ref status);
+
+    var baseurl = objAppInfo.BaseUrl;
+    var url = objAppInfo.BaseUrl;
+}
+
+
+<base href="@(baseurl)" />
+<link href="Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="Content/common-styles.css" rel="stylesheet" type="text/css" />
+<link href="Content/fullcalendar/fullcalendar.css" rel="stylesheet" type="text/css" />
+<link href="Content/daterangepicker/daterangepicker-bs3.css" rel="stylesheet" type="text/css" />
+<link href="Content/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css" rel="stylesheet" type="text/css" />
+<link href="Content/admin-styles.css" rel="stylesheet" type="text/css" />
+<!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+<div class="box box-solid">
+    <div class="box-header">
+        <h3 class="title t-t-c" style="text-align:center">Template Details</h3>
+    </div>
+    @using (Html.BeginForm("ViewMailTemplate", "MailTemplates", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="box-body">
+            <h3 class="title t-t-c" style="text-align:center">@objTemplates.Heading</h3>
+            @Html.Raw(objTemplates.Description))
+        </div>
+    }
+</div>
+
+

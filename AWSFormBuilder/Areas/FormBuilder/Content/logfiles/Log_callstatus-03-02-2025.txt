@@ -1,0 +1,10 @@
+-------------------START-------------2/3/2025 5:15:17 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502031145.14433965360@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/3/2025 5:15:17 PM
+-------------------START-------------2/3/2025 5:15:18 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502031145.16901364378@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/3/2025 5:15:18 PM

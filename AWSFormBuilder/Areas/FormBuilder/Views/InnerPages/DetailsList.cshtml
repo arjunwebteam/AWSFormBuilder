@@ -1,0 +1,175 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+}
+@{
+    string sortcolumn = (string)ViewBag.sortcolumn;
+    string sortorder = (string)ViewBag.sortorder;
+    Int64 Total = (Int64)ViewBag.total;
+    var PageNo = (Int64)ViewBag.pageno;
+    var Items = (Int64)ViewBag.items;
+
+    List<AWSFormBuilder.Entities.InnerPages> lstDetails = ViewBag.lstInnerPages;
+
+    // ✅ .NET Core cookie & auth
+    string userRole = null;
+    string userCookie = Context.Request.Cookies["UserCookie"];
+
+    if (User.Identity.IsAuthenticated &&
+        User.Identity.Name != null &&
+        !string.IsNullOrEmpty(userCookie))
+    {
+        // ✅ Decode cookie (replace with your auth logic)
+        var cookieParts = userCookie.Split('|');
+        userRole = cookieParts.Length > 1 ? cookieParts[1] : "";
+    }
+}
+
+<script type="text/javascript">
+
+    function InnerPageStatus(InnerPageId) {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("InnerPageStatus", "InnerPages")', // the URL of the controller action method
+            data: { InnerPageId: InnerPageId }, // optional data
+            datatype: "JSON",
+            success: function (result) {
+                if (result.ok) {
+                    $('#divmessage').html(result.data);
+                    $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                    DetailsBind($('#hdnPageNo').val());
+                }
+                else {
+                    $('#divmessage').html(result.data);
+                    $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                }
+            }
+        });
+    }
+
+    function UpdateDisplayOrder(i, InnerPageId) {
+        var DisplayOrder = parseInt($('#DisplayOrder' + i).val());
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("InnerPageDisplayOrder", "InnerPages")',
+            data: { DisplayOrder: DisplayOrder, InnerPageId: InnerPageId },
+            success: function (result) {
+                var div = '';
+                if (result.ok) {
+                    $("#divmessage").html(result.data);
+                    $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                    DetailsBind(1);
+                }
+                else {
+                    $("#divmessage").html(result.data);
+                    $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                }
+            }
+        });
+    }
+</script>
+
+<div class="row-fluid">
+    <div class="span12">
+        @if (Total == -1)
+        {
+            <div class="norecords">Sorry failed processing your request.</div> 
+        }
+        else
+        {
+            <table width="100%" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th width="5%" style="text-align: center">S.No.</th>
+                        <th><a onclick="javascript:sortresult('Heading');" class="white-t-u ">Page  Name @if (sortcolumn == "Heading")
+                                                                                                         {<img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" /> }</a></th>
+                        <th width="13%"><a onclick="javascript:sortresult('CategoryName');" class="white-t-u ">Category  Name @if (sortcolumn == "CategoryName")
+                                                                                                         {<img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" /> }</a></th>
+                        <th width="10%"><a onclick="javascript:sortresult('UpdatedBy');" class="white-t-u">Posted By @if (sortcolumn == "UpdatedBy")
+                                                                                                                        {<img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" /> }</a></th>
+                        <th width="12%"><a onclick="javascript:sortresult('UpdatedTime');" class="white-t-u">Posted Date @if (sortcolumn == "UpdatedTime")
+                                                                                                                        {<img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" /> }</a></th>
+                        <th width="10%">
+                            <a onclick="javascript:sortresult('DisplayOrder');" class="white-t-u">Order No @if (sortcolumn == "DisplayOrder")
+                                                                                                           {<img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" /> }</a>
+                        </th>
+                        <th width="12%">
+                            <a onclick="javascript:sortresult('IsActive');" class="white-t-u">Status @if (sortcolumn == "IsActive")
+                                                                                                     {<img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" /> }</a>
+                        </th> 
+                        <th width="7%">Action</th>
+                    </tr>
+                </thead>
+            @*     <tbody>
+                    @if (lstDetails.Count != 0)
+                    {
+                        int i = 0;
+                        var location = ConfigurationManager.AppSettings["usersiteurl"];
+                        foreach (var item in lstDetails)
+                        { 
+                        <tr>
+                            <td style="text-align: center">@item.RId</td>
+                            <td style="text-align: left" class="t-t-c">@item.Heading</td>
+                            <td style="text-align: left" class="t-t-c">@item.CategoryName</td>
+                            <td style="text-align: left" class="t-t-c">@item.UpdatedBy</td>
+                            <td>@item.UpdatedTime.ToString("MM/dd/yyyy")</td>
+                            <td>
+                                <input type="text" maxlength="3" style="width:50px;" id="DisplayOrder@(i)" value="@item.DisplayOrder" onkeypress ="return Common.isNumberKey(event)"/>
+                                <a onclick="UpdateDisplayOrder(@i,@item.InnerPageId);" title="Update"><i class="fa fa-fw fa-refresh"></i></a>
+
+                            </td>
+                            <td>
+
+                                @{
+
+
+                            var isactive = "";
+                            var active = "";
+                            var disable = "";
+                            if (item.IsActive == true)
+                            {
+                                isactive = "Active";
+                                disable = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageStatus(" + item.InnerPageId + ");\"";
+                            }
+                            else
+                            {
+                                isactive = "Disabled";
+                                active = "style=\"cursor: pointer;\" onclick=\"javascript:InnerPageStatus(" + item.InnerPageId + ");\"";
+                            }
+                                    <div class="admin-active">@isactive
+                                        <ul>
+                                            <li><a @Html.Raw(active) >Active</a></li>
+                                            <li><a @Html.Raw(disable) >Disabled</a></li>
+                                        </ul>
+                                    </div>      
+                                
+                                }
+                            </td> 
+                            <td>
+                                <a target="_blank" href="@location@(AWSFormBuilder.BLL.Common.EncodeURL(item.Heading)).html" title="View" class="r-p5"><i class="fa fa-eye"></i></a>
+                                <a href="@Url.Action("EditDetails", "InnerPages", new { InnerPageId = item.InnerPageId })" title="Edit" class="r-p5"><i class="fa fa-pencil-square-o"></i></a>
+                                @if (userRole.Contains("SuperAdmin"))
+                             {
+                                <a class="themedelete" onclick="javascript:Delete(@item.InnerPageId);" id="12" title="Delete"><i class="fa fa-trash-o"></i></a>
+                                }
+
+                            </td>
+                        </tr>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="norecords" colspan="8">No Web Pages Found.</td>
+                        </tr>
+                    }
+                </tbody> *@
+            </table>
+
+        }
+        }
+    </div>
+</div>
+@Html.Raw(AWSFormBuilder.Areas.FormBuilder.BLL.Common.SetPaging((Int64)ViewBag.items, ref Total, (Int64)ViewBag.pageno, "pagination pagination-centered"))

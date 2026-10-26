@@ -1,0 +1,10 @@
+-------------------START-------------12/6/2024 12:35:54 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412060706.25043187547@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/6/2024 12:35:54 PM
+-------------------START-------------12/6/2024 12:36:26 PM
+Page :/Admin/Account/UserValidate
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412060706.71000619977@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/6/2024 12:36:26 PM

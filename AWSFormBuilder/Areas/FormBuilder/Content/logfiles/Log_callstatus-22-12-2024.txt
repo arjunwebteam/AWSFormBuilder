@@ -1,0 +1,5 @@
+-------------------START-------------12/22/2024 10:35:58 AM
+Page :/Global/contact-us
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------12/22/2024 10:35:58 AM

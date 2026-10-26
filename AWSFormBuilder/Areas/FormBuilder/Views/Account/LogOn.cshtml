@@ -1,0 +1,299 @@
+﻿@using System.Configuration
+@model AWSFormBuilder.Entities.LogOnModel
+@{
+    var str = ViewBag.str;
+
+    int status = 0;
+
+    AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = new AWSFormBuilder.Entities.AppInfo();
+
+    objAppInfo = _AppInfo.GetAppInfoDetails(ref status);
+
+    ViewBag.Title = objAppInfo.SiteName + " - Control Panel";
+    ViewBag.Pageheading = "Log On";
+    var Logon = objAppInfo.BaseUrl + "Areas/FormBuilder/Content/Loginlogo/normalimages/";
+}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@objAppInfo.SiteName - Control Panel</title>
+
+    <link rel="icon" href="~/Areas/FormBuilder/Content/images/favicon-32x32.png" type="image/png" />
+
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zentic.css">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zentic-icons.css">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/login.css">
+    
+    <link href="~/Areas/FormBuilder/Content/plugins/notifications/css/lobibox.css" rel="stylesheet" />
+
+    <script src="~/Areas/FormBuilder/Content/js/jquery.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/Scripts/jquery.validate.js"></script>
+    <script src="~/Areas/FormBuilder/Content/js/jquery-validate.min.js"></script>
+</head>
+
+<body>
+
+    <div class="fb-login-page">
+
+        <!-- ===================== FLOATING BACKGROUND SHAPES ===================== -->
+        <div class="fb-bg-shapes">
+            <i class="icon-mail fb-shape fb-shape-icon-1"></i>
+            <i class="icon-lock fb-shape fb-shape-icon-2"></i>
+            <i class="icon-shield-half fb-shape fb-shape-icon-3"></i>
+            <i class="icon-log-in fb-shape fb-shape-icon-4"></i>
+            <i class="icon-eye fb-shape fb-shape-icon-5"></i>
+            <i class="icon-mail fb-shape fb-shape-icon-6"></i>
+            <div class="fb-shape fb-shape-square"></div>
+            <div class="fb-shape fb-shape-circle"></div>
+            <div class="fb-shape fb-shape-check">✓</div>
+        </div>
+
+        <!-- ===================== LEFT SIDE ===================== -->
+        <section class="fb-login-left">
+
+            <div class="fb-orb fb-orb-1"></div>
+            <div class="fb-orb fb-orb-2"></div>
+            <div class="fb-orb fb-orb-3"></div>
+            <div class="fb-grid"></div>
+
+            <div class="fb-left-content">
+
+                <div class="fb-left-copy">
+                    <h1>Build Smarter Collect <span>Better</span></h1>
+                    <p>Create powerful forms, automate workflows,<br />and manage data effortlessly.</p>
+                </div>
+
+                <div class="fb-illustration">
+
+                    <div class="fb-form-card">
+                        <div class="fb-form-line fb-line-small"></div>
+                        <div class="fb-form-line fb-line-large"></div>
+                        <div class="fb-check-row">
+                            <div class="fb-checkbox checked">✓</div>
+                            <div class="fb-check-line"></div>
+                        </div>
+                        <div class="fb-check-row">
+                            <div class="fb-checkbox"></div>
+                            <div class="fb-check-line fb-short"></div>
+                        </div>
+                        <div class="fb-form-button"></div>
+                    </div>
+
+                    <div class="fb-pencil">
+                        <span></span>
+                    </div>
+
+                    <div class="fb-floating fb-floating-chart">
+                        <div class="fb-bar bar-1"></div>
+                        <div class="fb-bar bar-2"></div>
+                        <div class="fb-bar bar-3"></div>
+                        <div class="fb-bar bar-4"></div>
+                    </div>
+
+                    <div class="fb-floating fb-floating-pie">
+                        <div class="fb-pie"></div>
+                    </div>
+
+                    <div class="fb-floating fb-floating-security">
+                        <i class="icon-shield-half"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="fb-datetime">
+                <div class="fb-date-content">
+                    <div id="fbCurrentTime" class="fb-current-time">--:--:--</div>
+                    <div id="fbCurrentDate" class="fb-current-date">Loading date...</div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ===================== RIGHT SIDE ===================== -->
+        <section class="fb-login-right">
+
+            <div class="fb-login-container">
+
+                <div class="fb-login-logo-wrap">
+                    <img src="@Logon/@objAppInfo.Loginlogo" alt="logo icon" class="fb-login-logo">
+                </div>
+
+                @if (TempData["messageType"] != null && TempData["message"] != null)
+                {
+                    <script>
+                        $(document).ready(function () {
+                            showLobiboxNotification('@TempData["messageType"]', '@TempData["message"]');
+                        });
+                    </script>
+                }
+
+                <script>
+                    function showLobiboxNotification(messageType, message) {
+                        var iconClass;
+                        switch (messageType.toLowerCase()) {
+                            case 'success':
+                                iconClass = 'bx bx-check-circle';
+                                break;
+                            case 'warning':
+                                iconClass = 'bx bx-warning-circle';
+                                break;
+                            case 'error':
+                                iconClass = 'bx bx-x-circle';
+                                break;
+                            default:
+                                iconClass = 'bx bx-info-circle';
+                                break;
+                        }
+
+                        Lobibox.notify(messageType, {
+                            pauseDelayOnHover: true,
+                            size: 'mini',
+                            rounded: true,
+                            icon: iconClass,
+                            delayIndicator: false,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            msg: message
+                        });
+                    }
+                </script>
+
+                <div class="fb-login-divider">
+                    <span></span>
+                    <strong>SIGN IN WITH EMAIL</strong>
+                    <span></span>
+                </div>
+
+                @using (Html.BeginForm())
+                {
+                    <div class="fb-form-group">
+                        <label for="Email" class="fb-form-label">Email Address<span>*</span></label>
+                        <div class="fb-input-wrapper">
+                            <span class="fb-input-icon"><i class="icon-mail"></i></span>
+                            <input type="email" id="Email" name="Email" class="fb-login-input" placeholder="Email Address" value="">
+                        </div>
+                    </div>
+
+                    <div class="fb-form-group">
+                        <div class="fb-password-label-row">
+                            <label for="Password" class="fb-form-label">Enter Password</label>
+                            <a href="@Url.Action("ForgotPassword", "Account")" class="fb-forgot-link">Forgot Password ?</a>
+                        </div>
+                        <div class="fb-input-wrapper">
+                            <span class="fb-input-icon"><i class="icon-lock"></i></span>
+                            <input type="password" id="Password" name="Password" class="fb-login-input" placeholder="Enter Password" value="">
+                            <button type="button" class="fb-password-toggle" data-action="toggle-pwd" data-input="Password" data-icon="loginEye">
+                                <i class="icon-eye" id="loginEye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="fb-signin-btn">
+                        <i class="icon-log-in"></i>
+                        <span>Sign In to Dashboard</span>
+                    </button>
+                }
+
+                @*  <div class="fb-demo-login">
+                    <div class="fb-demo-email">support@arjunweb.in</div>
+                    <div class="fb-demo-password">Aws@2026</div>
+                    <button type="button" id="copyDemoCredentials" class="fb-copy-btn" onclick="fillDemoCredentials()">Copy</button>
+                </div> *@
+
+                <div class="fb-bottom-divider">
+                    <span></span>
+                    <div>Design & Developed by <a href="https://arjunweb.com/" target="_blank">Arjunweb</a></div>
+                    <span></span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!--plugins-->
+    <script src="~/Areas/FormBuilder/Content/plugins/notifications/js/lobibox.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/plugins/notifications/js/notifications.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/plugins/notifications/js/notification-custom-script.js"></script>
+
+    <script>
+        // Live clock for the left panel
+        function fbUpdateDateTime() {
+            var now = new Date();
+            document.getElementById('fbCurrentTime').textContent = now.toLocaleTimeString('en-US');
+            document.getElementById('fbCurrentDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+        }
+        fbUpdateDateTime();
+        setInterval(fbUpdateDateTime, 1000);
+
+        // Password show/hide (login.js equivalent, kept local so it doesn't depend on that file's other unrelated behavior)
+        $(document).on('click', '[data-action="toggle-pwd"]', function () {
+            var $btn = $(this);
+            var $input = $('#' + $btn.data('input'));
+            var $icon = $('#' + $btn.data('icon'));
+
+            if ($input.attr('type') === 'password') {
+                $input.attr('type', 'text');
+                $icon.removeClass('icon-eye').addClass('icon-eye-off');
+            } else {
+                $input.attr('type', 'password');
+                $icon.removeClass('icon-eye-off').addClass('icon-eye');
+            }
+        });
+
+        function fillDemoCredentials() {
+            var $email = $('#Email');
+            var $password = $('#Password');
+
+            $email.val('support@arjunweb.in').trigger('input').trigger('change');
+            $password.val('Aws@2026').trigger('input').trigger('change');
+
+            var $copyBtn = $('#copyDemoCredentials');
+            var originalText = $copyBtn.text();
+            $copyBtn.text('Copied!');
+            setTimeout(function () { $copyBtn.text(originalText); }, 1500);
+        }
+
+        $(document).ready(function () {
+            $("form").validate({
+                rules: {
+                    Email: { required: true, validate_email: true },
+                    "Password": { required: true }
+                },
+                messages: {
+                    Email: { required: "Please Enter Email Address", validate_email: "Please Enter Valid Email Address" },
+                    "Password": { required: "Please Enter Your Password" }
+                },
+                errorElement: "div",
+                errorPlacement: function (error, element) {
+                    error.addClass("invalid-feedback");
+                    error.insertAfter(element.closest('.fb-input-wrapper'));
+                },
+                highlight: function (element) {
+                    $(element).closest('.fb-input-wrapper').find('.fb-login-input').addClass("is-invalid");
+                },
+                unhighlight: function (element) {
+                    $(element).closest('.fb-input-wrapper').find('.fb-login-input').removeClass("is-invalid");
+                }
+            });
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function () { console.log('Service Worker Registered'); })
+                .catch(function (err) { console.log('Service Worker Registration Failed', err); });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+-------------------START-------------5/27/2025 3:56:52 PM
+Page :/event-registration
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------5/27/2025 3:56:52 PM

@@ -1,0 +1,281 @@
+﻿@using System.Security.Claims
+@{
+    Layout = null;
+}
+@{
+    string sortcolumn = (string)ViewBag.sortcolumn;
+    string sortorder = (string)ViewBag.sortorder;
+    Int64 total = (Int64)ViewBag.total;
+
+
+    var PageNo = (Int64)ViewBag.pageno;
+    var Items = (Int64)ViewBag.items;
+
+    // ✅ ADDED — only SuperAdmin/DeveloperAdmin see the Impersonate button.
+    // Same "contains" style check used server-side in UsersController, since
+    // RoleName can be a comma-separated list of roles on one account.
+    string currentRole = Context.User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    bool canImpersonate = currentRole.Contains("SuperAdmin") || currentRole.Contains("DeveloperAdmin");
+
+    <div class="zentic-table-wrapper reg-page">
+
+        @if (total == -1)
+        {
+
+            <tr class="odd"><td valign="top" colspan="10" class="font-14 text-center">No Records found</td></tr>
+        }
+        else
+        {
+            <table class="zentic-table" id="bt2">
+                <thead>
+                    <tr>
+
+                        <th style="text-align:center" width="40">S.No</th>
+
+
+                        <th>Email</th>
+                        <th>Role Name</th>
+                        <th>Mobile Phone</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>#</th>
+                        <th>Password</th>
+                        <th>Status</th>
+                        <th class="text-center" width="80">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in (List<AWSFormBuilder.Entities.Users>)ViewBag.lstuser)
+                    {
+                        if (item.Designation != "DeveloperAdmin")
+                        {
+                            <tr data-registration-row>
+                                <td style="text-align:center">@item.RId</td>
+
+
+
+                                <td>@item.Email</td>
+                                <td>@item.RoleName</td>
+                                <td>@(item.MobilePhone != null && item.MobilePhone != "" ? item.MobilePhone : "N/A")</td>
+                                <td>@item.StartDate</td>
+                                <td>@item.EndDate</td>
+
+                               
+                                    <td><a href="@Url.Action("AssignMenu", "AdminMenuItems", new { RoleId = item.RoleId, UserId = item.UserId, UserName = item.UserName, RoleName = item.RoleName })">Access</a></td>
+
+
+                               
+                                <td>
+                                    <a id="pwdlnk-@item.UserId"
+                                       onclick="GetPassword(@item.UserId, '@item.Password');"
+                                       style="color:#00aeef; cursor:pointer;">Get Password</a>
+                                    <span id="pwdtxt-@item.UserId" style="display:none;"></span>
+                                </td>
+
+                                <td style="text-align:center">
+                                    @if (!item.RoleName.Contains("SuperAdmin"))
+                                    {
+                                        var isChecked = item.IsApproved ? "checked" : "";
+                                        var titleValue = item.IsApproved ? "Active" : "Disabled";
+
+                                        <label class="zentic-switch small-switch" title="@titleValue">
+                                            <input type="checkbox"
+                                                   onclick="UserStatus(@item.UserId)"
+                                                   @isChecked>
+                                            <span class="zentic-slider"></span>
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        // SuperAdmin is always Active and cannot be changed
+                                        <label class="zentic-switch small-switch" title="SuperAdmin status cannot be disabled. It is always Active">
+                                            <input type="checkbox"
+                                                   checked
+                                                   disabled>
+                                            <span class="zentic-slider"></span>
+                                        </label>
+                                    }
+                                </td>
+
+
+                                <td class="text-center">
+                                    <div class="table-actions d-flex align-items-center gap-3 fs-6">
+
+
+
+                                        @if (item.RoleName != "SuperAdmin")
+                                        {
+
+                                            <a class="btn p-0 text-warning table-action-btn" onclick="UserEdit(@item.UserId);;" title="Edit" aria-label="Edit"><i class="bi bi-pencil-fill"></i></a>
+
+                                            <a class="btn p-0 text-danger table-action-btn" onclick="javascript:UserDelete(@item.UserId, '@item.UserName');" title="Delete" aria-label="Delete"><i class="fa-solid fa-x"></i></a>
+
+                                            @if (canImpersonate)
+                                            {
+                                                <a class="btn p-0 zfb-action-btn zfb-impersonate-btn" style="font-size:18px;" onclick="javascript:UserImpersonate(@item.UserId, '@item.Email');" title="Sign in as this user" aria-label="Impersonate"><i class="bi-person-badge-fill"></i></a>
+                                            }
+
+                                        }
+
+                                        else
+                                        {
+                                            <a title="Edit" class="btn p-0 text-warning table-action-btn" onclick="UserEdit(@item.UserId);" aria-label="Edit"><i class="bi bi-pencil-fill"></i></a>
+
+
+                                            <a class="btn p-0 table-action-btn" onclick="return false;" title="Super Admin cannot be deleted" aria-label="Delete (disabled)" aria-disabled="true"><i class="fa-solid fa-x"></i></a>
+                                         
+                                        }
+
+
+
+                                    </div>
+
+
+                                </td>
+
+
+
+                            </tr>
+                        }
+                    }
+
+
+                </tbody>
+            </table>
+        }
+
+
+
+    </div>
+
+    <div class="zentic-card-footer">
+
+        <div class="table-entries-info" id="example_info" role="status" aria-live="polite">
+            Showing @((PageNo * Items) - (Items - 1)) - @((PageNo * Items) > total ? total : (PageNo * Items)) of @total entries
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-4" @(total > 0 ? "" : "disable")>
+            <div class="dataTables_length" id="example_length">
+                <div class="d-flex align-items-center gap-2 pt-1">
+                    <span>Show Items</span>
+                    <select id="txtitems" name="txtitems" aria-controls="example" onchange="ThemeBannerBind();" class="form-select form-select-sm w-auto">
+                        <option @(Items == 25 ? "selected=selected" : "") value="25">25</option>
+                        <option @(Items == 50 ? "selected=selected" : "") value="50">50</option>
+                        <option @(Items == 75 ? "selected=selected" : "") value="75">75</option>
+                        <option @(Items == 100 ? "selected=selected" : "") value="100">100</option>
+                    </select>
+                </div>
+            </div>
+            <nav class="table-pagination" id="example_paginate" aria-label="Page navigation">
+                @Html.Raw(AWSFormBuilder.Areas.FormBuilder.BLL.Common.SetPaging((Int64)ViewBag.items, ref total, (Int64)ViewBag.pageno, "pagination mb-0"))
+            </nav>
+        </div>
+
+    </div>
+
+}
+
+
+<script type="text/javascript">
+             function UserStatus(UserId) {
+                 $.ajax({
+                             type: "POST",
+                     url: '@Url.Action("UserStatus", "Users")', // the URL of the controller action method
+                     data: { UserId: UserId }, // optional data
+                     datatype: "JSON",
+                     success: function (result) {
+                         showLobiboxNotification(result.messageType, result.message);
+                                     if (result.ok) {
+                             //$('#divmessage').html(result.data);
+                             //$('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                             //$('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                         UserBind(1, 'on');
+                                     }
+                                     else {
+                             $('#divmessage').html(result.data);
+                             $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                             $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                     }
+                                 }
+                             });
+                         }
+
+                         function UserDelete(UserId, UserName) {
+
+                             var conf = confirm('Do you want to delete user ' + UserName + '?');
+
+                             if (conf) {
+                     $.ajax({
+                                 type: "POST",
+                         url: '@Url.Action("UserDelete", "Users")', // the URL of the controller action method
+                         data: { UserId: UserId }, // optional data
+                         datatype: "JSON",
+                         success: function (result) {
+                             showLobiboxNotification(result.messageType, result.message);
+                                         if (result.ok) {
+                                 //$('#divmessage').html(result.data);
+                                 //$('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                 //$('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                             UserBind(1, 'on');
+                                         }
+                                         else {
+                                 $('#divmessage').html(result.data);
+                                 $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                 $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                         }
+                                     }
+                                 });
+                             }
+     }
+
+     // ✅ ADDED — Impersonate: this is a full navigation (GET), not an AJAX
+     // call, because ImpersonateUser() re-issues the auth cookie for the
+     // whole browser session — the page has to actually reload under the
+     // new identity, an AJAX response can't do that.
+     function UserImpersonate(UserId, Email) {
+
+         var conf = confirm('Login as ' + Email + '? You will act on the app as this user until you click "Return to Admin".');
+
+         if (conf) {
+             window.location.href = '@Url.Action("ImpersonateUser", "Users")' + '?UserId=' + UserId;
+         }
+     }
+
+     // function GetPassword(id, pwd) {
+
+     //     $.ajax({
+     //         type: "POST",
+     //         cache: false,
+     //         url: '@Url.Action("GetPassword", "Users")', // the URL of the controller action method
+     //         data: { Password: pwd }, // optional data
+     //         success: function (result) {
+
+     //             $('#pwdlnk-' + id).hide();
+     //             $('#pwdtxt-' + id).show();
+     //             $('#pwdtxt-' + id).html(result.tata);
+     //         }
+     //     });
+    // }
+          function GetPassword(id, pwd) {
+         $.ajax({
+             type: "POST",
+             cache: false,
+             url: '@Url.Action("GetPassword", "Users")',
+             data: { Password: pwd },
+             success: function (result) {
+                 if (result.ok) {
+                     $('#pwdlnk-' + id).hide();
+                     $('#pwdtxt-' + id).text(result.success).show(); // ✅ was result.tata
+                 } else {
+                     $('#pwdtxt-' + id).html(result.success).show();
+                 }
+             },
+             error: function () {
+                 alert("Request failed. Please try again.");
+             }
+         });
+     }
+</script>
+
+

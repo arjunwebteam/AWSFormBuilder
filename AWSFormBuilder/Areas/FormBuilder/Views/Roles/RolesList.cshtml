@@ -1,0 +1,155 @@
+﻿@using System.Configuration;
+@{ Layout = null;}
+@{
+    string sortcolumn = (string)ViewBag.sortcolumn;
+    string sortorder = (string)ViewBag.sortorder;
+    Int64 Total = (Int64)ViewBag.total;
+    var PageNo = (Int64)ViewBag.pageno;
+    var Items = (Int64)ViewBag.items;
+
+
+    List<AWSFormBuilder.Entities.Roles> lstRoles = ViewBag.lstRoles;
+    bool IsEdit = Convert.ToBoolean(Context.Session.GetString("IsEdit"));
+    bool IsView = Convert.ToBoolean(Context.Session.GetString("IsView"));
+    bool IsDelete = Convert.ToBoolean(Context.Session.GetString("IsDelete"));
+    bool IsExport = Convert.ToBoolean(Context.Session.GetString("IsExport"));
+    bool IsAdd = Convert.ToBoolean(Context.Session.GetString("IsAdd"));
+
+
+}
+
+<script type="text/javascript">
+
+    function Rolestatus(RoleId) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("RolesStatus", "Roles")', // the URL of the controller action method
+            data: { RoleId: RoleId }, // optional data
+            datatype: "JSON",
+            success: function (result) {
+                showLobiboxNotification(result.messageType, result.message);
+                if (result.ok) {
+                    RolesBind(1);
+                }
+                else {
+                    $('#divmessage').html(result.data);
+                    $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                }
+            }
+        });
+    }
+
+    function DeleteRoles(RoleId, ImageUrl) {
+        var val2 = confirm("Do you want to delete this record?");
+        if (val2) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DeleteRoles", "Roles")',  // the URL of the controller action method
+                data: { RoleId: RoleId, ImageUrl: ImageUrl }, // optional data
+                success: function (result) {
+                    showLobiboxNotification(result.messageType, result.message);
+                    if (result.ok) {
+                        RolesBind(1);
+                    }
+                    else {
+                        $("#divmessage").val(result.data);
+                        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                    }
+                },
+            });
+        }
+    }
+
+   
+</script>
+
+<div class="zentic-table-wrapper reg-page">
+        <table class="zentic-table" id="bt2">
+            <thead>
+                <tr>
+                    <th style="text-align:center">S.No</th>
+                    <th>
+                        <a class="cursor-pointer sort-link" style="color:inherit;" onclick="javascript:sortresult('RoleName');">
+                            Role Name
+
+                            @if (sortcolumn == "RoleName")
+                            {
+                                <img alt="@(sortorder)" title="@(sortorder)" src="Content/Admin/images/sort_@(sortorder).gif" />
+                            }
+                        </a>
+                    </th>
+
+                    <th>#</th>
+                    <th>#</th>
+
+                    <th style="text-align:center">Posted Date</th>
+                    <th style="text-align:center">Status</th>
+                    <th style="text-align:center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (lstRoles.Count != 0)
+                {
+                    int i = 0;
+                    foreach (var item in lstRoles)
+                    {
+                <tr data-registration-row>
+                    <td style="text-align:center;">@item.RId</td>
+                    <td>@(item.RoleName == null || item.RoleName == "" ? "N/A" : item.RoleName)</td>
+                    <td><a class="text-success" href="@Url.Action("AssignMenu","AdminMenuItems", new { RoleId = item.RoleId })">Access</a></td>
+                    <td><a class="text-success" href="@Url.Action("Index","Users", new { RoleName = item.RoleName })">Admin Users(@item.UserCount)</a></td>
+
+                    <td style="text-align:center;">@(item.UpdatedTime != null && item.UpdatedTime != DateTime.MinValue ? item.UpdatedTime.ToString("MM/dd/yyyy") : "N/A")</td>
+
+                 <td style="text-align:center">
+    @{
+        var isChecked = item.IsActive ? "checked" : "";
+        var titleValue = item.IsActive ? "Active" : "Disabled";
+    }
+
+    <label class="zentic-switch small-switch" title="@titleValue">
+        <input type="checkbox"
+               onclick="Rolestatus(@item.RoleId)"
+               @isChecked>
+        <span class="zentic-slider"></span>
+    </label>
+</td>
+
+                    <td style="text-align:center;">
+                        <div class="table-actions d-flex align-items-center justify-content-center gap-2">
+                            @if (IsEdit == true)
+                            {
+                                <a class="btn p-0 text-warning table-action-btn" onclick="EditRolesType(@item.RoleId);" title="Edit" aria-label="Edit"><i class="bi bi-pencil-fill"></i></a>
+                            }
+                            @if (IsDelete == true)
+                            {
+                                <a class="btn p-0 text-danger table-action-btn" onclick="javascript:DeleteRoles(@item.RoleId);" title="Delete" aria-label="Delete"><i class="bi bi-trash-fill"></i></a>
+                            }
+                            </div>
+                    </td>
+
+                </tr>
+                        i++;
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="7" class="text-center">No Records found</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="zentic-card-footer" id="example_info" @(Total > 0 ? "" : "disable")>
+
+        <div class="table-entries-info" role="status" aria-live="polite">
+            Showing @((PageNo * Items) - (Items - 1)) - @((PageNo * Items) > Total ? Total : (PageNo * Items)) of @Total entries
+        </div>
+
+        <nav class="table-pagination" id="example_paginate" aria-label="Page navigation">
+            @Html.Raw(AWSFormBuilder.Areas.FormBuilder.BLL.Common.SetPaging((Int64)ViewBag.items, ref Total, (Int64)ViewBag.pageno, "pagination mb-0"))
+        </nav>
+
+    </div>
+
+</div>

@@ -1,0 +1,25 @@
+@using System.Security.Claims
+@{
+    // ✅ ADDED — Shows a persistent "Viewing as ..." banner site-wide while
+    // an admin is impersonating another user. Presence of the
+    // "ImpersonatedByAdminName" claim (only ever set inside
+    // UsersController.ImpersonateUser) is the single source of truth here —
+    // no session flags to keep in sync.
+    string impersonatedByName = Context.User?.FindFirst("ImpersonatedByAdminName")?.Value;
+    bool isImpersonating = !string.IsNullOrEmpty(impersonatedByName);
+}
+
+@if (isImpersonating)
+{
+    <div style="background:#fff3cd; color:#664d03; border-bottom:1px solid #ffe69c; padding:10px 20px; display:flex; align-items:center; justify-content:center; gap:12px; font-size:14px; position:sticky; top:0; z-index:1050;">
+        <i class="bi bi-person-badge-fill"></i>
+        <span>
+            You are viewing as <strong>@Context.User.FindFirst(ClaimTypes.Name)?.Value</strong>
+            (impersonated by @impersonatedByName)
+        </span>
+        <a href="@Url.Action("StopImpersonating", "Users", new { area = "FormBuilder" })"
+           class="btn btn-sm btn-dark" style="padding:4px 12px;">
+            Return to Admin
+        </a>
+    </div>
+}

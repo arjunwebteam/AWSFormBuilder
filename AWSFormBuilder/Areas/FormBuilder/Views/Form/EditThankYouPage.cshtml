@@ -1,0 +1,435 @@
+﻿@{
+    Int64 formId = (Int64)ViewBag.FormId;
+    string formTitle = (string)ViewBag.FormTitle;
+    string thankYouContent = (string)ViewBag.ThankYouContent;
+    bool isEmbed = ViewBag.IsEmbed != null && (bool)ViewBag.IsEmbed;
+
+    ViewBag.Title = "Thank You Page";
+    Layout = isEmbed ? "~/Areas/FormBuilder/Views/Shared/_EmbedLayout.cshtml" : "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    var cssVersion = DateTime.Now.Ticks;
+}
+
+
+<link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/mail.css?v=@cssVersion">
+<link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/thankyou-content.css?v=@cssVersion">
+
+@* <link rel="stylesheet" href="@Url.Content("~/Areas/FormBuilder/Content/css/thankyou-content.css")">
+ *@<script src="https://cdn.jsdelivr.net/npm/ckeditor5-classic-plus@41.3.0/build/ckeditor.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wForm,#wFormsList').addClass('active');
+
+    });
+</script>
+<div class="container-my">
+  <div class="aws-mail-page">
+    <div class="aws-mail-content">
+
+        
+        @using (Html.BeginForm("EditThankYouPage", "Form", FormMethod.Post, new { @id = "ThankYouPageForm", @name = "ThankYouPageForm" }))
+        {
+            <input id="FormId" name="FormId" value="@formId" type="hidden" />
+            <input name="embed" value="@(isEmbed ? "1" : "")" type="hidden" />
+
+            <!-- Page Header -->
+            <div class="aws-mail-page-header">
+                <div class="aws-mail-header-left">
+                    <div class="aws-mail-header-icon">
+                        <i class="icon-circle-check"></i>
+                    </div>
+
+                    <div>
+                        <h1>Thank You Page — @formTitle</h1>
+                        <p>This content is shown to the user after they submit "@formTitle".</p>
+                    </div>
+                </div>
+
+                @if (!isEmbed)
+                {
+                    <button type="button" class="aws-mail-back-btn"
+                            onclick="window.location.href='@Url.Action("Index", "Form")'">
+                        <i class="icon-arrow-left"></i>
+                        <span>Back to Form List</span>
+                    </button>
+                }
+            </div>
+
+
+            <section class="aws-mail-editor-card">
+
+                <div class="aws-mail-editor-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>Content <span class="text-danger">*</span></h2>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="aws-ty-view-btn" onclick="openThankYouPreview()">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-box">
+                    <!-- Hidden field posted to the server; kept in sync with the CKEditor content -->
+                    <textarea name="ThankYouContent" id="ThankYouContent" style="display:none;">@Html.Raw(thankYouContent)</textarea>
+
+                    <div id="ThankYouEditor"></div>
+
+                    <span class="field-validation-error" id="ThankYouContentError"></span>
+
+                    <script type="text/javascript">
+                        var thankYouEditorInstance;
+
+                        $(document).ready(function () {
+                            if (typeof ClassicEditor === 'undefined') {
+                                document.getElementById('ThankYouEditor').innerHTML =
+                                    '<div style="padding:14px;border:1.5px dashed #ef4444;border-radius:8px;color:#b91c1c;font-size:13px;">' +
+                                    'The content editor library failed to load (likely blocked by network/CDN access). ' +
+                                    'Please check your internet connection or network settings and refresh the page.' +
+                                    '</div>';
+                                return;
+                            }
+
+                            ClassicEditor
+                                .create(document.querySelector('#ThankYouEditor'), {
+                                    toolbar: [
+                                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                                        'fontSize', 'fontColor', 'alignment', '|',
+                                        'blockQuote', 'codeBlock', '|',
+                                        'numberedList', 'bulletedList', '|',
+                                        'heading', '|',
+                                        'removeFormat', 'link', 'imageUpload', '|',
+                                        'sourceEditing'
+                                    ],
+                                    fontSize: {
+                                        options: [9, 11, 13, 'default', 17, 19, 21, 24, 28, 32]
+                                    },
+                                    fontColor: {
+                                        colors: [
+                                            { color: '#000000', label: 'Black' },
+                                            { color: '#4b5563', label: 'Dim grey' },
+                                            { color: '#9ca3af', label: 'Grey' },
+                                            { color: '#ef4444', label: 'Red' },
+                                            { color: '#f97316', label: 'Orange' },
+                                            { color: '#eab308', label: 'Yellow' },
+                                            { color: '#22c55e', label: 'Green' },
+                                            { color: '#3b82f6', label: 'Blue' },
+                                            { color: '#6366f1', label: 'Indigo' },
+                                            { color: '#a855f7', label: 'Purple' },
+                                            { color: '#1f2937', label: 'Charcoal' },
+                                            { color: '#16a34a', label: 'Dark green' },
+                                            { color: '#2563eb', label: 'Dark blue' },
+                                            { color: '#7c3aed', label: 'Violet' }
+                                        ]
+                                    },
+                                    heading: {
+                                        options: [
+                                            { model: 'paragraph', title: 'Normal', class: 'ck-heading_paragraph' },
+                                            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                                            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                                            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                                        ]
+                                    }
+                                })
+                                .then(function (editor) {
+                                    thankYouEditorInstance = editor;
+
+                                    // Load existing content
+                                    var existingContent = $('#ThankYouContent').val();
+                                    if (existingContent) {
+                                        editor.setData(existingContent);
+                                    }
+
+                                    // Custom upload adapter -> POST to the existing file manager endpoint
+                                    editor.plugins.get('FileRepository').createUploadAdapter = function (loader) {
+                                        return {
+                                            upload: function () {
+                                                return loader.file.then(function (file) {
+                                                    return new Promise(function (resolve, reject) {
+                                                        var formData = new FormData();
+                                                        formData.append('upload', file);
+
+                                                        $.ajax({
+                                                            url: '/api/filemanager/upload',
+                                                            type: 'POST',
+                                                            data: formData,
+                                                            processData: false,
+                                                            contentType: false,
+                                                            success: function (response) {
+                                                                // adjust "response.url" per meeru upload API response shape
+                                                                var url = response.url || response;
+                                                                resolve({ default: url });
+                                                            },
+                                                            error: function () {
+                                                                reject('Image upload failed');
+                                                            }
+                                                        });
+                                                    });
+                                                });
+                                            }
+                                        };
+                                    };
+                                })
+                                .catch(function (error) {
+                                    console.error(error);
+                                    document.getElementById('ThankYouEditor').innerHTML =
+                                        '<div style="padding:14px;border:1.5px dashed #ef4444;border-radius:8px;color:#b91c1c;font-size:13px;">' +
+                                        'The content editor failed to initialize. Please refresh the page and try again.' +
+                                        '</div>';
+                                });
+                        });
+                    </script>
+                </div>
+
+
+                <!-- Sample Thank You page designs -->
+                <div class="aws-ty-samples">
+                    <p class="aws-ty-samples-label">Need inspiration? Use a sample Thank You page design — it's pasted in as ready-made content:</p>
+                    <div class="aws-ty-samples-btns">
+                        <button type="button" class="aws-ty-sample-btn" onclick="openSamplePreview(1)">
+                            <i class="bi bi-file-earmark-text"></i> Sample 1 — Simple (Green)
+                        </button>
+                        <button type="button" class="aws-ty-sample-btn" onclick="openSamplePreview(2)">
+                            <i class="bi bi-file-earmark-text"></i> Sample 2 — Next Steps (Blue)
+                        </button>
+                        <button type="button" class="aws-ty-sample-btn" onclick="openSamplePreview(3)">
+                            <i class="bi bi-file-earmark-text"></i> Sample 3 — Banner (Purple)
+                        </button>
+                            <button type="submit" class="aws-mail-submit-btn adminsubmit" value="submit">
+                                <i class="icon-check"></i>
+                                Submit
+                            </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Bottom Actions
+            <div class="aws-mail-actions">
+                if (!isEmbed)
+                {
+                    <a class="aws-mail-cancel-btn" href="@Url.Action("Index", "Form")">Cancel</a>
+                }
+            
+
+                </div> -->
+        }
+    </div>
+</div>
+</div>
+<!-- View / Live Preview Modal -->
+<div class="aws-ty-overlay" id="awsTyPreviewModal">
+    <div class="aws-ty-modal">
+        <div class="aws-ty-modal-header">
+            <h4><i class="bi bi-eye"></i> Thank You Page Preview</h4>
+            <button type="button" class="aws-ty-modal-close" onclick="closeThankYouPreview()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="aws-ty-modal-body">
+            <div class="aws-ty-preview-frame aws-thankyou-preview-scope ck-content" id="awsTyPreviewContent"></div>
+        </div>
+        <div class="aws-ty-modal-footer">
+            <button type="button" class="aws-ty-btn-cancel" onclick="closeThankYouPreview()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sample Design Preview Modal -->
+<div class="aws-ty-overlay" id="awsTySampleModal">
+    <div class="aws-ty-modal">
+        <div class="aws-ty-modal-header">
+            <h4 id="awsTySampleTitle"><i class="bi bi-file-earmark-text"></i> Sample</h4>
+            <button type="button" class="aws-ty-modal-close" onclick="closeSamplePreview()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="aws-ty-modal-body">
+            <div class="aws-ty-preview-frame aws-thankyou-preview-scope ck-content" id="awsTySampleContent"></div>
+        </div>
+        <div class="aws-ty-modal-footer">
+                    <button type="button" class="aws-ty-btn-cancel" onclick="closeSamplePreview()" style="margin-right: auto;">Cancel</button>
+            <div style="display:flex; gap:8px;">
+                <!-- ✅ ADDED — Previous (hidden on the first sample) -->
+                <button type="button" class="aws-ty-btn-cancel" id="awsTySamplePrevBtn" onclick="navigateSample(-1)" style="display:none;">
+                    <i class="bi bi-arrow-left"></i> Previous
+                </button>
+                <button type="button" class="aws-ty-btn-copy" id="awsTySampleCopyBtn" onclick="useSampleContent()">
+                    <i class="bi bi-clipboard-check"></i> Copy
+                </button>
+                <!-- ✅ ADDED — Next (hidden on the last sample) -->
+                <button type="button" class="aws-ty-btn-copy" id="awsTySampleNextBtn" onclick="navigateSample(1)">
+                    Next <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#ThankYouPageForm").submit(function () {
+            $('#ThankYouContent').val(getCurrentContent());
+        });
+
+        $("#ThankYouPageForm").validate({
+            rules: {
+                ThankYouContent: "required"
+            },
+            messages: {
+                ThankYouContent: "Thank You Page content is required"
+            },
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("invalid-feedback");
+                error.insertAfter(element);
+                if (element.closest(".input-box").length) {
+                    element.closest(".input-box").after(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-invalid").removeClass("is-valid");
+                }
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-valid").removeClass("is-invalid");
+                }
+            }
+        });
+    });
+
+    // ---------- Content helper ----------
+    function getCurrentContent() {
+        return thankYouEditorInstance ? thankYouEditorInstance.getData() : $('#ThankYouContent').val();
+    }
+
+    // ---------- View (live) preview ----------
+    function openThankYouPreview() {
+        document.getElementById('awsTyPreviewContent').innerHTML = getCurrentContent();
+        document.getElementById('awsTyPreviewModal').classList.add('show');
+        document.body.classList.add('aws-ty-open');
+    }
+
+    function closeThankYouPreview() {
+        document.getElementById('awsTyPreviewModal').classList.remove('show');
+        document.body.classList.remove('aws-ty-open');
+    }
+
+    // ---------- Sample designs ----------
+    // Built ONLY from markup this editor keeps (p / h1 / strong / ul + inline font-size, colour and
+    // alignment), the same pattern as the Mail Templates samples. The styling travels inside the content,
+    // so the sample popup, the editor body, the View modal and the live page all look the same.
+        var thankYouSamples = {
+        1: {
+            title: 'Sample 1 — Simple (Green)',
+            html: '<p style="text-align:center;"><strong><span style="color:#16a34a;font-size:32px;">\u2713</span></strong></p>\n' +
+                  '<h1 style="text-align:center;"><span style="color:#1f2937;font-size:32px;">Thank You!</span></h1>\n' +
+                  '<p style="text-align:center;"><span style="color:#4b5563;font-size:17px;">Your form has been submitted successfully. Thank you for taking the time to provide your information.</span></p>\n' +
+                  '<p style="text-align:center;"><strong><span style="color:#16a34a;font-size:13px;">Your submission has been received successfully.</span></strong></p>'
+        },
+        2: {
+            title: 'Sample 2 — Next Steps (Blue)',
+            html: '<p style="text-align:center;"><strong><span style="color:#2563eb;font-size:32px;">\u2713</span></strong></p>\n' +
+                  '<h1 style="text-align:center;"><span style="color:#1f2937;font-size:32px;">Thank You!</span></h1>\n' +
+                  '<p style="text-align:center;"><span style="color:#4b5563;font-size:17px;">We\u2019ve successfully received your response. Our team truly appreciates you taking the time to fill this out.</span></p>\n' +
+                  '<p style="text-align:center;"><strong><span style="color:#2563eb;font-size:17px;">What happens next?</span></strong></p>\n' +
+                  '<ul>\n<li>Our team will review your submission</li>\n<li>You\u2019ll receive a confirmation email shortly</li>\n<li>We\u2019ll reach out if any further details are needed</li>\n</ul>'
+        },
+        3: {
+            title: 'Sample 3 — Banner (Purple)',
+            html: '<p style="text-align:center;"><strong><span style="color:#7c3aed;font-size:13px;">\u2713 SUBMITTED SUCCESSFULLY</span></strong></p>\n' +
+                  '<h1 style="text-align:center;"><span style="color:#1f2937;font-size:32px;">Thank You!</span></h1>\n' +
+                  '<p style="text-align:center;"><span style="color:#4b5563;font-size:17px;">Thanks a ton for submitting your information. We\u2019ve got it, and we\u2019re on it!</span></p>\n' +
+                  '<p style="text-align:center;"><span style="color:#9ca3af;font-size:13px;">Everything looks good \u2014 no further action is needed from your side right now.</span></p>'
+        }
+    };
+
+    var currentSampleId = null;
+
+    // ✅ ADDED — total sample count, derived from thankYouSamples so Next/Previous
+    // keep working correctly if more samples are added later.
+    var sampleIds = Object.keys(thankYouSamples).map(Number).sort(function (a, b) { return a - b; });
+
+    function openSamplePreview(id) {
+        currentSampleId = id;
+        var sample = thankYouSamples[id];
+        document.getElementById('awsTySampleTitle').innerHTML = '<i class="bi bi-file-earmark-text"></i> ' + sample.title;
+        document.getElementById('awsTySampleContent').innerHTML = sample.html;
+        document.getElementById('awsTySampleModal').classList.add('show');
+        document.body.classList.add('aws-ty-open');
+        updateSampleNavButtons();
+    }
+
+    // ✅ ADDED — Next / Previous between samples without closing the modal.
+    // Previous is hidden on the first sample, Next is hidden on the last one.
+    function navigateSample(direction) {
+        var idx = sampleIds.indexOf(currentSampleId);
+        var nextIdx = idx + direction;
+        if (nextIdx < 0 || nextIdx >= sampleIds.length) return;
+        openSamplePreview(sampleIds[nextIdx]);
+    }
+
+    function updateSampleNavButtons() {
+        var idx = sampleIds.indexOf(currentSampleId);
+        var prevBtn = document.getElementById('awsTySamplePrevBtn');
+        var nextBtn = document.getElementById('awsTySampleNextBtn');
+        if (prevBtn) prevBtn.style.display = idx > 0 ? '' : 'none';
+        if (nextBtn) nextBtn.style.display = idx < sampleIds.length - 1 ? '' : 'none';
+    }
+
+    function closeSamplePreview() {
+        document.getElementById('awsTySampleModal').classList.remove('show');
+        document.body.classList.remove('aws-ty-open');
+        currentSampleId = null;
+    }
+
+               function useSampleContent() {
+                if (!currentSampleId || !thankYouEditorInstance) return;
+                var sample = thankYouSamples[currentSampleId];
+
+                var wrappedHtml = sample.html;
+
+                thankYouEditorInstance.setData(wrappedHtml);
+
+                // ✅ ADDED — CKEditor sometimes leaves one trailing empty paragraph
+                // after setData(); strip it so it doesn't get saved into ThankYouContent.
+                var currentData = thankYouEditorInstance.getData();
+                var cleanedData = currentData.replace(/<p>(&nbsp;|\s)*<\/p>\s*$/i, '');
+                if (cleanedData !== currentData) {
+                    thankYouEditorInstance.setData(cleanedData);
+                }
+
+                var btn = document.getElementById('awsTySampleCopyBtn');
+                var original = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check2"></i> Copied';
+
+                setTimeout(function () {
+                    btn.innerHTML = original;
+                    closeSamplePreview();
+                }, 700);
+            }
+    // ---------- Shared modal close behaviour ----------
+    document.addEventListener('click', function (event) {
+        var previewModal = document.getElementById('awsTyPreviewModal');
+        var sampleModal = document.getElementById('awsTySampleModal');
+        if (previewModal && previewModal.classList.contains('show') && event.target === previewModal) {
+            closeThankYouPreview();
+        }
+        if (sampleModal && sampleModal.classList.contains('show') && event.target === sampleModal) {
+            closeSamplePreview();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeThankYouPreview();
+            closeSamplePreview();
+        }
+    });
+</script>
+

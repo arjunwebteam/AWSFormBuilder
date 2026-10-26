@@ -1,0 +1,45 @@
+-------------------START-------------12/24/2024 12:23:50 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:23:50 PM
+-------------------START-------------12/24/2024 12:25:47 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:25:47 PM
+-------------------START-------------12/24/2024 12:36:58 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:36:58 PM
+-------------------START-------------12/24/2024 12:37:55 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:37:55 PM
+-------------------START-------------12/24/2024 12:38:35 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:38:35 PM
+-------------------START-------------12/24/2024 12:39:19 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:39:19 PM
+-------------------START-------------12/24/2024 12:40:00 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------12/24/2024 12:40:00 PM
+-------------------START-------------12/24/2024 12:58:32 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412240724.76279556326@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/24/2024 12:58:32 PM
+-------------------START-------------12/24/2024 12:58:33 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412240724.80396995987@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/24/2024 12:58:33 PM

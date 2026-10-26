@@ -1,0 +1,60 @@
+-------------------START-------------4/9/2025 10:38:37 AM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Unauthorized, Response: {"message":"We have detected you are using an unrecognised IP address 2406:b400:d5:7c5f:e063:af5c:71ab:d0b0. If you performed this action make sure to add the new IP address in this link: https://app.brevo.com/security/authorised_ips","code":"unauthorized"}
+
+-------------------END-------------4/9/2025 10:38:37 AM
+-------------------START-------------4/9/2025 10:38:39 AM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Unauthorized, Response: {"message":"We have detected you are using an unrecognised IP address 2406:b400:d5:7c5f:e063:af5c:71ab:d0b0. If you performed this action make sure to add the new IP address in this link: https://app.brevo.com/security/authorised_ips","code":"unauthorized"}
+
+-------------------END-------------4/9/2025 10:38:39 AM
+-------------------START-------------4/9/2025 4:04:24 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Unauthorized, Response: {"message":"We have detected you are using an unrecognised IP address 2406:b400:d5:7c5f:51f0:ce26:a00b:a755. If you performed this action make sure to add the new IP address in this link: https://app.brevo.com/security/authorised_ips","code":"unauthorized"}
+
+-------------------END-------------4/9/2025 4:04:24 PM
+-------------------START-------------4/9/2025 4:07:11 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Unauthorized, Response: {"message":"We have detected you are using an unrecognised IP address 2406:b400:d5:7c5f:51f0:ce26:a00b:a755. If you performed this action make sure to add the new IP address in this link: https://app.brevo.com/security/authorised_ips","code":"unauthorized"}
+
+-------------------END-------------4/9/2025 4:07:11 PM
+-------------------START-------------4/9/2025 5:44:02 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091209.16905791256@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 5:44:02 PM
+-------------------START-------------4/9/2025 5:44:03 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091209.40477789014@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 5:44:03 PM
+-------------------START-------------4/9/2025 6:06:07 PM
+Page :/Members/Acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091231.15927603500@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 6:06:07 PM
+-------------------START-------------4/9/2025 6:06:08 PM
+Page :/Members/Acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091231.91016001466@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 6:06:08 PM
+-------------------START-------------4/9/2025 6:08:10 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091233.88716848999@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 6:08:10 PM
+-------------------START-------------4/9/2025 6:08:11 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091233.24749109545@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 6:08:11 PM
+-------------------START-------------4/9/2025 6:12:47 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091238.56127432752@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 6:12:47 PM
+-------------------START-------------4/9/2025 6:12:47 PM
+Page :/global/member-registration-acknowledgement
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202504091238.95040162956@smtp-relay.mailin.fr>"}
+
+-------------------END-------------4/9/2025 6:12:47 PM

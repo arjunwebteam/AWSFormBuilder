@@ -1,0 +1,118 @@
+﻿@{
+    Layout = null;
+    string thankYouContent = ViewBag.ThankYouContent as string;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Thank You</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/icons.css" />
+    <link rel="stylesheet" href="@Url.Content("~/Areas/FormBuilder/Content/css/thankyou-content.css")" />
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/mail.css">
+
+</head>
+<body style="background:#f0f2f5;">
+    <div class="container d-flex align-items-center justify-content-center" style="min-height:100vh;">
+        <div class="bg-white p-5 rounded shadow-sm text-center">
+            @if (ViewBag.LogoUrl != null)
+            {
+                <img src="@ViewBag.LogoUrl" style="max-height:90px;" class="mb-3" />
+            }
+            @if (!string.IsNullOrWhiteSpace(thankYouContent))
+            {
+                <div class="thank-you-custom-content">
+                    @Html.Raw(thankYouContent)
+                </div>
+            }
+            else
+            {
+                <!-- Success Icon -->
+                <div class="aws-thankyou-icon">
+                    <span class="aws-checkmark">✓</span>
+                </div>
+
+                <!-- Heading -->
+                <h1 class="aws-thankyou-title">
+                    Thank You!
+                </h1>
+
+                <!-- Message -->
+                <p class="aws-thankyou-message">
+                    Your form has been submitted successfully.<br />
+                    Thank you for taking the time to provide your information.
+                </p>
+
+              @*   <!-- Success Box -->
+                <div class="aws-thankyou-success-box">
+                    Your submission has been received successfully.
+                </div> *@
+
+                <!-- Footer -->
+                <div class="aws-thankyou-success-box">
+                    Thank you for your submission.
+                </div>
+            }
+            <a href="@Url.Action("RenderForm", "Form", new { id =AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(ViewBag.FormId) })" class="btn btn-primary mt-3" style="background-color: #13458f;">Back to Form</a>
+        
+</div>
+    </div>
+    <style>
+        .aws-thankyou-preview-scope .aws-thankyou-success-box {
+            margin-top: 20px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .aws-thankyou-success-box {
+            margin-top: 28px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .aws-thankyou-preview-scope .aws-checkmark {
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1;
+            color: inherit;
+        }
+
+        .aws-thankyou-icon {
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e9f9ef;
+            color: #16a34a;
+            font-size: 42px;
+        }
+
+        .aws-thankyou-preview-scope .aws-thankyou-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e9f9ef;
+            color: #16a34a;
+        }
+    </style>
+</body>
+</html>

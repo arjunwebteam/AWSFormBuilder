@@ -1,0 +1,40 @@
+-------------------START-------------3/3/2025 12:47:28 PM
+Page :/User/Members/ChangePassword
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503030714.64317228982@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 12:47:28 PM
+-------------------START-------------3/3/2025 12:51:26 PM
+Page :/reset-password
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503030718.56043865670@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 12:51:26 PM
+-------------------START-------------3/3/2025 12:54:37 PM
+Page :/reset-password
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503030721.16000443240@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 12:54:37 PM
+-------------------START-------------3/3/2025 3:11:14 PM
+Page :/event-registration
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------3/3/2025 3:11:14 PM
+-------------------START-------------3/3/2025 4:49:28 PM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503031116.75169501753@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 4:49:28 PM
+-------------------START-------------3/3/2025 4:49:38 PM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503031116.63503547382@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 4:49:38 PM
+-------------------START-------------3/3/2025 4:53:05 PM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503031120.42651633378@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 4:53:05 PM
+-------------------START-------------3/3/2025 4:53:06 PM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503031120.11660844030@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/3/2025 4:53:06 PM

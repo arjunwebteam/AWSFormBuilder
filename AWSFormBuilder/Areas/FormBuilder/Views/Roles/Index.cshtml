@@ -1,0 +1,407 @@
+﻿@{
+    ViewBag.Title = "Index";
+    ViewBag.Pageheading = "Roles & Permissions";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+
+    bool IsEdit = Convert.ToBoolean(Context.Session.GetString("IsEdit"));
+    bool IsView = Convert.ToBoolean(Context.Session.GetString("IsView"));
+    bool IsDelete = Convert.ToBoolean(Context.Session.GetString("IsDelete"));
+    bool IsExport = Convert.ToBoolean(Context.Session.GetString("IsExport"));
+    bool IsAdd = Convert.ToBoolean(Context.Session.GetString("IsAdd"));
+    Int64 Mid = ViewBag.mid;
+}
+<script>
+    $(document).ready(function () {
+        loadMenuItems();
+                PagerClickBind();
+
+    });
+
+    function loadMenuItems() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("RolesList", "Roles")',
+            data: {
+                IsEdit    : '@ViewBag.IsEdit',
+                IsView    : '@ViewBag.IsView',
+                IsDelete  : '@ViewBag.IsDelete',
+                IsExport  : '@ViewBag.IsExport',
+                IsAdd     : '@ViewBag.IsAdd',
+                Mid       : '@ViewBag.mid',
+                ChapterId : '@(ViewBag.ChapterId == null || ViewBag.ChapterId == 0 ? 1 : ViewBag.ChapterId)'
+            },
+            success: function (data) {
+                $("#divRoles").html(data);
+            },
+            error: function () {
+                $("#divRoles").html('<p class="text-danger">Failed to load.</p>');
+            }
+        });
+    }
+     function PagerClickBind() {
+            $(document).off("click", ".pagination .page-link").on("click", ".pagination .page-link", function () {
+                var id = $(this).attr("id");
+                var pageNo;
+
+                if (id === "Previous" || id === "Next") {
+                    pageNo = parseInt($(this).data("page"));
+                } else {
+                    pageNo = parseInt(id);
+                }
+
+                if (!pageNo || isNaN(pageNo) || pageNo < 1) return;
+
+                $('#hdnPageNo').val(pageNo);
+                    RolesBind(pageNo);
+            });
+        }
+</script>
+
+<style>
+    .aws-h-a {
+        text-decoration: none !important;
+        position: relative;
+    }
+
+    a {
+        text-decoration: none !important;
+    }
+        .aws-h-a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            border-bottom: 2px solid #0756ca;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .aws-h-a:hover::after {
+            transform: scaleX(1);
+        }
+</style>
+
+
+
+<link rel="stylesheet" type="text/css" href="Content/Admin/lib/lightview/css/lightview/lightview.css" />
+<script type="text/javascript" src="Content/Admin/lib/lightview/js/spinners/spinners.js"></script>
+<script type="text/javascript" src="Content/Admin/lib/lightview/js/lightview/lightview.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wRoles, #RolesCategories').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        PagerClickBind();
+    });
+
+
+
+    $(document).ready(function () {
+        PagerClickBind();
+    });
+
+    function sortresult(sortcolumn) {
+        $('#hdnsortorder').val(($('#hdnsortorder').val() == 'ASC' ? 'DESC' : 'ASC'));
+        $('#hdnsortcolumn').val(sortcolumn);
+        RolesBind(1);
+    }
+
+    function RolesBind(Pageno) {
+        var pageno = Common.Pageno(Pageno);
+        var sortcolumn = $('#hdnsortcolumn').val();
+        var sortorder = $('#hdnsortorder').val();
+        var items = $('#txtitems').val();
+        var Search = $('#keyword').val().trim();
+
+
+        $.ajax({
+            url: '@Url.Action("RolesList", "Roles")',
+            type: 'GET',
+            cache: false,
+            data: { Search: Search, PageNo: pageno, SortColumn: sortcolumn, SortOrder: sortorder, Items: items,IsEdit: '@IsEdit', IsView: '@IsView', IsDelete: '@IsDelete', IsExport: '@IsExport', IsAdd: '@IsAdd', Mid: '@Mid'},
+            success: function (result) {
+                $('#divRoles').html(result);
+                PagerClickBind();
+
+            }
+        });
+    }
+
+    function ClearSearch() {
+        $('#keyword').val('');
+        $('#ChapterId').val('');
+        $('#CategoryId').val('');
+        $('#RolesType').val('');
+        $('#hdnPageNo').val(1);
+        RolesBind(1);
+    }
+
+
+    function getIconClass(messageType) {
+        switch (messageType) {
+            case 'success':
+                return 'bx bx-check-circle';
+            case 'warning':
+                return 'bx bx-warning-circle';
+            case 'error':
+                return 'bx bx-x-circle';
+            default:
+                return 'bx bx-info-circle';
+        }
+    }
+
+    function EditRolesType(Id) {
+        $.ajax({
+            url: '@Url.Action("EditRoles", "Roles")',
+            type: 'POST',
+            data: { RolesId: Id },
+            datatype: "JSON",
+            success: function (result) {
+                if (result.ok) {
+                    var _objRoles = result.data;
+                    $('#RoleName').val(_objRoles.RoleName);
+                    $('#RoleId').val(_objRoles.RoleId);
+
+                    $('#Add-Role').modal('show');
+                    $('#lbltitle').html('Edit Role');
+
+                    $('#RolesTitle').focus().removeClass("red-border");
+                }
+                else {
+                    $('#divmessage').val(result.data);
+                    $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                }
+            }
+        });
+    }
+
+
+
+</script>
+
+<input id="hdnPageNo" type="hidden" value="1" />
+<input id="hdnsortcolumn" type="hidden" value="" />
+<input id="hdnsortorder" type="hidden" value="DESC" />
+<input type="hidden" id="hdnimgvalidate" value="0" />
+
+
+<div class="zentic-card">
+    <div class="zentic-card-header registration-page-toolbar">
+        <div class="registration-toolbar-left">
+            <div class="topbar-search registration-search-box">
+                <i class="icon-search search-icon" id="rolesSearchIcon"></i>
+
+                <input type="text"
+                       class="search-input"
+                       name="keyword"
+                       id="keyword"
+                       placeholder="Search by Role Name..."
+                       autocomplete="off"
+                       onkeydown="if(event.key==='Enter'){RolesBind(1);}" />
+            </div>
+
+            <button type="button" class="btn btn-primary registration-search-btn" onclick="RolesBind(1);">Search</button>
+            <button type="button" class="btn btn-secondary registration-clear-btn" onclick="ClearSearch();">Clear</button>
+        </div>
+
+        <div class="registration-toolbar-right">
+            @if (IsAdd == true)
+            {
+                <button type="button" class="btn btn-primary" onclick="Add();">
+                    <i class="icon-plus"></i>
+                    Add Role
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="modal fade" id="Add-Role" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            @using (Html.BeginForm("AddRoles", "Roles", FormMethod.Post, new { enctype = "multipart/form-data", @id = "FormWebBanners", @name = "FormWebBanners" }))
+            {
+                <input type="hidden" id="RoleId" name="RoleId" value="" />
+                <input type="hidden" id="mid" name="mid" value="@Mid" />
+
+
+
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><span id="lbltitle"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-6">
+                                <div class="input-box">
+                                    <label class="form-label"> Role Name : <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="RoleName" name="RoleName" placeholder="Role Name">
+                                    <span id="spanRoleName" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>}
+        </div>
+    </div>
+
+    <div id="divRoles" class="clearfix">
+
+
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+    function Add() {
+        clearInnerPageCategory();
+        $("#Add-Role").modal('show');
+        $('#lbltitle').html('Add Role');
+    }
+
+    function clearInnerPageCategory() {
+        $('#RolesType').val('');
+        $('#RolesTitle').val('');
+
+        $('#RolesType').focus().removeClass("validate");
+        $('#RolesTitle').focus().removeClass("validate");
+
+    }
+
+
+
+</script>
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        PagerClickBind();
+    });
+
+
+
+
+
+
+
+    $(document).ready(function () {
+        $("#BannerUrl").change(function () {
+            validateBannerUrl();
+        });
+
+        function validateBannerUrl() {
+            $("#FormWebBanners").validate().resetForm();
+            $("#FormWebBanners").validate().element("#BannerUrl");
+        }
+
+        $.validator.addMethod("validImageExtension", function (value, element) {
+            if (element.files && element.files.length > 0) {
+                var allowedExtensions = ["jpg", "png", "gif", "jpeg"];
+                var fileName = element.files[0].name;
+                var extension = fileName.split('.').pop().toLowerCase();
+                return $.inArray(extension, allowedExtensions) !== -1;
+            }
+            return true;
+        }, "Only allowed extensions are: jpg, png, gif, jpeg");
+
+
+        var validateForm = $("#FormWebBanners").validate({
+            rules: {
+                RoleName: "required",
+            },
+            messages: {
+                //RoleName: "required",
+                RoleName: {
+                    required: "Please enter Role Name"
+                   
+                },
+            },
+            @*submitHandler: function (form) {
+                var RoleName = $("#RoleName").val();
+            var RoleId = 0;
+
+            $.ajax({
+                type: "POST",
+                  url: "@Url.Action("CheckRoleNameAvailability", "Roles")",
+                data: { RoleName: RoleName, RoleId: RoleId },
+                success: function (result) {
+                    if (result.ok) {
+                        alert(result.data);
+                        if (result.data === true) {
+                            form.submit(); // Proceed with form submission
+                        } else {
+                            $("#spanRoleName").text("Role Name is Already Available Required");
+                        }
+                    }
+                }
+            });
+        },*@
+
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                // Add the `invalid-feedback` class to the error element
+                error.addClass("invalid-feedback");
+
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else {
+                    error.insertAfter(element);
+                }
+
+                // Move the error element after the fieldset element
+                if (element.closest(".input-box").length) {
+                    element.closest(".input-box").after(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                // Highlight the input, textarea, or select element with the `is-invalid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-invalid").removeClass("is-valid");
+                }
+
+
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                // Unhighlight the input, textarea, or select element by adding the `is-valid` class
+                var $element = $(element);
+                if ($element.is('input, textarea, select')) {
+                    $element.addClass("is-valid").removeClass("is-invalid");
+                }
+
+            },
+
+
+        });
+
+        $('.modal').on('hidden.bs.modal', function () {
+            // Reset form fields
+            $('#FormWebBanners')[0].reset();
+
+            // Reset form validations
+            validateForm.resetForm();
+
+            // Clear validation classes
+            $('.modal').find('.error').removeClass('is-valid is-invalid');
+            $('.modal').find('.form-control').removeClass('is-valid is-invalid');
+        });
+    });
+
+
+
+
+</script>

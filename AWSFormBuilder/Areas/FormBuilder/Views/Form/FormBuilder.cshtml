@@ -1,0 +1,1226 @@
+﻿@{
+    ViewBag.Title = "Form Builder";
+    var cssVersion = DateTime.Now.Ticks;
+    int status = 0;
+    Int64 mid = ViewBag.mid;
+
+   AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = _AppInfo.GetAppInfoDetails(ref status);
+}
+
+<script>
+   
+    window.zfbAppRecaptchaSiteKey = @Html.Raw(Json.Serialize(objAppInfo != null ? objAppInfo.CapchaSiteKey : null));
+</script>
+
+<head>
+
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zfb-formbuilder.css?ver=@objAppInfo.DesktopVersion.ToString()">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zentic.css?ver=@objAppInfo.DesktopVersion.ToString()">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zentic-icons.css?ver=@objAppInfo.DesktopVersion.ToString()">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Builders - Control Panel</title>
+    <link rel="icon" type="image/svg+xml" href="assets/img/short-logo.png">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/bootstrap.min.css">
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+   
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<script>
+@if (ViewBag.FormSchema != null)
+{
+ <text>
+    document.addEventListener('DOMContentLoaded', function loadExistingForm() {
+    try {
+        const savedFields = JSON.parse(@Html.Raw(Json.Serialize((string)ViewBag.FormSchema)));
+        formFields = savedFields || [];
+
+
+        fieldCounter = formFields.reduce(function (max, f) {
+            const m = /^f(\d+)$/.exec(f.id || '');
+            return m ? Math.max(max, parseInt(m[1], 10)) : max;
+        }, 0);
+
+
+        const seenFieldIds = new Set();
+        formFields.forEach(function (f) {
+            if (!f.id || seenFieldIds.has(f.id)) {
+                fieldCounter++;
+                f.id = 'f' + fieldCounter;
+            }
+            seenFieldIds.add(f.id);
+        });
+
+        const savedFormTitle = @Html.Raw(Json.Serialize((string)ViewBag.FormTitle));
+
+        const logoUrl = @Html.Raw(Json.Serialize((string)ViewBag.LogoUrl));
+        if (logoUrl) {
+            document.getElementById('logoUrl').value = logoUrl;
+
+            const savedWidth = @Html.Raw(Json.Serialize((int?)ViewBag.LogoWidth));
+            const savedHeight = @Html.Raw(Json.Serialize((int?)ViewBag.LogoHeight));
+            logoWidth = savedWidth || null;
+            logoHeight = savedHeight || 110;
+
+            updateLogoPreview(logoUrl);
+        }
+
+        const designJson = @Html.Raw(Json.Serialize((string)ViewBag.FormDesign));
+        if (designJson) {
+            try {
+                const savedDesign = JSON.parse(designJson);
+                formDesign = Object.assign({}, formDesign, savedDesign || {});
+
+        
+                if (typeof loadGoogleFont === 'function') {
+                    loadGoogleFont(formDesign.fontFamily);
+                }
+            } catch (e2) {
+                console.error('Failed to parse saved form design', e2);
+            }
+        }
+
+
+        const submitBtnEl = document.querySelector('.fb-submit-btn');
+        if (submitBtnEl) submitBtnEl.textContent = formDesign.submitButtonText || 'Submit';
+
+
+        const conditionsJson = @Html.Raw(Json.Serialize((string)ViewBag.FormConditions));
+        if (conditionsJson) {
+            try {
+                formConditions = JSON.parse(conditionsJson) || [];
+                conditionCounter = formConditions.reduce(function (max, c) {
+                    const m = /^c(\d+)$/.exec(c.id || '');
+                    return m ? Math.max(max, parseInt(m[1], 10)) : max;
+                }, 0);
+            } catch (e3) {
+                console.error('Failed to parse saved conditions', e3);
+            }
+        }
+
+        if (typeof ensureTitleField === 'function') {
+            ensureTitleField(savedFormTitle);
+        }
+        if (typeof lastKnownFormTitle !== 'undefined') {
+            lastKnownFormTitle = savedFormTitle || '';
+        }
+        if (typeof syncTitlePayloadFromField === 'function') {
+            syncTitlePayloadFromField();
+        }
+
+        renderCanvas();
+                                                            } catch (e) {
+            console.error('Failed to load existing form', e);
+            alert('LOAD ERROR: ' + e.message + '\n\nLine info:\n' + (e.stack || 'no stack'));
+        }
+        });
+</text>
+}
+
+</script>
+<script src="~/Areas/FormBuilder/Content/scripts/zfb-formbuilder.js?ver=@objAppInfo.DesktopVersion.ToString()"></script>
+<script>
+    /* Small dark toast (bottom-centre, auto-hides after 2s) that replaces the
+       old blocking "Form saved! FormId: 46" browser popup. The save code lives in
+       zfb-formbuilder.js and calls alert('Form saved! FormId: ...'), so that one
+       message is intercepted here and shown as a toast instead — every other
+       alert() in the builder (validation messages etc.) still works as before. */
+    (function () {
+        var TOAST_MS = 2000;
+        var toastTimer = null;
+
+        function injectToastStyle() {
+            if (document.getElementById('zfbToastStyle')) return;
+            var s = document.createElement('style');
+            s.id = 'zfbToastStyle';
+         
+            s.textContent =
+                '.zfb-toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,12px);' +
+                'background-color:green;color:#fff;padding:13px 20px;border-radius:6px;font-size:14px;' +
+                'font-family:inherit;box-shadow:0 4px 14px rgba(0,0,0,.28);opacity:0;' +
+                'transition:opacity .25s ease,transform .25s ease;z-index:2147483647;pointer-events:none;}' +
+                '.zfb-toast.show{opacity:1;transform:translate(-50%,0);}';
+            document.head.appendChild(s);
+        }
+
+        window.zfbToast = function (message) {
+            injectToastStyle();
+            var el = document.getElementById('zfbToast');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'zfbToast';
+                el.className = 'zfb-toast';
+                el.setAttribute('role', 'status');
+                document.body.appendChild(el);
+            }
+            el.textContent = message;
+            void el.offsetWidth; // restart the transition if a toast is already showing
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { el.classList.remove('show'); }, TOAST_MS);
+        };
+
+        var nativeAlert = window.alert.bind(window);
+        window.alert = function (msg) {
+            if (/^\s*form saved/i.test(String(msg == null ? '' : msg))) {
+                window.zfbToast('Form updated successfully');
+                return;
+            }
+            nativeAlert(msg);
+        };
+    })();
+</script>
+<script>
+    /* ✅ ADDED — page look for the builder canvas (view-only decoration).
+       Adds a footer to each page (Next on page 1, Back + Next on middle pages,
+       Back + Submit on the last page) and moves "+ Add New Page" under the
+       form card. The added pieces are tagged .zfb-injected, are rebuilt after
+       every canvas render, and never touch formFields. */
+    (function () {
+        var decorating = false;
+        var observer = null;
+
+        function bandColors(canvas) {
+           
+            var el = canvas.parentNode, bg = '';
+            while (el && el.nodeType === 1) {
+                var c = getComputedStyle(el).backgroundColor;
+                if (c && c !== 'transparent' && c !== 'rgba(0, 0, 0, 0)') { bg = c; break; }
+                el = el.parentNode;
+            }
+            var card = getComputedStyle(canvas).backgroundColor;
+            if (bg) canvas.style.setProperty('--zfb-band-bg', bg);
+            if (card && card !== 'rgba(0, 0, 0, 0)') canvas.style.setProperty('--zfb-card-bg', card);
+        }
+
+        function makeBtn(text, back, like) {
+            var b;
+            if (!back && like) {
+                b = like.cloneNode(true);          // same colours as the real Submit button
+                b.removeAttribute('id');
+                b.className = (like.className || '') + ' zfb-fake-nav zfb-injected';
+                b.textContent = text;
+            } else {
+                b = document.createElement('button');
+                b.className = 'zfb-fake-nav zfb-fake-back zfb-injected';
+                b.textContent = text;
+            }
+            b.type = 'button';
+            b.tabIndex = -1;
+            return b;
+        }
+
+        window.zfbDecoratePages = function () {
+            var canvas = document.getElementById('canvas');
+            if (!canvas) return;
+            decorating = true;
+            try {
+                Array.prototype.slice.call(canvas.querySelectorAll('.zfb-injected')).forEach(function (n) { n.remove(); });
+                bandColors(canvas);
+
+                var submit = document.getElementById('canvasSubmitWrapper');
+                var submitBtn = submit ? submit.querySelector('.fb-submit-btn, .zfb-submit-btn') : null;
+
+                var addRow = document.getElementById('addPageBtnWrapper');
+                if (addRow && canvas.parentNode && addRow.previousElementSibling !== canvas) {
+                    canvas.parentNode.insertBefore(addRow, canvas.nextSibling);
+                }
+
+                var breaks = Array.prototype.filter.call(canvas.children, function (el) {
+                    return el.classList.contains('zfb-pagebreak-item') || !!el.querySelector(':scope > .zfb-pagebreak-row');
+                });
+
+                breaks.forEach(function (brk, i) {
+                    var footer = document.createElement('div');
+                    footer.className = 'zfb-page-footer zfb-injected' + (i === 0 ? ' zfb-footer-first' : '');
+                    if (i > 0) footer.appendChild(makeBtn('Back', true));
+                    footer.appendChild(makeBtn('Next', false, submitBtn));
+                    canvas.insertBefore(footer, brk);
+                });
+
+                if (submit && breaks.length) {
+                    submit.insertBefore(makeBtn('Back', true), submit.firstChild);
+                }
+            } finally {
+                if (observer) observer.takeRecords();
+                decorating = false;
+            }
+        };
+
+        
+        window.zfbInjectedBefore = function (el) {
+            var n = 0, s = el;
+            while ((s = s.previousElementSibling)) { if (s.classList.contains('zfb-injected')) n++; }
+            return n;
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var canvas = document.getElementById('canvas');
+            if (!canvas) return;
+            observer = new MutationObserver(function () {
+                if (!decorating) window.zfbDecoratePages();
+            });
+            observer.observe(canvas, { childList: true });
+            window.zfbDecoratePages();
+        });
+    })();
+</script>
+<div class="zfb-app zfb-app-embedded">
+
+    <header class="zfb-topbar fb-header-sticky">
+        <div class="zfb-topbar-row">
+            <div class="zfb-topbar-left">
+
+                <div class="zfb-sidebar-brand zfb-header-brand">
+                    <button type="button" class="aws-formlist-btn-back" onclick="window.location.href='@Url.Action("Index", "Form", new { mid = ViewBag.mid })'">
+                        <div class="sign"><i class="icon-arrow-left"></i></div>
+                        <div class="text">Back to List</div>
+                    </button>
+                    <div class="zfb-brand-text">
+                        <img src="~/Areas/FormBuilder/Content/images/short-logo.png" alt="Form Builder">
+                    </div>
+                </div>
+
+                <div class="zfb-title-editor zfb-title-editor-top-nav" id="formTitleEditor">
+                    <span class="zfb-title-text" id="formTitleText" onclick="startTopNavTitleEdit()" title="Click to edit form title">Form Title</span>
+                    <input type="text" class="zfb-title-input" id="formTitleEditInput"
+                           oninput="onTopNavTitleInput()"
+                           onkeydown="if(event.key==='Enter'){this.blur();}else if(event.key==='Escape'){cancelTopNavTitleEdit();}"
+                           onblur="commitTopNavTitleEdit()" />
+                    <button type="button" class="zfb-title-edit-btn" id="formTitleEditBtn" onclick="startTopNavTitleEdit()" title="Edit form title">
+                        <i class="icon-edit"></i>
+                    </button>
+                </div>
+                <input type="hidden" id="formTitle" value="" />
+            </div>
+
+            <div class="zfb-topbar-actions">
+                <button class="zfb-btn zfb-btn-customize" id="conditionsBtn" onclick="openConditionsModal()">
+                    <i class="icon-settings-2"></i> Conditions
+                </button>
+                @if (ViewBag.FormId != 0)
+                {
+                    <button type="button" class="zfb-btn zfb-btn-customize fb-view-tab active" id="backToBuilderBtn" onclick="showFormBuilderView()">
+                        <i class="icon-panel-left"></i> Form Builder
+                    </button>
+                }
+                <button class="zfb-btn zfb-btn-customize" id="customizeBtn" onclick="toggleCustomizePanel()">
+                    <i class="icon-settings-2"></i> Customize
+                </button>
+                <button class="zfb-btn zfb-btn-customize" id="formDesignerBtn" onclick="toggleDesignPanel()"><i class="icon-palette"></i> Form Designer</button>
+
+                @if (ViewBag.FormId != 0)
+                {
+                    <button type="button" class="zfb-btn zfb-btn-customize" id="thankYouPageBtn" onclick="showThankYouPanel()">
+                        <i class="icon-file-check"></i>
+                        <span>Thank You Page</span>
+                    </button>
+
+                    <div class="fb-mail-dropdown" id="mailTemplateDropdown">
+                        <button type="button" class="zfb-btn zfb-btn-customize" id="mailTemplateToggleBtn" onclick="toggleMailDropdown(event)">
+                            <i class="icon-mail"></i>
+                            <span>Mail Templates</span>
+                            <i class="icon-chevron-down"></i>
+                        </button>
+                        <div class="fb-mail-dropdown-menu" id="mailTemplateDropdownMenu">
+                            <a href="javascript:void(0)" onclick="showMailTemplatePanel('Admin')">Admin Template </a>
+                            <a href="javascript:void(0)" onclick="showMailTemplatePanel('User')">User Template </a>
+
+                        </div>
+                    </div>
+                }
+                @if (ViewBag.FormId != 0)
+                {
+                    <button type="button" class="zfb-btn zfb-btn-customize t-success" id="previewBtn"
+                            onclick="zfbOpenPreview('@Url.Action("RenderForm", "Form", new { id = AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId((Int64)ViewBag.FormId) })')">
+                        <i class="icon-eye"></i> Preview
+                    </button>
+                }
+                <button class="zfb-btn zfb-btn-primary" onclick="saveForm()"><i class="icon-save"></i> Save Form</button>
+            </div>
+        </div>
+        <input type="hidden" id="logoUrl" value="" />
+    </header>
+
+    <div class="zfb-workspace fb-wrapper" id="fbWorkspaceView">
+
+        <aside class="zfb-palette-sidebar fb-palette">
+
+            <div class="zfb-palette-tabs">
+                <div class="zfb-palette-tab active" id="paletteTabBtnLabels" onclick="switchPaletteTab('labels')">Labels</div>
+                <div class="zfb-palette-tab" id="paletteTabBtnPayments" onclick="switchPaletteTab('payments')">Payments</div>
+            </div>
+
+            <div class="zfb-field-search">
+                <i class="icon-search zfb-search-icon"></i>
+                <input type="text" id="zfbFieldSearch" placeholder="Search fields..." autocomplete="off">
+                <button type="button" id="zfbFieldSearchClear" class="zfb-search-clear" aria-label="Clear search"><i class="icon-x"></i></button>
+            </div>
+
+            <div class="zfb-palette-body">
+                <div id="paletteTabLabels">
+                    <div class="zfb-palette-section-label">Basic Fields</div>
+                    <div id="paletteList">
+                        <div class="zfb-field-chip" data-type="heading"><span class="zfb-chip-icon"><i class="icon-heading"></i></span>Heading <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="firstname"><span class="zfb-chip-icon"><i class="icon-user"></i></span>First Name <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="lastname"><span class="zfb-chip-icon"><i class="icon-user"></i></span>Last Name <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="email"><span class="zfb-chip-icon"><i class="icon-mail"></i></span>Email <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="address"><span class="zfb-chip-icon"><i class="icon-map-pin"></i></span>Address <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="country"><span class="zfb-chip-icon"><i class="icon-globe"></i></span>Country <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="state"><span class="zfb-chip-icon"><i class="icon-map"></i></span>State <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="borderlabel"><span class="zfb-chip-icon"><i class="icon-minus"></i></span>Border Label <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="phone"><span class="zfb-chip-icon"><i class="icon-phone"></i></span>Phone <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="date"><span class="zfb-chip-icon"><i class="icon-calendar"></i></span>Date Picker <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="appointment"><span class="zfb-chip-icon"><i class="icon-calendar-clock"></i></span>Appointment <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="signature"><span class="zfb-chip-icon"><i class="icon-pen-tool"></i></span>Signature <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="fillblank"><span class="zfb-chip-icon"><i class="icon-text-cursor-input"></i></span>Fill in the Blank <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="productlist"><span class="zfb-chip-icon"><i class="icon-shopping-cart"></i></span>Product List <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="text"><span class="zfb-chip-icon"><i class="icon-type"></i></span>Short Text <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="textarea"><span class="zfb-chip-icon"><i class="icon-align-left"></i></span>Long Text <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="paragraph"><span class="zfb-chip-icon"><i class="icon-pilcrow"></i></span>Paragraph <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="dropdown"><span class="zfb-chip-icon"><i class="icon-chevron-down"></i></span>Dropdown <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="radio"><span class="zfb-chip-icon"><i class="icon-circle-dot"></i></span>Single Choice <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="checkbox"><span class="zfb-chip-icon"><i class="icon-square-check"></i></span>Multiple Choice <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="number"><span class="zfb-chip-icon"><i class="icon-hash"></i></span>Number <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="image"><span class="zfb-chip-icon"><i class="icon-image"></i></span>Image <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="fileupload"><span class="zfb-chip-icon"><i class="icon-paperclip"></i></span>File Upload <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="time"><span class="zfb-chip-icon"><i class="icon-clock"></i></span>Time <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="terms"><span class="zfb-chip-icon"><i class="icon-file-text"></i></span>Terms &amp; Conditions <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="captcha"><span class="zfb-chip-icon"><i class="icon-shield-check"></i></span>Captcha <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip" data-type="starrating"><span class="zfb-chip-icon"><i class="icon-star"></i></span>Star Rating <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                    </div>
+                </div>
+
+                <div id="paletteTabPayments" style="display:none;">
+                    <div class="zfb-palette-section-label">Payment Gateways</div>
+                    <div id="paymentPaletteList">
+                        <div class="zfb-field-chip fb-field-type" data-type="payment" data-gateway="paypal"><span class="zfb-chip-icon"><i class="icon-wallet"></i></span>PayPal <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip fb-field-type" data-type="payment" data-gateway="stripe"><span class="zfb-chip-icon"><i class="icon-credit-card"></i></span>Stripe <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                        <div class="zfb-field-chip fb-field-type" data-type="payment" data-gateway="square"><span class="zfb-chip-icon"><i class="icon-square"></i></span>Square <span class="zfb-chip-icon"> <i class="icon-grip-vertical"></i></span></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="zfb-main">
+            <div class="zfb-canvas-scroll">
+
+                <div class="zfb-canvas fb-canvas" id="canvas">
+
+                    <!-- ✅ ADDED — "Page 1" marker so the first page is labeled
+                         the same way later pages are (via the pagebreak "PAGE N"
+                         markers in renderCanvas()). Static and undeletable since
+                         there's always exactly one first page. -->
+                    <div class="zfb-first-page-label">Page 1</div>
+
+                    <div id="canvasLogoBanner" class="zfb-canvas-logo-banner fb-canvas-logo-banner" style="display:none;" onclick="selectLogo();" title="Click to customize logo">
+                        <img id="canvasLogoImg" src="" alt="Form Logo" />
+                        <div class="zfb-side-icons fb-side-icons">
+                            <button type="button" class="zfb-icon-btn fb-icon-btn zfb-icon-edit" onclick="selectLogo(); event.stopPropagation();" title="Customize"><i class="icon-settings-2"></i></button>
+                            <button type="button" class="zfb-icon-btn fb-icon-btn fb-icon-delete zfb-icon-delete" onclick="deleteLogo(); event.stopPropagation();" title="Delete"><i class="icon-trash-2"></i></button>
+                        </div>
+                    </div>
+                    <!-- Form Title is no longer a separate stuck element here — it's
+                         formFields[0], a normal heading field rendered by renderCanvas()
+                         with the same edit/delete/drag behavior as any other heading. -->
+                    <div class="zfb-empty-hint fb-empty-hint" id="emptyHint"><i class="icon-panel-left"></i>Drag fields here to build your form</div>
+                    <!-- ✅ ADDED — Multi-page forms. Always sits right above the Submit
+                         preview; renderCanvas() re-positions it there after every render
+                         so it's always after the last field, whichever page that's on.
+                         Clicking it appends a "pagebreak" marker field (addNewPage() in
+                         zfb-formbuilder.js) which renders as its own draggable/deletable
+                         row (see renderCanvas()'s pagebreak branch) — drag it to reorder
+                         where the page split happens, or delete it to merge pages back. -->
+                    <div class="zfb-add-page-row fb-add-page-row" id="addPageBtnWrapper">
+                        <span class="zfb-add-page-line"></span>
+                        <button type="button" class="zfb-add-page-btn" onclick="addNewPage()">+ Add New Page</button>
+                        <span class="zfb-add-page-line"></span>
+                    </div>
+                    <div class="zfb-canvas-submit fb-canvas-submit" id="canvasSubmitWrapper" data-type="submit">
+                        <button type="button" class="zfb-submit-btn fb-submit-btn">Submit</button>
+                        <div class="zfb-side-icons fb-side-icons">
+                            <button type="button" class="zfb-icon-btn fb-icon-btn fb-icon-delete zfb-icon-delete" onclick="deleteSubmitButton(event)" title="Delete Submit"><i class="icon-trash-2"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="zfb-props-sidebar fb-props" id="fbPropsPanel">
+            <div class="zfb-props-header fb-props-header d-flex justify-content-between align-items-center">
+                <h6 class="zfb-props-title m-0" id="propsPanelTitle"><i class="icon-settings-2"></i> Field Properties</h6>
+                <button type="button" class="zfb-props-close" id="closeDesignBtn" style="display:none;" onclick="closePropsPanel()"><i class="icon-x"></i> Close</button>
+            </div>
+
+            <div class="zfb-logo-field">
+                <div class="zfb-logo-label">Form Logo</div>
+                <input type="file" id="logoFile" class="zfb-file-input" accept="image/*" onchange="uploadLogo()" />
+                <img id="logoPreview" class="zfb-logo-preview" src="" style="display:none;" />
+                <button type="button" id="logoCustomizeBtn" class="zfb-icon-btn-mini zfb-icon-btn-mini-customize" style="display:none;" onclick="selectLogo()" title="Customize Logo"><i class="icon-settings-2"></i></button>
+                <button type="button" id="logoDeleteBtn" class="zfb-icon-btn-mini" style="display:none;" onclick="deleteLogo()" title="Remove Logo"><i class="icon-trash-2"></i></button>
+            </div>
+
+            <div class="zfb-props-body" id="propsPanel">
+                <p class="zfb-props-empty text-muted small">Select a field to edit</p>
+            </div>
+        </aside>
+
+    </div>
+
+    @if (ViewBag.FormId != 0)
+    {
+        <div class="fb-embed-panel" id="fbThankYouPanelView" style="display:none;">
+            <iframe id="fbThankYouFrame" class="fb-embed-iframe" src="about:blank" title="Thank You Page"></iframe>
+        </div>
+
+        <div class="fb-embed-panel" id="fbMailTemplatePanelView" style="display:none;">
+            <iframe id="fbMailTemplateFrame" class="fb-embed-iframe" src="about:blank" title="Mail Templates"></iframe>
+        </div>
+    }
+</div>
+
+@if (ViewBag.FormId != 0)
+{
+    <style>
+        .fb-mail-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .fb-mail-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 6px;
+            background: #fff;
+            border: 1px solid #e2e2e2;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            min-width: 165px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+            .fb-mail-dropdown-menu.open {
+                display: block;
+            }
+
+            .fb-mail-dropdown-menu a {
+                display: block;
+                padding: 10px 16px;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+                white-space: nowrap;
+            }
+
+                .fb-mail-dropdown-menu a:hover {
+                    background: #f5f5f7;
+                }
+
+        .fb-embed-panel {
+            width: 100%;
+            height: calc(100vh - 70px);
+        }
+
+        .fb-embed-iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+    </style>
+
+    <script>
+        var FB_THANK_YOU_URL = '@Url.Action("EditThankYouPage", "Form", new { id = ViewBag.FormId })';
+        var FB_MAIL_TEMPLATE_BASE_URL = '@Url.Action("EditByForm", "MailTemplates", new { formId = ViewBag.FormId })';
+
+        var FB_HIDE_WHILE_PANEL_OPEN_IDS = ['conditionsBtn', 'customizeBtn', 'formDesignerBtn', 'previewBtn'];
+
+        // ALL of the mutually-exclusive header buttons. Only one of these is ever
+        // "active" (highlighted) at a time — Form Builder is active by default,
+        // and opening Customize / Form Designer / Thank You Page / Mail Templates
+        // always clears it from every other button first.
+        var FB_HEADER_BUTTON_IDS = ['backToBuilderBtn', 'customizeBtn', 'formDesignerBtn', 'thankYouPageBtn', 'mailTemplateToggleBtn'];
+
+        function setActiveHeaderButton(activeId) {
+            FB_HEADER_BUTTON_IDS.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.classList.toggle('active', id === activeId);
+            });
+        }
+
+        function setBuilderOnlyButtonsVisible(visible) {
+            FB_HIDE_WHILE_PANEL_OPEN_IDS.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = visible ? '' : 'none';
+            });
+        }
+
+        function hideEmbedPanels() {
+            var typ = document.getElementById('fbThankYouPanelView');
+            var mtp = document.getElementById('fbMailTemplatePanelView');
+            if (typ) typ.style.display = 'none';
+            if (mtp) mtp.style.display = 'none';
+        }
+
+        function showFormBuilderView() {
+            hideEmbedPanels();
+            document.getElementById('fbWorkspaceView').style.display = '';
+            setBuilderOnlyButtonsVisible(true);
+            setActiveHeaderButton('backToBuilderBtn');
+        }
+
+        function showThankYouPanel() {
+            closeMailDropdown();
+            document.getElementById('fbWorkspaceView').style.display = 'none';
+            hideEmbedPanels();
+            setBuilderOnlyButtonsVisible(false);
+
+            var frame = document.getElementById('fbThankYouFrame');
+            var url = FB_THANK_YOU_URL + (FB_THANK_YOU_URL.indexOf('?') > -1 ? '&' : '?') + 'embed=1';
+            if (frame.getAttribute('data-loaded-url') !== url) {
+                frame.src = url;
+                frame.setAttribute('data-loaded-url', url);
+            }
+            document.getElementById('fbThankYouPanelView').style.display = 'block';
+
+            setActiveHeaderButton('thankYouPageBtn');
+        }
+
+        function showMailTemplatePanel(mailType) {
+            closeMailDropdown();
+            document.getElementById('fbWorkspaceView').style.display = 'none';
+            hideEmbedPanels();
+            setBuilderOnlyButtonsVisible(false);
+
+            var frame = document.getElementById('fbMailTemplateFrame');
+            var url = FB_MAIL_TEMPLATE_BASE_URL + '&mailType=' + encodeURIComponent(mailType) + '&embed=1';
+            frame.src = url;
+            frame.setAttribute('data-loaded-url', url);
+            document.getElementById('fbMailTemplatePanelView').style.display = 'block';
+
+            setActiveHeaderButton('mailTemplateToggleBtn');
+        }
+
+        function toggleMailDropdown(e) {
+            e.stopPropagation();
+            var menu = document.getElementById('mailTemplateDropdownMenu');
+            if (menu) menu.classList.toggle('open');
+        }
+
+        function closeMailDropdown() {
+            var menu = document.getElementById('mailTemplateDropdownMenu');
+            if (menu) menu.classList.remove('open');
+        }
+
+        document.addEventListener('click', function (e) {
+            var dd = document.getElementById('mailTemplateDropdown');
+            if (dd && !dd.contains(e.target)) closeMailDropdown();
+        });
+    </script>
+}
+<script>
+    // Note: the top-nav "Form Title" (#formTitleText) is kept in sync by
+    // syncTitlePayloadFromField() in zfb-formbuilder.js. It can now ALSO be
+    // edited directly here — click the text or the pencil icon
+    // (startTopNavTitleEdit/commitTopNavTitleEdit/cancelTopNavTitleEdit,
+    // defined in zfb-formbuilder.js) — in addition to editing on the canvas
+    // heading field itself (click its Customize icon), same as any other
+    // heading. Both paths write to the same underlying title field, so
+    // either stays in sync with the other.
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var fieldSearch = document.getElementById("zfbFieldSearch");
+        var clearButton = document.getElementById("zfbFieldSearchClear");
+        if (!fieldSearch || !clearButton) return;
+
+        function filterFields() {
+            var searchValue = fieldSearch.value.trim().toLowerCase();
+            var activeTab = document.getElementById("paletteTabLabels").style.display !== "none" ? "labels" : "payments";
+            var scope = activeTab === "labels" ? document.getElementById("paletteList") : document.getElementById("paymentPaletteList");
+
+            scope.querySelectorAll(".zfb-field-chip").forEach(function (item) {
+                var fieldText = item.textContent.toLowerCase();
+                item.style.display = fieldText.includes(searchValue) ? "" : "none";
+            });
+
+            clearButton.style.display = searchValue.length > 0 ? "flex" : "none";
+        }
+
+        fieldSearch.addEventListener("input", filterFields);
+
+        clearButton.addEventListener("click", function () {
+            fieldSearch.value = "";
+            document.querySelectorAll(".zfb-field-chip").forEach(function (item) {
+                item.style.display = "";
+            });
+            clearButton.style.display = "none";
+            fieldSearch.focus();
+        });
+    });
+</script>
+
+
+<div class="fb-cond-overlay" id="condOverlay" style="display:none;" onclick="if(event.target===this) closeConditionsModal();">
+    <div class="fb-cond-modal">
+        <div class="fb-cond-header d-flex justify-content-between align-items-center">
+            <h5 class="m-0" id="condModalTitle">⚙️ Conditional Logic</h5>
+            <button type="button" class="btn-close" onclick="closeConditionsModal()"></button>
+        </div>
+        <div class="fb-cond-body" id="condModalBody">
+        </div>
+    </div>
+</div>
+
+<!-- ✅ ADDED — "at least one Required field" warning shown by saveForm()
+     when no field in the form has its Required checkbox turned on. Reuses
+     the same overlay/modal visual language as the Conditions modal above
+     (own class names so it doesn't share state with it). -->
+<div class="fb-cond-overlay" id="zfbRequiredWarnOverlay" style="display:none;" onclick="if(event.target===this) closeRequiredFieldWarning();">
+    <div class="fb-cond-modal zfb-required-warn-modal">
+        <div class="fb-cond-header d-flex justify-content-between align-items-center">
+            <h5 class="m-0">⚠️ No Required Field Selected</h5>
+            <button type="button" class="btn-close" onclick="closeRequiredFieldWarning()"></button>
+        </div>
+        <div class="fb-cond-body">
+            <p class="mb-3">
+                This form doesn't have any field marked as <strong>Required</strong> yet.
+                Please open a field's <strong>Field Properties</strong> panel and select the
+                <strong>Required</strong> checkbox for at least one field before saving.
+            </p>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="zfb-btn zfb-btn-primary" onclick="closeRequiredFieldWarning()">
+                    Okay, I'll add one
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    let formConditions = [];
+    let conditionCounter = 0;
+    let condModalView = 'list';
+    let condDraft = null;
+    let condEditingId = null;
+
+
+    const COND_TRIGGER_EXCLUDED_TYPES = ['heading', 'paragraph', 'payment', 'captcha', 'signature', 'fullname', 'address'];
+    const COND_TARGET_EXCLUDED_TYPES = ['payment', 'captcha', 'fullname', 'address'];
+
+    const COND_OPERATORS = [
+        { id: 'equals', label: 'Equals' },
+        { id: 'notEquals', label: 'Not Equals' },
+        { id: 'contains', label: 'Contains' },
+        { id: 'isChecked', label: 'Is Checked' },
+        { id: 'isEmpty', label: 'Is Empty' },
+        { id: 'notEmpty', label: 'Is Not Empty' }
+    ];
+
+    const COND_ACTIONS = [
+        { id: 'show', label: 'Show Field(s)' },
+        { id: 'hide', label: 'Hide Field(s)' },
+        { id: 'require', label: 'Require Field(s)' },
+        { id: 'optional', label: 'Make Field(s) Optional' },
+        { id: 'enable', label: 'Enable Field(s)' },
+        { id: 'disable', label: 'Disable Field(s)' },
+        { id: 'mask', label: 'Mask Field(s)' },
+        { id: 'unmask', label: 'Unmask Field(s)' },
+        { id: 'update', label: "Copy Value Into Field(s)" }
+    ];
+
+
+    const COND_ACTION_GROUPS = [
+        { id: 'showhide', label: 'Show/Hide Field', desc: 'Change visibility of specific form fields', actions: ['show', 'hide'] },
+        { id: 'requiremask', label: 'Enable/Require/Mask Field', desc: 'Require or disable a field, or set a mask', actions: ['require', 'optional', 'enable', 'disable', 'mask', 'unmask'] },
+        { id: 'update', label: 'Update Field', desc: "Copy a field's value", actions: ['update'] }
+    ];
+
+    function condGroupForAction(actionId) {
+        return (COND_ACTION_GROUPS.find(g => g.actions.includes(actionId)) || COND_ACTION_GROUPS[0]).id;
+    }
+
+       currentFormId = @ViewBag.FormId;
+
+    logoWidth = null;
+    logoHeight = 110;
+
+    designPanelOpen = false;
+    designSubTab = 'colors';
+
+    formDesign = {
+        colorSchemeId: null,
+        themeId: null,
+        pageColor: '#eef1f5',
+        pageImageUrl: '',
+        formColor: '#ffffff',
+        formImageUrl: '',
+        fontColor: '#33475b',
+        inputBackground: '#ffffff',
+        formWidth: null,
+        labelAlignment: 'top',
+        questionSpacing: 12,
+        fontFamily: 'Poppins',
+        fontSize: 14,
+        fontWeight: 'normal',
+        buttonStyleId: 'flat-blue',
+        buttonCss: 'background:rgb(19 69 143);color:#fff;',
+        submitButtonAlign: 'center',
+        submitButtonText: 'Submit',
+     
+        logoBgColor: '#eef2f7',
+        logoAlignment: 'center',
+        logoAltText: '',
+        logoBottomSpacing: 20,
+        logoHeadingGap: 16,
+        logoHeadingRowPaddingX: 35,
+        logoPadding: {},
+        logoMargin: {},
+        logoLayout: 'stacked'
+    };
+
+    buttonStylePresets = [
+        { id: 'flat-blue', category: 'flat', css: 'background:rgb(19 69 143);color:#fff;' },
+        { id: 'flat-green', category: 'flat', css: 'background:#28a745;color:#fff;' },
+        { id: 'flat-red', category: 'flat', css: 'background:#e0455c;color:#fff;' },
+        { id: 'flat-orange', category: 'flat', css: 'background:#ff7a1a;color:#fff;' },
+        { id: 'flat-dark', category: 'flat', css: 'background:#1e2635;color:#fff;' },
+        { id: 'flat-purple', category: 'flat', css: 'background:#8a4fe0;color:#fff;' },
+        { id: 'gradient-blue', category: 'gradient', css: 'background:linear-gradient(135deg,#4a7cf6,#8a4fe0);color:#fff;' },
+        { id: 'gradient-sunset', category: 'gradient', css: 'background:linear-gradient(135deg,#ff7a1a,#e0455c);color:#fff;' },
+        { id: 'gradient-green', category: 'gradient', css: 'background:linear-gradient(135deg,#28a745,#17a2b8);color:#fff;' },
+        { id: 'outline-blue', category: 'flat', css: 'background:#fff;color:rgb(19 69 143);border:2px solid rgb(19 69 143);' },
+        { id: 'outline-dark', category: 'flat', css: 'background:#fff;color:#1e2635;border:2px solid #1e2635;' },
+        { id: 'gradient-purple', category: 'gradient', css: 'background:linear-gradient(135deg,#8a4fe0,#e0455c);color:#fff;' }
+    ];
+    buttonStyleTab = 'all';
+
+    colorSchemes = [
+        { id: 'blue', page: '#eef1f5', form: '#ffffff', font: '#1c2b39', accent: '#4a7cf6' },
+        { id: 'orange', page: '#fff7ef', form: '#ffffff', font: '#5a3b1c', accent: '#ff7a1a' },
+        { id: 'green', page: '#eefaf1', form: '#ffffff', font: '#173a25', accent: '#28a745' },
+        { id: 'purple', page: '#f5f0fb', form: '#ffffff', font: '#2e1c4a', accent: '#8a4fe0' },
+        { id: 'red', page: '#fdeef0', form: '#ffffff', font: '#4a1620', accent: '#e0455c' },
+        { id: 'teal', page: '#e9f7f7', form: '#ffffff', font: '#123a3a', accent: '#17a2b8' },
+        { id: 'dark', page: '#1b2330', form: '#2b3648', font: '#f1f4f9', accent: '#4a7cf6' },
+        { id: 'mono', page: '#f4f4f4', form: '#ffffff', font: '#222222', accent: '#333333' }
+    ];
+
+    themePresets = [
+        { id: 'default', name: 'Default', page: '#eef1f5', form: '#ffffff', font: '#33475b', input: '#ffffff' },
+        { id: 'ocean', name: 'Ocean Mist', page: '#e7f3fb', form: '#ffffff', font: '#123a52', input: '#f4fbff' },
+        { id: 'sunset', name: 'Sunset', page: '#fff1e6', form: '#fffaf5', font: '#5a2d0c', input: '#fff7f0' },
+        { id: 'forest', name: 'Forest', page: '#eaf5ec', form: '#ffffff', font: '#173a25', input: '#f3fbf4' },
+        { id: 'lavender', name: 'Lavender', page: '#f3effb', form: '#ffffff', font: '#2e1c4a', input: '#f9f6fd' },
+        { id: 'midnight', name: 'Midnight', page: '#171d29', form: '#232c3d', font: '#eef1f5', input: '#2c3648' },
+        { id: 'graphite', name: 'Graphite', page: '#eceff1', form: '#ffffff', font: '#263238', input: '#f5f6f7' },
+        { id: 'rose', name: 'Rose', page: '#fdeef1', form: '#fffbfc', font: '#4a1620', input: '#fff4f6' }
+    ];
+
+    gatewayInfo = {
+        paypal: { label: 'PayPal', icon: '🅿️', color: '#13458f' },
+        stripe: { label: 'Stripe', icon: '💳', color: '#13458f' },
+        square: { label: 'Square', icon: '⬛', color: '#13458f' }
+    };
+
+    fieldLabels = {
+        heading: "Section Heading",
+        fullname: "Full Name",
+        firstname: "First Name",
+        lastname: "Last Name",
+        email: "Email",
+        address: "Address",
+        phone: "Phone Number",
+        date: "Date",
+        appointment: "Appointment",
+        signature: "Signature",
+        fillblank: "Fill in the blank",
+        productlist: "Product",
+        text: "Text Field",
+        textarea: "Long Text",
+        paragraph: "Paragraph text goes here...",
+        dropdown: "Dropdown",
+        radio: "Single Choice",
+        checkbox: "Multiple Choice",
+        number: "Number",
+        image: "Image",
+        fileupload: "Upload File",
+        time: "Time",
+        terms: "I agree to the Terms & Conditions",
+        captcha: "Please verify that you are human",
+        starrating: "Rate this",
+        payment: "Payment"
+    };
+
+    applyDesignToCanvas();
+
+
+    new Sortable(document.getElementById('paletteList'), {
+        group: { name: 'shared', pull: 'clone', put: false },
+        sort: false,
+        animation: 150
+    });
+
+    new Sortable(document.getElementById('paymentPaletteList'), {
+        group: { name: 'shared', pull: 'clone', put: false },
+        sort: false,
+        animation: 150
+    });
+
+
+    // ✅ ADDED — if a field was dropped on (or right beside) an empty page's
+    // "Drag fields here…" box, snap it to sit directly under that page's heading
+    // (i.e. immediately before the box) and return the index it would have had
+    // if it had been dropped exactly there — so it lands INSIDE that page.
+    // Any other drop keeps the original evt.newIndex untouched.
+    function zfbIndexAfterEmptyPageDrop(evt) {
+        var item = evt.item;
+        var prev = item.previousElementSibling;
+        var next = item.nextElementSibling;
+        var hint = (prev && prev.classList.contains('zfb-page-dropzone-hint')) ? prev
+                 : (next && next.classList.contains('zfb-page-dropzone-hint')) ? next
+                 : null;
+
+        // The view-only page footers (.zfb-injected) are extra nodes in the canvas;
+        // take them out of the count so the index means what it always did.
+        var injected = (typeof zfbInjectedBefore === 'function') ? zfbInjectedBefore(item) : 0;
+        if (!hint) return evt.newIndex - injected;
+
+        hint.parentNode.insertBefore(item, hint);
+        var idx = 0, el = item;
+        while ((el = el.previousElementSibling)) {
+            if (el.nodeName.toUpperCase() !== 'TEMPLATE' && !el.classList.contains('zfb-injected')) idx++;
+        }
+        return idx;
+    }
+
+    canvasSortable = new Sortable(document.getElementById('canvas'), {
+        group: 'shared',
+        animation: 150,
+        
+        draggable: '.fb-canvas-item, .fb-canvas-submit, .zfb-page-dropzone-hint, .zfb-page-footer',
+        filter: '.zfb-page-dropzone-hint, .zfb-page-footer',
+        preventOnFilter: false,
+        onAdd: function (evt) {
+            const type = evt.item.getAttribute('data-type');
+            const gateway = evt.item.getAttribute('data-gateway');
+          
+            if (type === 'submit') {
+                evt.item.remove();
+                return;
+            }
+            const dropIndex = zfbIndexAfterEmptyPageDrop(evt);
+            evt.item.remove();
+            addField(type, dropIndex, gateway);
+        },
+        onUpdate: function () {
+            syncOrderFromDOM();
+        }
+    });
+
+    function requiredHideTogglesHtml(field) {
+        return `
+            <div class="d-flex gap-4">
+                <div class="form-check form-switch fb-toggle-switch">
+                    <input type="checkbox" class="form-check-input" role="switch" id="reqChk_${field.id}" ${field.required ? 'checked' : ''} onchange="updateField('${field.id}','required',this.checked)">
+                    <label class="form-check-label" for="reqChk_${field.id}">Required</label>
+                </div>
+                <div class="form-check form-switch fb-toggle-switch">
+                    <input type="checkbox" class="form-check-input" role="switch" id="hideChk_${field.id}" ${field.hidden ? 'checked' : ''} onchange="updateField('${field.id}','hidden',this.checked); renderCanvas();">
+                    <label class="form-check-label" for="hideChk_${field.id}">Hide</label>
+                </div>
+            </div>
+        `;
+    }
+
+
+    function condFieldLabel(fieldId) {
+        const f = formFields.find(x => x.id === fieldId);
+        return f ? (f.label || f.type) : '(deleted field)';
+    }
+
+    function condTriggerableFields() {
+        return formFields.filter(f => !COND_TRIGGER_EXCLUDED_TYPES.includes(f.type));
+    }
+
+    function condTargetableFields(excludeId) {
+        return formFields.filter(f => !COND_TARGET_EXCLUDED_TYPES.includes(f.type) && f.id !== excludeId);
+    }
+
+    function condOperatorNeedsValue(operatorId) {
+        return operatorId !== 'isChecked' && operatorId !== 'isEmpty' && operatorId !== 'notEmpty';
+    }
+
+    function openConditionsModal() {
+        condModalView = 'list';
+        condDraft = null;
+        condEditingId = null;
+        document.getElementById('condOverlay').style.display = 'flex';
+        renderConditionsModal();
+    }
+
+    function closeConditionsModal() {
+        document.getElementById('condOverlay').style.display = 'none';
+    }
+
+    function addNewCondition() {
+        const triggerable = condTriggerableFields();
+        if (!triggerable.length) {
+            alert('Add at least one field to the form before creating a condition.');
+            return;
+        }
+        conditionCounter++;
+        condDraft = {
+            id: 'c' + conditionCounter,
+            triggerFieldId: triggerable[0].id,
+            operator: 'equals',
+            triggerValue: '',
+            category: 'showhide',
+            action: 'show',
+            targetFieldIds: [],
+            sourceFieldId: ''
+        };
+        condEditingId = null;
+
+        condModalView = 'category';
+        renderConditionsModal();
+    }
+
+    function editCondition(id) {
+        const rule = formConditions.find(r => r.id === id);
+        if (!rule) return;
+        condDraft = JSON.parse(JSON.stringify(rule));
+        if (!condDraft.category) condDraft.category = condGroupForAction(condDraft.action); // ✅ ADDED — infer category for rules saved before this existed
+        condEditingId = id;
+        condModalView = 'editor';
+        renderConditionsModal();
+    }
+
+    function selectConditionCategory(catId) {
+        if (!condDraft) return;
+        condDraft.category = catId;
+        const group = COND_ACTION_GROUPS.find(g => g.id === catId);
+        if (group && !group.actions.includes(condDraft.action)) {
+            condDraft.action = group.actions[0];
+        }
+        renderConditionsModal();
+    }
+
+    function proceedToConditionEditor() {
+        if (!condDraft || !condDraft.category) return;
+        condModalView = 'editor';
+        renderConditionsModal();
+    }
+
+    function backToConditionCategory() {
+        if (!condDraft) return;
+        condModalView = 'category';
+        renderConditionsModal();
+    }
+
+    function deleteCondition(id) {
+        if (!confirm('Delete this condition?')) return;
+        formConditions = formConditions.filter(r => r.id !== id);
+        renderConditionsModal();
+    }
+
+    function cancelConditionEditor() {
+        condDraft = null;
+        condEditingId = null;
+        condModalView = 'list';
+        renderConditionsModal();
+    }
+
+    function updateConditionDraft(key, value) {
+        if (!condDraft) return;
+        condDraft[key] = value;
+        if (key === 'triggerFieldId') {
+            condDraft.triggerValue = '';
+        }
+        renderConditionsModal();
+    }
+
+    function toggleConditionTarget(fieldId, checked) {
+        if (!condDraft) return;
+        if (!Array.isArray(condDraft.targetFieldIds)) condDraft.targetFieldIds = [];
+        if (checked) {
+            if (!condDraft.targetFieldIds.includes(fieldId)) condDraft.targetFieldIds.push(fieldId);
+        } else {
+            condDraft.targetFieldIds = condDraft.targetFieldIds.filter(id => id !== fieldId);
+        }
+    }
+
+    function saveConditionDraft() {
+        if (!condDraft || !condDraft.triggerFieldId) return;
+        if (condDraft.category === 'update' && !condDraft.sourceFieldId) {
+            alert('Choose which field\'s value should be copied.');
+            return;
+        }
+        if (!condDraft.targetFieldIds || !condDraft.targetFieldIds.length) {
+            alert(condDraft.category === 'update'
+                ? 'Select at least one field to copy the value into.'
+                : 'Select at least one target field for this condition.');
+            return;
+        }
+        if (condOperatorNeedsValue(condDraft.operator) && !condDraft.triggerValue) {
+            alert('Enter a value to compare against, or choose an operator that doesn\'t need one (Is Checked / Is Empty / Is Not Empty).');
+            return;
+        }
+        if (condEditingId) {
+            const idx = formConditions.findIndex(r => r.id === condEditingId);
+            if (idx > -1) formConditions[idx] = condDraft;
+        } else {
+            formConditions.push(condDraft);
+        }
+        condDraft = null;
+        condEditingId = null;
+        condModalView = 'list';
+        renderConditionsModal();
+    }
+
+    function renderConditionsModal() {
+        const body = document.getElementById('condModalBody');
+        const title = document.getElementById('condModalTitle');
+
+        if (condModalView === 'category') {
+            title.textContent = 'Manage Conditional Logic';
+            body.innerHTML = `
+                <div class="fb-cond-category">
+                    <div class="fb-cond-category-grid">
+                        ${COND_ACTION_GROUPS.map(g => `
+                            <div class="fb-cond-category-card ${condDraft.category === g.id ? 'active' : ''}" onclick="selectConditionCategory('${g.id}')">
+                                <input type="radio" name="condCategory" ${condDraft.category === g.id ? 'checked' : ''} onclick="event.stopPropagation(); selectConditionCategory('${g.id}')">
+                                <div>
+                                    <div class="fb-cond-category-title">${g.label}</div>
+                                    <div class="fb-cond-category-desc text-muted small">${g.desc}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-outline-secondary" onclick="cancelConditionEditor()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="proceedToConditionEditor()">Continue</button>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        if (condModalView === 'editor') {
+            title.textContent = condEditingId ? '✏️ Edit Condition' : '➕ New Condition';
+            const triggerable = condTriggerableFields();
+            const triggerField = formFields.find(f => f.id === condDraft.triggerFieldId);
+            const needsValue = condOperatorNeedsValue(condDraft.operator);
+            const hasOptions = triggerField && Array.isArray(triggerField.options) && triggerField.options.length;
+            const category = condDraft.category || condGroupForAction(condDraft.action);
+            const group = COND_ACTION_GROUPS.find(g => g.id === category) || COND_ACTION_GROUPS[0];
+            const groupActions = COND_ACTIONS.filter(a => group.actions.includes(a.id));
+            const isUpdate = category === 'update';
+
+            const targetable = isUpdate
+                ? condTargetableFields(condDraft.sourceFieldId)
+                : condTargetableFields(condDraft.triggerFieldId);
+
+            body.innerHTML = `
+                <div class="fb-cond-editor">
+                    <a href="javascript:void(0)" class="fb-cond-back-link" onclick="backToConditionCategory()">← Select Condition Action Type</a>
+
+                    <label class="form-label mt-2">If</label>
+                    <select class="form-select mb-2" onchange="updateConditionDraft('triggerFieldId', this.value)">
+                        ${triggerable.map(f => `<option value="${f.id}" ${f.id === condDraft.triggerFieldId ? 'selected' : ''}>${f.label} (${f.type})</option>`).join('')}
+                    </select>
+
+                    <label class="form-label">Condition</label>
+                    <select class="form-select mb-2" onchange="updateConditionDraft('operator', this.value)">
+                        ${COND_OPERATORS.map(o => `<option value="${o.id}" ${o.id === condDraft.operator ? 'selected' : ''}>${o.label}</option>`).join('')}
+                    </select>
+
+                    ${needsValue ? `
+                        <label class="form-label">Value</label>
+                        ${hasOptions ? `
+                            <select class="form-select mb-2" onchange="updateConditionDraft('triggerValue', this.value)">
+                                <option value="">-- Select a value --</option>
+                                ${triggerField.options.map(o => `<option value="${o}" ${o === condDraft.triggerValue ? 'selected' : ''}>${o}</option>`).join('')}
+                            </select>
+                        ` : `
+                            <input type="text" class="form-control mb-2" value="${condDraft.triggerValue || ''}" onchange="updateConditionDraft('triggerValue', this.value)" placeholder="Value to compare against" />
+                        `}
+                    ` : ''}
+
+                    ${isUpdate ? `
+                        <label class="form-label">Then copy value from</label>
+                        <select class="form-select mb-2" onchange="updateConditionDraft('sourceFieldId', this.value)">
+                            <option value="">-- Select a field --</option>
+                            ${triggerable.map(f => `<option value="${f.id}" ${f.id === condDraft.sourceFieldId ? 'selected' : ''}>${f.label} (${f.type})</option>`).join('')}
+                        </select>
+
+                        <label class="form-label">Into field(s)</label>
+                    ` : `
+                        <label class="form-label">Then</label>
+                        <select class="form-select mb-2" onchange="updateConditionDraft('action', this.value)">
+                            ${groupActions.map(a => `<option value="${a.id}" ${a.id === condDraft.action ? 'selected' : ''}>${a.label}</option>`).join('')}
+                        </select>
+
+                        <label class="form-label">On field(s)</label>
+                    `}
+                    <div class="fb-cond-target-list">
+                        ${targetable.length ? targetable.map(f => `
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="condTarget_${f.id}"
+                                       ${condDraft.targetFieldIds && condDraft.targetFieldIds.includes(f.id) ? 'checked' : ''}
+                                       onchange="toggleConditionTarget('${f.id}', this.checked)">
+                                <label class="form-check-label" for="condTarget_${f.id}">${f.label} (${f.type})</label>
+                            </div>
+                        `).join('') : '<p class="text-muted small">No other fields available to target.</p>'}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-outline-secondary" onclick="cancelConditionEditor()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveConditionDraft()">Save Condition</button>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // List view
+        title.textContent = '⚙️ Conditional Logic';
+        const opLabel = id => (COND_OPERATORS.find(o => o.id === id) || {}).label || id;
+        const actionLabel = id => (COND_ACTIONS.find(a => a.id === id) || {}).label || id;
+        const thenLabel = rule => rule.action === 'update'
+            ? `Copy "${condFieldLabel(rule.sourceFieldId)}" into ${(rule.targetFieldIds || []).map(condFieldLabel).join(', ') || '(none)'}`
+            : `${actionLabel(rule.action)}: ${(rule.targetFieldIds || []).map(condFieldLabel).join(', ')}`;
+
+        body.innerHTML = `
+            <div class="fb-cond-list">
+                ${formConditions.length ? formConditions.map(rule => `
+                    <div class="fb-cond-row">
+                        <div>
+                            <div><strong>If</strong> ${condFieldLabel(rule.triggerFieldId)} <strong>${opLabel(rule.operator).toLowerCase()}</strong>${condOperatorNeedsValue(rule.operator) ? ` "${rule.triggerValue}"` : ''}</div>
+                            <div class="text-muted small"><strong>Then</strong> ${thenLabel(rule)}</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editCondition('${rule.id}')">Edit</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCondition('${rule.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('') : '<p class="text-muted small">No conditions yet. Conditions let you show/hide, require, mask, or copy values between fields based on what the visitor fills in elsewhere on the form.</p>'}
+            </div>
+            <button type="button" class="btn btn-primary w-100 mt-3" onclick="addNewCondition()">+ Add New Condition</button>
+        `;
+    }
+
+
+</script>
+

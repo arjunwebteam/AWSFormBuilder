@@ -1,0 +1,33 @@
+<<<<<<< HEAD
+-------------------START-------------2/12/2025 11:23:19 AM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502120550.32049315796@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/12/2025 11:23:19 AM
+-------------------START-------------2/12/2025 11:23:35 AM
+Page :/User/Services/AddServiceDonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502120551.29040553640@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/12/2025 11:23:35 AM
+=======
+-------------------START-------------2/12/2025 4:05:06 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502121035.40723814982@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/12/2025 4:05:06 PM
+-------------------START-------------2/12/2025 4:23:12 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502121053.20090315889@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/12/2025 4:23:12 PM
+-------------------START-------------2/12/2025 4:52:26 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502121122.69074193394@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/12/2025 4:52:26 PM
+-------------------START-------------2/12/2025 4:52:51 PM
+Page :/Admin/Account/UserValidate
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202502121123.94847052616@smtp-relay.mailin.fr>"}
+
+-------------------END-------------2/12/2025 4:52:51 PM
+>>>>>>> 99db6e4c602cf55c6d623b6b0ab661f3dff8efa9

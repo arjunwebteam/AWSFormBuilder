@@ -1,0 +1,636 @@
+﻿@{
+    Layout = null;
+
+
+    List<AWSFormBuilder.Entities.AdminMenuItems> lstSubMenuMaster = ViewBag.lstMenuMaster;
+    List<AWSFormBuilder.Entities.AdminMenuItems> lstMainMenuMaster = ViewBag.lstMainMenuMaster;
+    List<AWSFormBuilder.Entities.Role_Menu> lstrole_Menus = ViewBag.lstrole_Menus;
+    List<AWSFormBuilder.Entities.Users> lstEmployeeCompanyInformation = ViewBag.lstEmployeeCompanyInformation;
+    Int64 UserId = ViewBag.UserId;
+
+}
+
+<input type="hidden" id="EmployeeCompanyIds" value="@string.Join(",", lstEmployeeCompanyInformation.Select(x => x.UserId))" />
+<input type="hidden" id="Menus" value="@string.Join(",", lstMainMenuMaster.Select(x => x.MenuItemId))" />
+
+<input type="hidden" id="items" name="items" value="" />
+
+<script>
+    $(document).ready(function () {
+        //$('#Updatehide').hide;
+        $('#Updatehide').addClass('d-none');
+        $('#Updatehide1').addClass('d-none');
+        $('#Updatehide2').addClass('d-none');
+    });
+    function validateroles() {
+        var RoleIds = Common.GetCheckBoxValue('RoleNamecheckbox');
+        var IsAdds = Common.GetCheckBoxValue('IsAdd');
+        var IsEdits = Common.GetCheckBoxValue('IsEdit');
+        var IsViews = Common.GetCheckBoxValue('IsView');
+        var IsDeletes = Common.GetCheckBoxValue('IsDelete');
+        var IsExports = Common.GetCheckBoxValue('IsExport');
+        if (RoleIds == "") {
+            alert("Please select atleast one Item.");
+            return false;
+        }
+        $('#RoleIds').val(RoleIds);
+        $('#IsAdds').val(IsAdds);
+        $('#IsEdits').val(IsEdits);
+        $('#IsViews').val(IsViews);
+        $('#IsDeletes').val(IsDeletes);
+        $('#IsExports').val(IsExports);
+    }
+
+    function enableoptions(rolename, j) {
+        var checkbox = document.getElementById('RoleNamecheckbox-' + j);
+        if (checkbox.checked) {
+            $('#showbutton-' + j).show();
+           // $('#D3').removeClass('d-none').addClass('dis-b');
+            $('#updatebutton-' + j).removeClass('d-none').addClass('dis-b');
+            $('#Role-' + rolename).show();
+        }
+        else {
+            $('#showbutton-' + j).hide();
+            //$('#updatebutton-' + j).hide();
+            $('#updatebutton-' + j).removeClass('dis-b').addClass('d-none');
+
+            $('#Role-' + rolename).hide();
+        }
+    }
+
+    function selectall(j) {
+        var all = document.getElementById('IsSelectAll-' + j);
+        if (all.checked) {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = true;
+            $('#updatebutton-' + j).removeClass('d-none').addClass('dis-b');
+
+            var isadds = document.getElementById('IsAdd-' + j);
+            isadds.checked = true;
+
+            var isedits = document.getElementById('IsEdit-' + j);
+            isedits.checked = true;
+
+            var isviews = document.getElementById('IsView-' + j);
+            isviews.checked = true;
+
+            var isdeletes = document.getElementById('IsDelete-' + j);
+            isdeletes.checked = true;
+
+            var isexports = document.getElementById('IsExport-' + j);
+            isexports.checked = true;
+
+        }
+        else {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = false;
+            $('#updatebutton-' + j).removeClass('dis-b').addClass('d-none');
+
+
+            var isadds = document.getElementById('IsAdd-' + j);
+            isadds.checked = false;
+
+            var isedits = document.getElementById('IsEdit-' + j);
+            isedits.checked = false;
+
+            var isviews = document.getElementById('IsView-' + j);
+            isviews.checked = false;
+
+            var isdeletes = document.getElementById('IsDelete-' + j);
+            isdeletes.checked = false;
+
+            var isexports = document.getElementById('IsExport-' + j);
+            isexports.checked = false;
+        }
+
+
+
+    }
+
+    function bindrole(j) {
+        var isadds = document.getElementById('IsAdd-' + j);
+        var isedits = document.getElementById('IsEdit-' + j);
+        var isviews = document.getElementById('IsView-' + j);
+        var isdeletes = document.getElementById('IsDelete-' + j);
+        var isexports = document.getElementById('IsExport-' + j);
+        if (isadds.checked) {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = true;
+        }
+        else if (isedits.checked) {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = true;
+        }
+        else if (isviews.checked) {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = true;
+        }
+        else if (isdeletes.checked) {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = true;
+        }
+        else if (isexports.checked) {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = true;
+        }
+        else {
+            var isroles = document.getElementById('RoleNamecheckbox-' + j);
+            isroles.checked = false;
+        }
+
+    }
+
+    function RemoveRoleAccess(RoleMenuMasterId, RoleName, pid) {
+
+        var conf = confirm('Do you want to delete access to this ' + RoleName + '?');
+
+                            if (conf) {
+                    $.ajax({
+                                type: "POST",
+                        url: '@Url.Action("RemoveRoleMenuAccess", "AdminMenuItems")', // the URL of the controller action method
+                        data: { RoleMenuMasterId: RoleMenuMasterId, ParentId: pid, UserId:@UserId }, // optional data
+                        datatype: "JSON",
+                        success: function (result) {
+                            if (result.ok) {
+                                showLobiboxNotification(result.messageType, result.message);
+
+                                //$('#divmessage').html(result.data);
+                                $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                AssignMenuBind();
+                                        }
+                                        else {
+                                $('#divmessage').html(result.data);
+                                $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+                                        }
+                                    }
+                                });
+                            }
+    }
+
+    function manageroles(parentids, roleid) {
+        // Comma-separated string
+        var commaSeparatedString = parentids;
+
+        var isrole = document.getElementById('RoleNamecheckbox-' + roleid);
+
+        // Split the string into an array using the split method
+        var arrayOfValues = commaSeparatedString.split(',');
+
+        // Variable to store the result
+        var result = '';
+
+        // Loop through the array and assign values to the result variable
+        for (var i = 0; i < arrayOfValues.length; i++) {
+            //result += arrayOfValues[i];
+            var issubroles = document.getElementById('RoleNamecheckbox-' + arrayOfValues[i]);
+            if (isrole.checked) {
+                issubroles.checked = true;
+            }
+            else {
+                issubroles.checked = false;
+            }
+
+
+        }
+    }
+    function toggleAllCheckboxes(j,roleId, isChecked) {
+        // List of checkbox names to toggle
+        const checkboxNames = ["IsAdd", "IsEdit", "IsView", "IsDelete", "IsExport", "IsSelectAll"];
+
+        // Iterate through the checkbox names and toggle their states
+        checkboxNames.forEach(function (name) {
+            const checkbox = document.getElementById(`${name}-${roleId}`);
+
+            if (checkbox) {
+                checkbox.checked = isChecked;
+            }
+            var checkboxk = document.getElementById('RoleNamecheckbox-' + j);
+
+            if (checkboxk.checked) {
+
+                $('#updatebutton-' + j).removeClass('d-none').addClass('dis-b');
+
+            }
+            else {
+
+                $('#updatebutton-' + j).removeClass('dis-b').addClass('d-none');
+            }
+        });
+    }
+    function SubtoggleAllCheckboxes(j,roleId, isChecked) {
+        // List of checkbox names to toggle
+        const checkboxNames = ["IsAdd", "IsEdit", "IsView", "IsDelete", "IsExport", "IsSelectAll"];
+
+        // Iterate through the checkbox names and toggle their states
+        checkboxNames.forEach(function (name) {
+            const checkbox = document.getElementById(`${name}-${roleId}`);
+            if (checkbox) {
+                checkbox.checked = isChecked;
+            }
+            var checkboxk = document.getElementById('RoleNamecheckbox-' + j);
+
+            if (checkboxk.checked) {
+
+                $('#updatebutton-' + j).removeClass('d-none').addClass('dis-b');
+
+            }
+            else {
+
+                $('#updatebutton-' + j).removeClass('dis-b').addClass('d-none');
+            }
+        });
+    }
+
+</script>
+<!-- breadcumb -->
+<div class="card">
+    <div class="card-body">
+        <table width="100%" class="table table-striped align-middle mb-0">
+            @{int j = 3;
+                int l = 3;
+                <thead class="table-light">
+                    <tr>
+                        @*<th width="5%" align="center" style="padding:8px 6px; text-align:center;">S.No.</th>*@
+                        <th width="33%" style="text-align: left;padding:8px 6px">
+                            Menu Name
+                        </th>
+                        <th width="10%" style="padding:8px 6px; text-align:center;">
+                            Is-Add
+                        </th>
+                        <th width="10%" style="padding:8px 6px; text-align:center;">
+                            Is-Edit
+                        </th>
+                        <th width="10%" style="padding:8px 6px; text-align:center;">
+                            Is-View
+                        </th>
+                        <th width="10%" style="padding:8px 6px; text-align:center;">
+                            Is-Delete
+                        </th>
+                        <th width="10%" style="padding:8px 6px; text-align:center;">
+                            Is-Export
+                        </th>
+                        <th width="10%" style="padding:8px 6px; text-align:center;">
+                            Select All
+                        </th>
+                        <th width="7%" style="padding:8px 6px; text-align:center;">#</th>
+                        <th width="7%" style="padding:8px 6px; text-align:center;">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var role in lstMainMenuMaster)
+                    {
+                        int t1 = 0;
+                        Int64 urid = 0;
+                        Int64 MenuId = 0;
+                        bool isadd = false;
+                        bool isedit = false;
+                        bool isview = false;
+                        bool isdelete = false;
+                        bool isexport = false;
+                        if (lstrole_Menus != null)
+                        {
+                            for (var x1 = 0; x1 < lstrole_Menus.Count; x1++)
+                            {
+                                if (role.MenuItemId == lstrole_Menus[x1].MenuId)
+                                {
+                                    t1 = 1;
+                                    urid = lstrole_Menus[x1].RoleMenuMasterId;
+                                    MenuId = lstrole_Menus[x1].MenuId;
+                                    isadd = lstrole_Menus[x1].IsAdd;
+                                    isedit = lstrole_Menus[x1].IsEdit;
+                                    isview = lstrole_Menus[x1].IsView;
+                                    isdelete = lstrole_Menus[x1].IsDelete;
+                                    isexport = lstrole_Menus[x1].IsExport;
+
+                                }
+                            }
+                        }
+                        if (t1 == 1)
+                        {
+
+
+
+                            <tr>
+                                <input type="hidden" id="RoleMenuMasterId-@role.MenuItemId" name="RoleMenuMasterId" value="@urid" />
+                                <td>
+                                    <label>
+                                        <input type="checkbox" checked="checked" name="RoleNamecheckbox" id="RoleNamecheckbox-@role.MenuItemId" class="flat-red" onclick="enableoptions('@role.DisplayName',@role.MenuItemId);manageroles('@role.comma_separated_ids',@role.MenuItemId);" value="@{@role.MenuItemId}">
+                                        @role.DisplayName
+                                    </label>
+                                </td>
+                                @if (role.MenuItemCount != 0)
+                                {
+                                    <td style="text-align:center;" colspan="8">
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" @(isadd == true ? "checked=checked" : "") name="IsAdd" onclick="bindrole(@role.MenuItemId); SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsAdd');" id="IsAdd-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" @(isedit == true ? "checked=checked" : "") name="IsEdit" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsEdit');" id="IsEdit-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" @(isview == true ? "checked=checked" : "") name="IsView" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsView');" id="IsView-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" @(isdelete == true ? "checked=checked" : "") name="IsDelete" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsDelete');" id="IsDelete-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" @(isexport == true ? "checked=checked" : "") name="IsExport" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsExport');" id="IsExport-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsSelectAll" id="IsSelectAll-@role.MenuItemId" onclick="selectall(@role.MenuItemId);" class="flat-red" value="Yes" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <a style="text-decoration: underline; color: #ff6a00; font-weight: bold; cursor: pointer" onclick="RemoveRoleAccess(@urid, '@role.DisplayName',@role.MenuItemId);">Remove</a>
+                                    </td>
+
+                                    <td style="text-align:center;">
+                                        <span id="updatebutton-@j" class="d-none">
+                                            <a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor: pointer"
+                                               onclick="AssignRoleUsers(@role.MenuItemId, @role.MenuItemId, @role.MenuItemId);">
+                                                Update
+                                            </a>
+                                        </span>
+                                        @*<a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor: pointer" onclick="AssignRoleUsers(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId);">Update</a>*@
+                                    </td>
+                                }
+
+
+
+
+
+                            </tr>
+
+
+                        }
+                        else
+                        {
+
+                            <tr>
+                                <td>
+
+                                    <label>
+                                        <input type="checkbox" name="RoleNamecheckbox" id="RoleNamecheckbox-@role.MenuItemId" class="flat-red"
+                                               onclick="toggleAllCheckboxes(@role.MenuItemId,'@role.MenuItemId', this.checked);manageroles('@role.comma_separated_ids',@role.MenuItemId);" value="@role.MenuItemId">
+                                        @role.DisplayName
+                                    </label>
+                                </td>
+                                @if (role.MenuItemCount != 0)
+                                {
+                                    <td style="text-align:center;" colspan="8">
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsAdd" onclick="bindrole(@role.MenuItemId); SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsAdd')" id="IsAdd-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsEdit" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsEdit')" id="IsEdit-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsView" id="IsView-@role.MenuItemId" onclick="SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsView')" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsDelete" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsDelete')" id="IsDelete-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsExport" onclick="bindrole(@role.MenuItemId);SingleMenuUpdate(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId,'IsExport')" id="IsExport-@role.MenuItemId" class="flat-red" value="true" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <label class="checkbox-in">
+                                            <input type="checkbox" name="IsSelectAll" id="IsSelectAll-@role.MenuItemId" onclick="selectall(@role.MenuItemId);" class="flat-red" value="Yes" />
+
+                                        </label>
+                                    </td>
+                                    <td style="text-align:center;">
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span id="updatebutton-@role.MenuItemId" class="d-none">
+                                            <a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor: pointer" onclick="AssignRoleUsers(@role.MenuItemId, @role.MenuItemId);" id="">Update</a>
+
+                                        </span>
+                                        @*<a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor: pointer" onclick="AssignRoleUsers(@role.MenuItemId, @role.MenuItemId,@role.MenuItemId);">Update</a>*@
+                                    </td>
+                                    @*<td style="text-align:center;">
+                                            <a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor: pointer" onclick="AssignRoleUsers(@role.MenuItemId, @role.MenuItemId);" id="">Update</a>
+                                        </td>*@
+
+                                }
+
+
+
+
+
+                            </tr>
+
+                        }
+
+                        foreach (var subrole in lstSubMenuMaster)
+                        {
+
+                            int subt1 = 0;
+                            Int64 suburid = 0;
+                            bool subisadd = false;
+                            bool subisedit = false;
+                            bool subisview = false;
+                            bool subisdelete = false;
+                            bool subisexport = false;
+                            if (lstrole_Menus != null)
+                            {
+                                for (var x1 = 0; x1 < lstrole_Menus.Count; x1++)
+                                {
+                                    if (subrole.MenuItemId == lstrole_Menus[x1].MenuId)
+                                    {
+                                        subt1 = 1;
+                                        //suburid = lstrole_Menus[x1].UserRoleId;
+                                        suburid = lstrole_Menus[x1].RoleMenuMasterId;
+
+                                        MenuId = lstrole_Menus[x1].MenuId;
+                                        subisadd = lstrole_Menus[x1].IsAdd;
+                                        subisedit = lstrole_Menus[x1].IsEdit;
+                                        subisview = lstrole_Menus[x1].IsView;
+                                        subisdelete = lstrole_Menus[x1].IsDelete;
+                                        subisexport = lstrole_Menus[x1].IsExport;
+
+                                    }
+                                }
+                            }
+
+                            if (subrole.PageParentId == role.MenuItemId)
+                            {
+                                if (subt1 == 1)
+                                {
+                                    <tr>
+                                        <input type="hidden" id="RoleMenuMasterId-@subrole.MenuItemId" name="RoleMenuMasterId" value="@suburid" />
+                                        <td>
+                                            <label>
+                                                <span style="display: inline-block; padding-left: 60px;">
+                                                <img src="Areas/FormBuilder/Content/images/indicater.gif" />
+                                                    <input type="checkbox" checked="checked" name="RoleNamecheckbox" id="RoleNamecheckbox-@subrole.MenuItemId" class="flat-red" onclick="enableoptions('@subrole.DisplayName',@subrole.MenuItemId);" value="@{@subrole.MenuItemId}">
+                                                    @subrole.DisplayName
+                                                </span>
+                                            </label>
+                                        </td>
+
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" @(subisadd == true ? "checked=checked" : "") name="IsAdd" onclick="bindrole(@subrole.MenuItemId);SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsAdd');" id="IsAdd-@subrole.MenuItemId" class="flat-red" value="true" />
+
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" @(subisedit == true ? "checked=checked" : "") name="IsEdit" onclick="bindrole(@subrole.MenuItemId);SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsEdit');" id="IsEdit-@subrole.MenuItemId" class="flat-red" value="true" />
+
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" @(subisview == true ? "checked=checked" : "") name="IsView" onclick="bindrole(@subrole.MenuItemId);SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsView');" id="IsView-@subrole.MenuItemId" class="flat-red" value="true" />
+
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" @(subisdelete == true ? "checked=checked" : "") name="IsDelete" onclick="bindrole(@subrole.MenuItemId);SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsDelete');" id="IsDelete-@subrole.MenuItemId" class="flat-red" value="true" />
+
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" @(subisexport == true ? "checked=checked" : "") name="IsExport" onclick="bindrole(@subrole.MenuItemId);SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsExport');" id="IsExport-@subrole.MenuItemId" class="flat-red" value="true" />
+
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" name="IsSelectAll" id="IsSelectAll-@subrole.MenuItemId" onclick="selectall(@subrole.MenuItemId);" class="flat-red" value="Yes" />
+
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <a style="text-decoration: underline; color: #ff6a00; font-weight: bold; cursor: pointer" onclick="RemoveRoleAccess(@suburid, '@subrole.DisplayName', @subrole.MenuItemId);">Remove</a>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor: pointer" onclick="AssignRoleUsers(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId);">Update</a>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td>
+                                            <label>
+                                                <span style="display: inline-block; padding-left: 60px;">
+                                            <img src="Areas/FormBuilder/Content/images/indicater.gif" />
+                                                    <input type="checkbox" name="RoleNamecheckbox" id="RoleNamecheckbox-@subrole.MenuItemId" class="flat-red"
+                                                           onclick="SubtoggleAllCheckboxes(@subrole.MenuItemId,'@subrole.MenuItemId', this.checked);" value="@subrole.MenuItemId">
+                                                    @subrole.DisplayName
+                                                </span>
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" name="IsAdd" id="IsAdd-@subrole.MenuItemId" onclick="SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsAdd');" class="flat-red" value="true" />
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" name="IsEdit" id="IsEdit-@subrole.MenuItemId" onclick="SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsEdit');" class="flat-red" value="true" />
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                        <input type="checkbox" name="IsView" id="IsView-@subrole.MenuItemId"
+                                               onclick="bindrole(@subrole.MenuItemId); SingleMenuUpdate(@subrole.MenuItemId,
+                @subrole.MenuItemId, @subrole.PageParentId,'IsView');" class="flat-red" value="true" />
+                                    </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" name="IsDelete" id="IsDelete-@subrole.MenuItemId" onclick="SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsDelete');" class="flat-red" value="true" />
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" name="IsExport" id="IsExport-@subrole.MenuItemId" onclick="SingleMenuUpdate(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId,'IsExport');" class="flat-red" value="true" />
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <label class="checkbox-in">
+                                                <input type="checkbox" name="IsSelectAll" id="IsSelectAll-@subrole.MenuItemId" class="flat-red" onclick="selectall(@subrole.MenuItemId);" value="Yes" />
+                                            </label>
+                                        </td>
+                                        <td style="text-align:center;">
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <span id="updatebutton-@subrole.MenuItemId" class="d-none">
+                                                <a style="text-decoration: underline; color: #2aab0f; font-weight: bold; cursor:pointer"
+                                                   onclick="AssignRoleUsers(@subrole.MenuItemId, @subrole.MenuItemId, @subrole.PageParentId);">Update</a>
+                                            </span>
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        }
+                        j++;
+                    }
+
+                </tbody>
+            }
+        </table>
+        <!--<div class="row">
+            <div class="col-lg-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-success px-3 me-2" onclick="PostRoleMenus();">-->
+        @*<i class="bi bi-plus-circle m-0"></i>*@
+        <!--Submit</button>
+                <a class="btn btn-danger px-3" href="@Url.Action("AssignMenu","AdminMenuItems")">Cancel</a>
+            </div>
+        </div>-->
+
+    </div>
+</div>
+

@@ -1,0 +1,30 @@
+-------------------START-------------3/12/2025 3:49:20 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503121014.42813027893@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/12/2025 3:49:20 PM
+-------------------START-------------3/12/2025 3:49:20 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503121014.66846071796@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/12/2025 3:49:20 PM
+-------------------START-------------3/12/2025 3:54:17 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503121019.81216362506@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/12/2025 3:54:17 PM
+-------------------START-------------3/12/2025 3:54:18 PM
+Page :/become-a-member
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202503121019.69683474919@smtp-relay.mailin.fr>"}
+
+-------------------END-------------3/12/2025 3:54:18 PM
+-------------------START-------------3/12/2025 4:13:21 PM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------3/12/2025 4:13:21 PM
+-------------------START-------------3/12/2025 6:00:03 PM
+Page :/contact-us
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------3/12/2025 6:00:03 PM

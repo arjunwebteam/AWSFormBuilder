@@ -1,0 +1,597 @@
+/* ============================================================
+   FORM BUILDER LOGIN PAGE
+   ============================================================ */
+
+:root {
+    --fb-blue: #2563eb;
+    --fb-blue-light: #4f7cff;
+    --fb-dark: #10183f;
+    --fb-dark-2: #172553;
+    --fb-text: #172033;
+    --fb-muted: #68758a;
+    --fb-border: #d9dee8;
+}
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    overflow: hidden;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+
+/* ============================================================
+   MAIN PAGE
+   ============================================================ */
+
+.fb-login-page {
+    width: 100vw;
+    height: 100vh;
+    min-height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    background: #07377e;
+}
+
+
+/* ============================================================
+   LEFT SIDE (removed — form now centers across the full page)
+   ============================================================ */
+
+.fb-login-left {
+    display: none;
+}
+
+
+/* ============================================================
+   FLOATING BACKGROUND SHAPES
+   ============================================================ */
+
+.fb-bg-shapes {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.fb-shape {
+    position: absolute;
+    color: rgb(255 255 255 / 22%);
+    animation: fbShapeFloat 9s ease-in-out infinite;
+}
+
+.fb-shape-icon-1 {
+    top: 10%;
+    left: 8%;
+    font-size: 70px;
+    animation-delay: 0s;
+}
+
+.fb-shape-icon-2 {
+    top: 68%;
+    left: 12%;
+    font-size: 54px;
+    animation-delay: 1.5s;
+}
+
+.fb-shape-icon-3 {
+    top: 16%;
+    left: 86%;
+    font-size: 82px;
+    animation-delay: 0.8s;
+}
+
+.fb-shape-icon-4 {
+    top: 76%;
+    left: 82%;
+    font-size: 60px;
+    animation-delay: 2.2s;
+}
+
+.fb-shape-icon-5 {
+    top: 42%;
+    left: 4%;
+    font-size: 46px;
+    animation-delay: 3s;
+}
+
+.fb-shape-icon-6 {
+    top: 8%;
+    left: 45%;
+    font-size: 40px;
+    animation-delay: 1.1s;
+}
+
+.fb-shape-square {
+    width: 54px;
+    height: 54px;
+    border: 2px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    top: 50%;
+    left: 6%;
+    animation-delay: 1s;
+}
+
+.fb-shape-circle {
+    width: 44px;
+    height: 44px;
+    border: 2px solid rgba(255, 255, 255, 0.09);
+    border-radius: 50%;
+    top: 58%;
+    left: 91%;
+    animation-delay: 2.7s;
+}
+
+.fb-shape-check {
+    width: 46px;
+    height: 46px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    top: 84%;
+    left: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.1);
+    animation-delay: 1.8s;
+}
+
+@keyframes fbShapeFloat {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-22px) rotate(8deg);
+    }
+
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+
+/* ============================================================
+   RIGHT SIDE / FORM CARD
+   ============================================================ */
+
+.fb-login-right {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 2;
+    overflow-y: auto;
+}
+
+.fb-login-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 36px;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: box-shadow 0.25s ease;
+}
+
+    .fb-login-container:hover {
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+
+.fb-login-logo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.fb-login-logo {
+    width: 235px;
+    max-width: 70%;
+    height: auto;
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+
+.fb-login-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+    .fb-login-divider span {
+        flex: 1;
+        height: 1px;
+        background: #dce1e8;
+    }
+
+    .fb-login-divider strong {
+        font-size: 12px;
+        color: #b3bac4;
+        font-weight: 500;
+        letter-spacing: 0.25px;
+        white-space: nowrap;
+    }
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.fb-form-group {
+    margin-bottom: 19px;
+}
+
+.fb-form-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #34445a;
+    font-weight: 500;
+}
+
+    .fb-form-label span {
+        color: #ef4444;
+    }
+
+
+/* ============================================================
+   PASSWORD ROW
+   ============================================================ */
+
+.fb-password-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
+
+    .fb-password-label-row .fb-form-label {
+        margin-bottom: 0;
+    }
+
+.fb-forgot-link {
+    color: #093c6c;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+    .fb-forgot-link:hover {
+        color: #0956db;
+        text-decoration: underline;
+    }
+
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+
+.fb-input-wrapper {
+    position: relative;
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #d2d8e1;
+    border-radius: 5px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .fb-input-wrapper:focus-within {
+        border-color: #3964ff;
+        box-shadow: 0 0 0 2px rgba(57, 100, 255, 0.08);
+    }
+
+.fb-input-icon {
+    width: 50px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #536174;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.fb-login-input {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    padding: 0 15px 0 10px;
+    font-size: 14px;
+    color: #273447;
+}
+
+    .fb-login-input::placeholder {
+        color: #aeb6c2;
+    }
+
+    .fb-login-input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+
+/* ============================================================
+   PASSWORD TOGGLE
+   ============================================================ */
+
+.fb-password-toggle {
+    width: 50px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-left: 1px solid #e1e5eb;
+    background: transparent;
+    color: #536174;
+    font-size: 17px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+    .fb-password-toggle:hover {
+        color: #1769ff;
+    }
+
+
+/* ============================================================
+   SIGN IN BUTTON
+   ============================================================ */
+
+.fb-signin-btn {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 8px;
+    border-radius: 5px;
+    background: #13458f;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+ 
+
+
+/* ============================================================
+   DEMO LOGIN
+   ============================================================ */
+
+.fb-demo-login {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(105px, 0.8fr) 78px;
+    width: 100%;
+    margin-top: 20px;
+    border: 1px solid #dce1e8;
+    border-radius: 2px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.fb-demo-email,
+.fb-demo-password {
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    padding: 0 11px;
+    font-size: 13px;
+    color: #263548;
+    border-right: 1px solid #d8dee7;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.fb-copy-btn {
+    margin: 8px;
+    border: 0;
+    border-radius: 4px;
+    background: #093c6c;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+    .fb-copy-btn:hover {
+        background: #185ab9;
+    }
+
+
+/* ============================================================
+   BOTTOM DIVIDER
+   ============================================================ */
+
+.fb-bottom-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 27px;
+    color: #68758a;
+    font-size: 13px;
+}
+
+    .fb-bottom-divider span {
+        flex: 1;
+        height: 1px;
+        background: #e0e4ea;
+    }
+
+    .fb-bottom-divider div {
+        white-space: nowrap;
+    }
+
+    .fb-bottom-divider a {
+        color: #093c6c;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .fb-bottom-divider a:hover {
+            text-decoration: underline;
+        }
+
+
+/* ============================================================
+   TWO FACTOR
+   ============================================================ */
+
+.fb-two-factor {
+    text-align: center;
+    margin-top: 14px;
+}
+
+    .fb-two-factor a {
+        color: #617087;
+        font-size: 13px;
+        text-decoration: none;
+    }
+
+        .fb-two-factor a:hover {
+            color: #1769ff;
+        }
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+    body {
+        overflow: auto;
+    }
+
+    .fb-login-page {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .fb-login-right {
+        width: 100%;
+        min-height: 100vh;
+        height: auto;
+    }
+
+    .fb-login-container {
+        width: min(520px, calc(100% - 40px));
+        max-width: 100%;
+        padding: 35px 0;
+        padding: 35px 28px;
+    }
+
+    .fb-bg-shapes {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .fb-login-container {
+        width: calc(100% - 32px);
+        padding: 28px 20px;
+    }
+
+    .fb-login-logo {
+        width: 190px;
+    }
+
+    .fb-login-divider {
+        margin-bottom: 23px;
+    }
+
+    .fb-form-label {
+        font-size: 13px;
+    }
+
+    .fb-input-wrapper {
+        height: 46px;
+    }
+
+    .fb-login-input {
+        font-size: 13px;
+    }
+
+    .fb-input-icon,
+    .fb-password-toggle {
+        width: 45px;
+    }
+
+    .fb-signin-btn {
+        height: 46px;
+        font-size: 14px;
+    }
+
+    .fb-demo-login {
+        grid-template-columns: 1fr 92px 65px;
+    }
+
+    .fb-demo-email,
+    .fb-demo-password {
+        min-height: 50px;
+        font-size: 11px;
+        padding: 0 8px;
+    }
+
+    .fb-copy-btn {
+        margin: 7px;
+        font-size: 11px;
+    }
+
+    .fb-bottom-divider {
+        font-size: 11px;
+    }
+
+    .fb-two-factor a {
+        font-size: 11px;
+    }
+}

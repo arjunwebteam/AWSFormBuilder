@@ -1,0 +1,15 @@
+-------------------START-------------12/20/2024 1:27:30 PM
+Page :/Admin/Account/ForgotPassword
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412200753.74082146196@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/20/2024 1:27:30 PM
+-------------------START-------------12/20/2024 1:32:27 PM
+Page :/Admin/Account/ForgotPassword
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412200758.32003308090@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/20/2024 1:32:27 PM
+-------------------START-------------12/20/2024 1:40:07 PM
+Page :/Admin/Account/ForgotPassword
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412200806.36942686410@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/20/2024 1:40:07 PM

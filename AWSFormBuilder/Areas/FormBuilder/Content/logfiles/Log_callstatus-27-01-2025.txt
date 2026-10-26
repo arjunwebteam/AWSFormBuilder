@@ -1,0 +1,58 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+-------------------START-------------1/27/2025 12:31:27 PM
+Page :/Global/contact-us
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------1/27/2025 12:31:27 PM
+=======
+-------------------START-------------1/27/2025 1:30:12 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202501270757.67188320430@smtp-relay.mailin.fr>"}
+
+-------------------END-------------1/27/2025 1:30:12 PM
+-------------------START-------------1/27/2025 1:30:13 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202501270757.90577491597@smtp-relay.mailin.fr>"}
+
+-------------------END-------------1/27/2025 1:30:13 PM
+>>>>>>> origin/master
+=======
+-------------------START-------------1/27/2025 11:27:19 AM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------1/27/2025 11:27:19 AM
+-------------------START-------------1/27/2025 11:28:44 AM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------1/27/2025 11:28:44 AM
+-------------------START-------------1/27/2025 11:48:33 AM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------1/27/2025 11:48:33 AM
+-------------------START-------------1/27/2025 11:54:17 AM
+Page :/Admin/Members/AddMember
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"htmlContent is missing"}
+
+-------------------END-------------1/27/2025 11:54:17 AM
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
+>>>>>>> 9f5c0486cafde5d049b9705ada919709554d6cac
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
+-------------------START-------------1/27/2025 6:17:05 PM
+Page :/Admin/Volunteers/Volunteerstatus
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"subject is required"}
+
+-------------------END-------------1/27/2025 6:17:05 PM
+-------------------START-------------1/27/2025 6:17:20 PM
+Page :/Admin/Volunteers/Volunteerstatus
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"subject is required"}
+
+-------------------END-------------1/27/2025 6:17:20 PM
+>>>>>>> origin/master

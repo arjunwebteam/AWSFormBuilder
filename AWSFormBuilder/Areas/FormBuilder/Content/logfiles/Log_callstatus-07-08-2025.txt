@@ -1,0 +1,45 @@
+-------------------START-------------8/7/2025 10:33:51 AM
+Page :/event-registration
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------8/7/2025 10:33:51 AM
+-------------------START-------------8/7/2025 12:55:34 PM
+Page :/event-registration
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------8/7/2025 12:55:34 PM
+-------------------START-------------8/7/2025 3:26:22 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508070956.13287331621@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 3:26:22 PM
+-------------------START-------------8/7/2025 3:26:44 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508070956.95428924025@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 3:26:44 PM
+-------------------START-------------8/7/2025 3:30:40 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508071000.78382308338@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 3:30:40 PM
+-------------------START-------------8/7/2025 3:34:34 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508071004.10668513361@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 3:34:34 PM
+-------------------START-------------8/7/2025 3:58:06 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508071028.93601153359@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 3:58:06 PM
+-------------------START-------------8/7/2025 4:04:50 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508071034.59688204804@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 4:04:50 PM
+-------------------START-------------8/7/2025 4:09:31 PM
+Page :/Admin/EventRegistrations/ResendQRCode
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202508071039.34954767164@smtp-relay.mailin.fr>"}
+
+-------------------END-------------8/7/2025 4:09:31 PM

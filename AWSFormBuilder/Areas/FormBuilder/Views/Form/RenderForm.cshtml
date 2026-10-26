@@ -1,0 +1,3288 @@
+@model AWSFormBuilder.Entities.FormBuilder
+@{
+    ViewBag.Title = Model.Title;
+    Layout = null;
+
+    int status = 0;
+    AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = _AppInfo.GetAppInfoDetails(ref status);
+
+    var designJson = string.IsNullOrEmpty(Model.DesignJson) ? "{}" : Model.DesignJson;
+    var conditionsJson = string.IsNullOrEmpty(Model.ConditionsJson) ? "[]" : Model.ConditionsJson;   // ✅ ADDED
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    @* ✅ ADDED — jQuery Validate powers all client-side field validation on this form now,
+       instead of the browser's native "Please fill out this field" popups. *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    @* ✅ ADDED — powers the searchable "Country" field dropdown (search box on top of the list) *@
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    @if (ViewBag.PaymentEnabled == true && ViewBag.PaymentGateway == "stripe")
+    {
+        <script src="https://js.stripe.com/v3/"></script>
+    }
+    @if (ViewBag.PaymentEnabled == true && ViewBag.PaymentGateway == "paypal")
+    {
+        <script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.PaymentPublicKey&currency=@(ViewBag.PaymentCurrency ?? "USD")"></script>
+    }
+    @if (ViewBag.PaymentEnabled == true && ViewBag.PaymentGateway == "square")
+    {
+        <script src="@(ViewBag.PaymentMode == "live" ? "https://web.squarecdn.com/v1/square.js" : "https://sandbox.web.squarecdn.com/v1/square.js")"></script>
+    }
+    @if (ViewBag.CaptchaEnabled == true && ViewBag.CaptchaType == "hcaptcha")
+    {
+        <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    }
+    @if (ViewBag.CaptchaEnabled == true && ViewBag.CaptchaType == "recaptcha")
+    {
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    }
+    <style>
+        .form-check {
+            display: block;
+            min-height: 2.5rem;
+            padding-left: 1.5em;
+            margin-bottom: .125rem;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single, .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: rgb(31 32 33) !important;
+        }
+
+        .select2-container--default .select2-results > .select2-results__options {
+            font-size: 13px !important;
+        }
+        /* ✅ ADDED — "Border Label" field: a labelled horizontal divider,
+                                                                                           same look as the Form Builder canvas preview. */
+        .zfb-border-label {
+            position: relative;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+            .zfb-border-label::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                border-top: var(--zfb-border-width, 1px) solid var(--zfb-border-color, #d7dce2);
+            }
+
+        .zfb-border-label-text {
+            position: relative;
+            display: inline-block;
+            background: #fff;
+            padding: 0 12px;
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        body {
+            background: #eef1f5;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 40px 15px;
+        }
+
+        .form-card {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .form-logo-wrap {
+            padding: 30px 20px 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+            .form-logo-wrap img {
+                border-radius: 8px;
+                display: inline-block;
+                max-width: 100%;
+            }
+
+        .form-title-wrap {
+            text-align: center;
+            padding: 22px 20px 10px;
+        }
+
+            .form-title-wrap h3 {
+                font-weight: 700;
+                color: #1c2b39;
+                margin-bottom: 0;
+            }
+
+        .form-body {
+            padding: 25px 35px 35px;
+        }
+
+            .form-body .mb-3:not(.form-heading-group) {
+                margin-bottom: 22px !important;
+            }
+
+            /* ✅ ADDED — more breathing room between every field */
+            .form-body .form-group {
+                margin-bottom: 14px; /* was 30px */
+            }
+
+        .form-label {
+            font-weight: 600;
+            color: #33475b;
+            margin-bottom: 6px;
+        }
+
+        /* ✅ ADDED — Radio field (e.g. Area of Interest): bolder label, more gap below label, more gap between options */
+        .zfb-radio-field > .form-label {
+            font-weight: 700 !important;
+            font-size: 16px !important;
+            color: #1f2d3d;
+            margin-bottom: 12px; /* gap between label and first option */
+        }
+
+        .zfb-radio-field .form-check {
+            margin-bottom: 12px; /* gap between options */
+        }
+
+            .zfb-radio-field .form-check:last-child {
+                margin-bottom: 0;
+            }
+
+        .zfb-address-heading {
+            font-weight: 600 !important;
+            font-size: 16px !important;
+            color: #000 !important;
+        }
+
+
+        .zfb-floating-group {
+            position: relative;
+            margin-top: 10px; /* was 14px */
+            --zfb-label-bg: #fff;
+            --zfb-input-bg: #fff;
+            --zfb-fs: 17px; /* NEW - resting placeholder / typed text size */
+            --zfb-fs-float: 11px; /* NEW - label size once floated on the border */
+        }
+
+            .zfb-floating-group .form-label {
+                position: absolute;
+                top: 11px;
+                left: 13px;
+                max-width: calc(100% - 26px);
+                margin: 0;
+                padding: 0;
+                font-weight: 400;
+                line-height: 1.5;
+                font-size: var(--zfb-fs, 17px) !important; /* NEW - bigger placeholder */
+                color: #6b7785;
+                background: transparent;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                z-index: 2;
+                pointer-events: none;
+                transition: top .15s ease, left .15s ease, font-size .15s ease, line-height .15s ease, padding .15s ease, color .15s ease;
+            }
+
+            /* NEW - typed text / placeholder size matches the resting label */
+            .zfb-floating-group .form-control,
+            .zfb-floating-group .form-select,
+            .zfb-floating-group .select2-selection__rendered {
+                font-size: var(--zfb-fs, 17px) !important;
+            }
+
+                /* the label doubles as the placeholder, so hide the real one until focus */
+                .zfb-floating-group .form-control::placeholder {
+                    color: transparent;
+                    transition: color .15s ease;
+                }
+
+        .form-control.is-invalid {
+            box-shadow: none !important;
+        }
+
+        .form-control:focus {
+            box-shadow: none !important;
+        }
+
+        .form-select:focus {
+            box-shadow: none !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single, .select2-container--default.select2-container--open .select2-selection--single {
+            box-shadow: none !important;
+        }
+
+        .zfb-floating-group .form-control:focus::placeholder {
+            color: #9aa5b1;
+        }
+
+        .zfb-floating-group.zfb-fl-always .form-control::placeholder {
+            color: #9aa5b1;
+        }
+
+        /* floated state — focused / always-floated types */
+        .zfb-floating-group:focus-within .form-label,
+        .zfb-floating-group.zfb-fl-always .form-label {
+            top: -8px;
+            left: 10px;
+            max-width: calc(100% - 20px);
+            padding: 0 5px;
+            font-size: var(--zfb-fs-float, 11px) !important; /* was 12px */
+            line-height: 16px;
+            font-weight: 500;
+            background: linear-gradient(to bottom, var(--zfb-label-bg) 0, var(--zfb-label-bg) 50%, var(--zfb-input-bg) 50%, var(--zfb-input-bg) 100%);
+        }
+
+        .zfb-floating-group:focus-within .form-label {
+            color: rgb(19 69 143);
+        }
+
+        /* floated state — box already has a value / a dropdown option is chosen
+                                                                   (needs :has(); kept in separate rules so an older browser can't
+                                                                   invalidate the rules above) */
+        .zfb-floating-group:has(.form-control:not(:placeholder-shown)) .form-label,
+        .zfb-floating-group.zfb-fl-select:has(select option:not([value=""]):checked) .form-label,
+        .zfb-floating-group.zfb-fl-select:has(.select2-container--open) .form-label,
+        .zfb-floating-group.zfb-fl-select:has(.select2-container--focus) .form-label {
+            top: -8px;
+            left: 10px;
+            max-width: calc(100% - 20px);
+            padding: 0 5px;
+            font-size: var(--zfb-fs-float, 11px) !important; /* was 12px */
+            line-height: 16px;
+            font-weight: 500;
+            background: linear-gradient(to bottom, var(--zfb-label-bg) 0, var(--zfb-label-bg) 50%, var(--zfb-input-bg) 50%, var(--zfb-input-bg) 100%);
+        }
+
+        /* ✅ ADDED — dropdowns (native + select2): while nothing is chosen the
+                                                                   label sits inside the box, so the "Select..." text is hidden. */
+        .zfb-floating-group.zfb-fl-select:not(:focus-within) select.form-select:has(option[value=""]:checked) {
+            color: transparent;
+        }
+
+        /* Country/State select2: the label already says what the box is, so the grey
+                                                                   "Select Country" placeholder never needs to show next to the floated label. */
+        .zfb-floating-group.zfb-fl-select .select2-selection__placeholder {
+            color: transparent !important;
+        }
+
+        .zfb-floating-group.zfb-fl-select select option {
+            color: #212529;
+        }
+
+        .zfb-floating-group.zfb-fl-select:not(:focus-within):not(:has(.select2-container--open)):has(select option[value=""]:checked) .select2-selection__rendered,
+        .zfb-floating-group.zfb-fl-select:not(:focus-within):not(:has(.select2-container--open)):has(select option[value=""]:checked) .select2-selection__placeholder {
+            color: transparent !important;
+        }
+
+        /* ✅ ADDED — Address / Full Name sub-boxes (Street, City, Zip …) */
+        .zfb-sub-group {
+            margin-bottom: 10px; /* was 12px */
+        }
+
+        .zfb-sub-row {
+            display: flex;
+            gap: 12px; /* was 16px */
+        }
+
+            .zfb-sub-row .zfb-sub-group {
+                flex: 1 1 0;
+                min-width: 0;
+                margin-bottom: 0;
+            }
+
+        .zfb-floating-group:has(.form-control:-webkit-autofill) .form-label {
+            top: -8px;
+            left: 10px;
+            padding: 0 5px;
+            font-size: var(--zfb-fs-float, 11px) !important; /* was 12px */
+            line-height: 16px;
+            background: linear-gradient(to bottom, var(--zfb-label-bg) 0, var(--zfb-label-bg) 50%, var(--zfb-input-bg) 50%, var(--zfb-input-bg) 100%);
+        }
+
+        .form-control, .form-select {
+            border-radius: 4px; /* was 8px */
+            border: 1px solid #d7dce1;
+            padding: 10px 12px;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: rgb(9 9 9);
+            }
+
+        /* ✅ ADDED — every plain dropdown (any field with several options) always shows the ▼ icon.
+                   Searchable selects (Country) draw their own arrow, so they're excluded. */
+        select.form-select:not(.select2-hidden-accessible) {
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 2.25rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23697684' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right .85rem center !important;
+            background-size: 14px 12px !important;
+        }
+
+        .form-check-input:checked {
+            background-color: rgb(19 69 143);
+            border-color: rgb(19 69 143);
+        }
+        /* validation error message font size (form only) */
+        #dynamicForm .text-danger.small {
+            font-size: 12px; /* ikkada kavalsina size pettu */
+            line-height: 1.3;
+        }
+
+        .btn-submit-form {
+            background: rgb(19 69 143);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: background .2s ease;
+        }
+
+            .btn-submit-form:hover {
+                background: rgb(14 52 108);
+            }
+
+        .submit-wrap {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* ✅ ADDED — MULTI-PAGE / STEP FORM */
+        .form-page {
+            display: block;
+        }
+
+        /* ✅ CHANGED — step indicator now sits beside the Back/Next buttons
+                                                                                   (see .form-page-nav below) instead of centered above the fields,
+                                                                                   so it's left-aligned and sized to share a row with them. */
+        .form-step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin: 6px 0 26px;
+        }
+
+        .form-step-dot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+            .form-step-dot.active {
+                background: var(--zfb-btn-bg, rgb(19 69 143));
+                color: var(--zfb-btn-color, #fff);
+            }
+
+            .form-step-dot.done {
+                background: #22c55e;
+                color: #fff;
+            }
+
+        .form-step-connector {
+            width: 24px;
+            height: 2px;
+            background: #e5e7eb;
+            flex-shrink: 0;
+        }
+
+            .form-step-connector.done {
+                background: #22c55e;
+            }
+
+        .form-page-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        /* ✅ ADDED — groups Back + Next together on the right of the nav
+                                                                                   row, now that the step indicator (not these buttons) owns the
+                                                                                   left side of that row. */
+        .form-page-nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .btn-page-back, .btn-page-next {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .btn-page-back {
+            background: #eef1f5;
+            color: #1c2b39;
+            margin-right: auto;
+        }
+
+            .btn-page-back:hover {
+                background: #e2e6ec;
+            }
+
+        .btn-page-next {
+            background: var(--zfb-btn-bg, rgb(19 69 143));
+            color: var(--zfb-btn-color, #fff);
+            margin-left: auto;
+        }
+
+            /* no hover colour change — same colours as the normal state (this also
+                                                                       stops Bootstrap's .btn:hover from repainting the button) */
+            .btn-page-next:hover {
+                background: var(--zfb-btn-bg, rgb(19 69 143));
+                color: var(--zfb-btn-color, #fff);
+            }
+
+        /* ✅ ADDED — on the last page Submit joins the nav row: Back in the left
+                                                                   corner, Submit in the right corner. */
+        .form-page-nav .submit-wrap {
+            margin: 0 0 0 auto;
+            text-align: right;
+        }
+
+        h5 {
+            color: #1c2b39;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        /* Heading field — full-bleed colored section */
+        .form-heading-section {
+            margin: -8px -35px 22px;
+            padding: 16px 35px;
+        }
+
+            .form-heading-section h5 {
+                margin: 0;
+            }
+
+        /* Long heading / paragraph text stays inside the form width and wraps onto 2, 3 or more lines */
+        .form-heading-section,
+        .form-body .form-group {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+            .form-heading-section h5,
+            .form-body .form-group > p {
+                max-width: 100%;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+        /* Logo + Heading rendered side by side (Form Builder "Side by Side" layout).
+                                                                                           flex-wrap stays "nowrap" on purpose — with a long title, the logo and
+                                                                                           title must stay on the same row; the title text shrinks/wraps inside
+                                                                                           its own column (min-width:0 + overflow-wrap below) instead of the
+                                                                                           whole row breaking onto a second line. */
+        .form-logo-heading-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 16px;
+            padding: 30px 35px 20px;
+        }
+
+            .form-logo-heading-row .form-logo-wrap {
+                border-bottom: none;
+                padding: 0;
+                flex: 0 0 auto;
+            }
+
+            .form-logo-heading-row .form-heading-section {
+                flex: 1 1 auto;
+                min-width: 0;
+                margin: 0 !important;
+            }
+
+                .form-logo-heading-row .form-heading-section h5 {
+                    overflow-wrap: anywhere;
+                    /* Long titles shrink instead of forcing the row to wrap */
+                    font-size: clamp(14px, 2.4vw, 20px) !important;
+                }
+
+        /* Below ~560px there simply isn't room for logo + title on one
+                                                                                               line without the title becoming unreadable — stack them here,
+                                                                                               and only here, as a last resort. */
+        @@media (max-width: 560px) {
+            .form-logo-heading-row {
+                flex-wrap: wrap;
+            }
+
+                .form-logo-heading-row .form-heading-section h5 {
+                    font-size: 18px !important;
+                }
+        }
+
+        /* ✅ ADDED — payment field styling */
+        .payment-box {
+            /* ✅ CHANGED — darker, more prominent border since Payment is the
+                                               most important section of the form. */
+            border: 1px solid #1c1d1f;
+            border-radius: 10px;
+            padding: 16px;
+            background: #fafbfc;
+        }
+
+            .payment-box .payment-amount-badge {
+                font-weight: 700;
+                color: #1c2b39;
+            }
+
+        /* ✅ ADDED — Payment's own label: bold + black, since it's the
+                                           section most likely to make or break a submission. */
+        .zfb-payment-heading {
+            font-weight: 800 !important;
+            color: #000 !important;
+        }
+
+        .payment-message {
+            display: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* ✅ ADDED — invisible overlay that intercepts the first click on the PayPal button so
+                                                                                                                   required-field/captcha validation runs BEFORE PayPal's popup ever opens. Without this,
+                                                                                                                   PayPal pre-opens a blank popup window on every click (to dodge popup blockers) and only
+                                                                                                                   closes it afterwards if validation fails — causing the popup to visibly flash open and
+                                                                                                                   shut. Once validation passes the overlay hides itself so the real button becomes
+                                                                                                                   clickable. */
+        .paypal-click-guard {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        /* ✅ ADDED — JotCaptcha distorted-text widget */
+        .jotcaptcha-box {
+            display: inline-block;
+        }
+
+        .jotcaptcha-img-wrap {
+            display: inline-block;
+            border: 1px solid #d7dce1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+            .jotcaptcha-img-wrap canvas {
+                display: block;
+            }
+
+        /* ✅ CHANGED — refresh button used to float on top of the canvas (top-right corner),
+                                                                                                                   which clipped/obscured the last captcha character. Moved it off the image entirely
+                                                                                                                   and attached it to the textbox as an input-group addon instead. */
+        .jotcaptcha-input-group {
+            max-width: 220px;
+        }
+
+            .jotcaptcha-input-group .form-control {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+        .jotcaptcha-refresh {
+            border: 1px solid #d7dce1;
+            border-left: none;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            background: #f4f6f9;
+            color: #4a7cf6;
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 12px;
+        }
+
+            .jotcaptcha-refresh:hover {
+                background: #eef1f5;
+            }
+
+        .payment-message.payment-error {
+            display: block;
+            background: #fdecea;
+            color: #c0392b;
+        }
+
+        .payment-message.payment-info {
+            display: block;
+            background: #eaf1fd;
+            color: #2c5cc5;
+        }
+
+        /* ✅ ADDED — Half-width fields side by side */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -6px; /* was -8px */
+        }
+
+            .form-row .form-group {
+                flex: 0 0 100%;
+                max-width: 100%;
+                padding: 0 6px; /* was 8px */
+                margin-bottom: 14px; /* was 30px */
+            }
+
+                .form-row .form-group.half {
+                    flex: 0 0 50%;
+                    max-width: 50%;
+                }
+
+                    /* ✅ FIXED — the field itself is a .form-group nested inside the
+                                                                               half-width column, so it was picking up the column's padding and
+                                                                               margin a second time (boxes narrower than full-width ones and a
+                                                                               double gap under every side-by-side row). */
+                    .form-row .form-group.half > .form-group {
+                        padding: 0;
+                        max-width: 100%;
+                        flex: none;
+                        margin-top: 0;
+                        margin-bottom: 0 !important;
+                    }
+
+        /* ✅ ADDED — Label alignment support (top/left/right) */
+        .form-group.label-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+            .form-group.label-left .form-label {
+                flex: 0 0 140px;
+                margin-bottom: 0;
+                padding-top: 8px;
+            }
+
+            .form-group.label-left .form-control,
+            .form-group.label-left .form-select {
+                flex: 1;
+            }
+
+        .form-group.label-right {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+            .form-group.label-right .form-label {
+                flex: 0 0 140px;
+                margin-bottom: 0;
+                padding-top: 8px;
+                text-align: right;
+            }
+
+            .form-group.label-right .form-control,
+            .form-group.label-right .form-select {
+                flex: 1;
+            }
+
+        /* ✅ ADDED — Captcha field's own Label Alignment (left/center/right),
+                                                                           set per-field in Field Properties. This is separate from the
+                                                                           form-wide .label-left/.label-right rules above — it positions the
+                                                                           captcha's label relative to its widget (reCAPTCHA / hCaptcha /
+                                                                           Image Captcha), matching the Form Builder canvas preview. */
+        .captcha-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+            .captcha-group.captcha-align-left {
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+                .captcha-group.captcha-align-left .captcha-field-label {
+                    flex: 0 0 auto;
+                    padding-top: 10px;
+                    margin-bottom: 0;
+                }
+
+            .captcha-group.captcha-align-right {
+                flex-direction: row-reverse;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+                .captcha-group.captcha-align-right .captcha-field-label {
+                    flex: 0 0 auto;
+                    padding-top: 10px;
+                    margin-bottom: 0;
+                }
+
+            .captcha-group.captcha-align-center {
+                align-items: center;
+                text-align: center;
+            }
+
+                .captcha-group.captcha-align-center .captcha-widget,
+                .captcha-group.captcha-align-center .g-recaptcha,
+                .captcha-group.captcha-align-center .h-captcha,
+                .captcha-group.captcha-align-center .jotcaptcha-box {
+                    margin: 0 auto;
+                }
+
+        /* ✅ ADDED — matches the Form Builder's field padding so the Country /
+                                                                           State select2 dropdowns don't sit taller/shorter than every other
+                                                                           field (they were rendering with select2's own default 28px-tall
+                                                                           box instead of the form's normal 10px/12px padding). */
+        .select2-container--default .select2-selection--single {
+            height: auto;
+            border: 1px solid #d7dce1;
+            border-radius: 4px; /* was 8px */
+            padding: 10px 12px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 1.5;
+                padding: 0;
+                padding-right: 20px;
+                color: #1c2b39;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: 100%;
+                top: 0;
+                right: 8px;
+            }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: rgb(19 69 143);
+            box-shadow: 0 0 0 3px rgba(19,69,143,0.15);
+        }
+
+        .select2-dropdown {
+            border-color: #d7dce1;
+            border-radius: 4px; /* was 8px */
+            overflow: hidden;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .form-group.label-top .form-label {
+            display: block;
+            margin-bottom: 13px;
+        }
+
+        .form-closed-wrap {
+            text-align: center;
+            padding: 50px 30px;
+        }
+
+            .form-closed-wrap h3 {
+                color: #1c2b39;
+                font-weight: 700;
+                margin-bottom: 14px;
+            }
+
+            .form-closed-wrap p {
+                color: #5a6b7b;
+                margin-bottom: 6px;
+            }
+
+            .form-closed-wrap .closed-contact {
+                margin-top: 18px;
+                font-weight: 600;
+                color: #33475b;
+            }
+
+        /* ✅ ADDED — visual cue for fields disabled by a condition */
+        .cond-field-disabled {
+            opacity: 0.55;
+        }
+    </style>
+</head>
+<body>
+    <script src="~/Areas/FormBuilder/Content/Scripts/form-client-validate.js"></script>
+    <script src="~/Areas/FormBuilder/Content/Scripts/form-payment-gateway.js"></script>
+    <div class="form-card">
+        @if (ViewBag.FormClosed == true)
+        {
+            <div class="form-closed-wrap">
+                <h3>Registration Closed</h3>
+                <p>This registration form is no longer accepting submissions.</p>
+                <p>For assistance, please contact our support team:</p>
+                <div class="closed-contact">
+                    @if (objAppInfo != null && !string.IsNullOrEmpty(objAppInfo.CompanyPhone))
+                    {
+                        <text>📞 @objAppInfo.CompanyPhone<br /></text>
+                    }
+                    @if (objAppInfo != null && !string.IsNullOrEmpty(objAppInfo.CompanyEmail))
+                    {
+                        <text>✉️ @objAppInfo.CompanyEmail</text>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+
+            var logoBgColor = "";
+            var logoAlignment = "center";
+            var logoAltText = "";
+            var logoBottomSpacing = "20";
+            var logoBoxCss = "";
+            var submitButtonText = "Submit";
+            var submitButtonAlign = "center";
+            if (!string.IsNullOrEmpty(Model.DesignJson))
+            {
+                try
+                {
+                    var designObj = Newtonsoft.Json.Linq.JObject.Parse(Model.DesignJson);
+                    if (designObj["logoBgColor"] != null) logoBgColor = designObj["logoBgColor"].ToString();
+                    if (designObj["logoAlignment"] != null) logoAlignment = designObj["logoAlignment"].ToString();
+                    if (designObj["logoAltText"] != null) logoAltText = designObj["logoAltText"].ToString();
+                    if (designObj["logoBottomSpacing"] != null) logoBottomSpacing = designObj["logoBottomSpacing"].ToString();
+
+                    foreach (var boxSide in new[] { "top", "right", "bottom", "left" })
+                    {
+                        var padTok = designObj["logoPadding"] as Newtonsoft.Json.Linq.JObject;
+                        var marTok = designObj["logoMargin"] as Newtonsoft.Json.Linq.JObject;
+                        int boxVal;
+                        if (padTok != null && padTok[boxSide] != null && int.TryParse(padTok[boxSide].ToString(), out boxVal))
+                            logoBoxCss += "padding-" + boxSide + ":" + boxVal + "px;";
+                        if (marTok != null && marTok[boxSide] != null && int.TryParse(marTok[boxSide].ToString(), out boxVal))
+                            logoBoxCss += "margin-" + boxSide + ":" + boxVal + "px;";
+                    }
+                    if (designObj["submitButtonText"] != null && !string.IsNullOrWhiteSpace(designObj["submitButtonText"].ToString()))
+                        submitButtonText = designObj["submitButtonText"].ToString();
+                    if (designObj["submitButtonAlign"] != null && !string.IsNullOrWhiteSpace(designObj["submitButtonAlign"].ToString()))
+                        submitButtonAlign = designObj["submitButtonAlign"].ToString();
+                }
+                catch { }
+            }
+
+
+            @if (!string.IsNullOrEmpty(Model.LogoUrl))
+            {
+                <div class="form-logo-wrap"
+                     style="background-color: @(string.IsNullOrEmpty(logoBgColor) ? "transparent" : logoBgColor);
+                                                                                                                                        text-align: @(logoAlignment == "left" ? "left" : logoAlignment == "right" ? "right" : "center");
+                                                                                                                                        padding-bottom: @(logoBottomSpacing)px;@Html.Raw(logoBoxCss)">
+                    <img src="@Model.LogoUrl"
+                         alt="@(string.IsNullOrEmpty(logoAltText) ? "Form Logo" : logoAltText)"
+                         style="@(Model.LogoHeight.HasValue ? $"height:{Model.LogoHeight}px;" : "max-height:110px;")@(Model.LogoWidth.HasValue ? $"width:{Model.LogoWidth}px;" : "width:auto;")" />
+                </div>
+            }
+
+
+            <div class="form-body">
+                <form id="dynamicForm" novalidate>
+                    <input type="text" name="hp_website" id="hp_website" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
+                    <input type="hidden" id="formLoadedAt" value="@DateTime.UtcNow.ToString("o")" />
+                    <div id="formFieldsContainer"></div>
+                    <div class="submit-wrap" style="text-align:@(submitButtonAlign == "left" ? "left" : submitButtonAlign == "right" ? "right" : "center");">
+                        <button type="submit" class="btn btn-submit-form">@submitButtonText</button>
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const schema = @Html.Raw(Model.FormSchema);
+
+
+        (function enforceLastPageFieldsOnRender(fields) {
+            const LAST_PAGE_ONLY_TYPES = ['payment', 'captcha', 'terms'];
+
+            let lastPageStart = 0;
+            fields.forEach(function (f, i) {
+                if (f.type === 'pagebreak') lastPageStart = i + 1;
+            });
+
+            const moved = [];
+            for (let i = lastPageStart - 1; i >= 0; i--) {
+                if (LAST_PAGE_ONLY_TYPES.indexOf(fields[i].type) !== -1) {
+                    moved.unshift(fields.splice(i, 1)[0]);
+                    lastPageStart--; // one fewer field before the split point now
+                }
+            }
+
+            if (moved.length) {
+                fields.push.apply(fields, moved);
+            }
+        })(schema);
+
+        const formId = @Model.FormId;
+        const encryptedFormId = '@AWSFormBuilder.Areas.FormBuilder.BLL.FormLinkObfuscator.EncryptFormId(Model.FormId)'; // ✅ used for URLs the user can see (address bar), so the raw integer id is never exposed there
+        const container = document.getElementById('formFieldsContainer');
+        const design = @Html.Raw(designJson);   // ✅ ADDED — { pageColor, pageImageUrl, formColor, formImageUrl, fontColor, inputBackground }
+        const formConditions = @Html.Raw(conditionsJson);   // ✅ ADDED — [{id, triggerFieldId, operator, triggerValue, action, targetFieldIds}, ...]
+
+        // ✅ ADDED — Google Fonts support for the published form.
+        // Must mirror `googleFontOptions` in zfb-formbuilder.js so whatever the
+        // user picked in the Form Designer renders identically here.
+        const ZFB_GOOGLE_FONTS = [
+            { name: 'Poppins', stack: "'Poppins', sans-serif", google: true },
+            { name: 'Arial', stack: "Arial, Helvetica, sans-serif", google: false },
+            { name: 'Georgia', stack: "Georgia, serif", google: false },
+            { name: 'Verdana', stack: "Verdana, Geneva, sans-serif", google: false },
+            { name: 'Alberta Stencil', stack: "'Alberta Stencil', sans-serif", google: false },
+            { name: 'Roboto', stack: "'Roboto', sans-serif", google: true },
+            { name: 'Open Sans', stack: "'Open Sans', sans-serif", google: true },
+            { name: 'Montserrat', stack: "'Montserrat', sans-serif", google: true },
+            { name: 'Lato', stack: "'Lato', sans-serif", google: true, weights: '300;400;700' },
+            { name: 'Inter', stack: "'Inter', sans-serif", google: true },
+            { name: 'Oswald', stack: "'Oswald', sans-serif", google: true },
+            { name: 'Raleway', stack: "'Raleway', sans-serif", google: true },
+            { name: 'Nunito', stack: "'Nunito', sans-serif", google: true },
+            { name: 'Nunito Sans', stack: "'Nunito Sans', sans-serif", google: true },
+            { name: 'Playfair Display', stack: "'Playfair Display', serif", google: true, weights: '400;700' },
+            { name: 'Merriweather', stack: "'Merriweather', serif", google: true, weights: '300;400;700' },
+            { name: 'Lora', stack: "'Lora', serif", google: true, weights: '400;500;600;700' },
+            { name: 'Roboto Slab', stack: "'Roboto Slab', serif", google: true },
+            { name: 'Bitter', stack: "'Bitter', serif", google: true },
+            { name: 'Libre Baskerville', stack: "'Libre Baskerville', serif", google: true, weights: '400;700' },
+            { name: 'Rubik', stack: "'Rubik', sans-serif", google: true },
+            { name: 'Work Sans', stack: "'Work Sans', sans-serif", google: true },
+            { name: 'Quicksand', stack: "'Quicksand', sans-serif", google: true },
+            { name: 'Mulish', stack: "'Mulish', sans-serif", google: true },
+            { name: 'Noto Sans', stack: "'Noto Sans', sans-serif", google: true },
+            { name: 'PT Sans', stack: "'PT Sans', sans-serif", google: true, weights: '400;700' },
+            { name: 'Ubuntu', stack: "'Ubuntu', sans-serif", google: true, weights: '300;400;500;700' },
+            { name: 'Source Sans 3', stack: "'Source Sans 3', sans-serif", google: true },
+            { name: 'Fira Sans', stack: "'Fira Sans', sans-serif", google: true },
+            { name: 'Cabin', stack: "'Cabin', sans-serif", google: true, weights: '400;500;600;700' },
+            { name: 'Hind', stack: "'Hind', sans-serif", google: true },
+            { name: 'Kanit', stack: "'Kanit', sans-serif", google: true },
+            { name: 'Archivo', stack: "'Archivo', sans-serif", google: true },
+            { name: 'Exo 2', stack: "'Exo 2', sans-serif", google: true },
+            { name: 'Josefin Sans', stack: "'Josefin Sans', sans-serif", google: true },
+            { name: 'Manrope', stack: "'Manrope', sans-serif", google: true },
+            { name: 'Karla', stack: "'Karla', sans-serif", google: true },
+            { name: 'Barlow', stack: "'Barlow', sans-serif", google: true },
+            { name: 'DM Sans', stack: "'DM Sans', sans-serif", google: true }
+        ];
+
+        // Accepts a plain name ("Poppins") or a legacy full stack
+        // ("'Poppins', sans-serif") so older saved designs keep working.
+        function zfbGetFontDef(value) {
+            if (!value) return null;
+
+            const raw = String(value).split(',')[0].replace(/["']/g, '').trim().toLowerCase();
+
+            return ZFB_GOOGLE_FONTS.find(f => f.name.toLowerCase() === raw) || null;
+        }
+
+        function zfbFontStack(value) {
+            const def = zfbGetFontDef(value);
+            if (def) return def.stack;
+            return String(value || 'Poppins') + ', sans-serif';
+        }
+
+        function zfbLoadGoogleFont(value) {
+            const def = zfbGetFontDef(value);
+            if (!def || !def.google) return;
+
+            const id = 'zfb-gfont-' + def.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            if (document.getElementById(id)) return;
+
+            const link = document.createElement('link');
+            link.id = id;
+            link.rel = 'stylesheet';
+            link.href =
+                'https://fonts.googleapis.com/css2?family=' +
+                encodeURIComponent(def.name).replace(/%20/g, '+') +
+                ':wght@@' + (def.weights || '300;400;500;600;700') +
+                '&display=swap';
+
+            document.head.appendChild(link);
+        }
+
+        // ✅ ADDED — applies the Form Designer's page/form/font/input styling to the live published form
+        function applyDesignStyles(d) {
+            if (!d) return;
+
+            if (d.pageImageUrl) {
+                document.body.style.background = `url('${d.pageImageUrl}') center / cover no-repeat fixed`;
+            } else if (d.pageColor) {
+                document.body.style.background = d.pageColor;
+            }
+
+            const card = document.querySelector('.form-card');
+            if (card) {
+                if (d.formColor) card.style.background = d.formColor;
+                if (d.formImageUrl) {
+                    card.style.backgroundImage = `url('${d.formImageUrl}')`;
+                    card.style.backgroundSize = 'cover';
+                    card.style.backgroundPosition = 'center';
+                }
+            }
+
+            if (d.fontColor) {
+                // ✅ FIX — this form-wide Font Color used to include h5 in its
+                // selector, which runs AFTER every heading field's own <h5> is
+                // built (schema.forEach() above already wrote its inline
+                // color: the field's own "Heading Text Color", or #1c2b39 by
+                // default). Since inline styles set later win, this line was
+                // silently overwriting that per-heading color with the global
+                // one on every render - so a heading set to white here always
+                // came back looking like the default dark text on the live
+                // form, even though it showed correctly while editing in the
+                // Form Builder (whose own font-color pass only ever touched
+                // field labels, never h5). Headings manage their own color
+                // through their dedicated field property, so they're excluded
+                // from this global pass entirely.
+                document.querySelectorAll('.form-label, h3, .text-muted').forEach(el => el.style.color = d.fontColor);
+            }
+
+            if (d.inputBackground) {
+                document.querySelectorAll('.form-control, .form-select').forEach(el => el.style.backgroundColor = d.inputBackground);   // ✅ CHANGED — was style.background, whose shorthand also erased the dropdown ▼ arrow image
+            }
+
+            // ✅ ADDED — the floating label sits on the card's surface (not
+            // inside the input), so its own little background patch needs to
+            // match the card color, not stay hard-coded white, or a custom
+            // Form Color would show a white square behind every label.
+            // ✅ CHANGED — set as CSS variables (not inline) so the label only gets
+            // its background patch while floated on the border; at rest it is
+            // transparent and sits inside the box like a placeholder.
+            document.querySelectorAll('.zfb-floating-group').forEach(el => {
+                if (d.formColor) el.style.setProperty('--zfb-label-bg', d.formColor);
+                if (d.inputBackground) el.style.setProperty('--zfb-input-bg', d.inputBackground);
+            });
+
+            // ✅ ADDED — Font family / size
+            // The Form Designer saves a plain family name ("Poppins", "DM Sans").
+            // Pull the matching Google Fonts stylesheet in first, then apply the
+            // full stack so the font actually renders on the public form.
+            if (d.fontFamily) {
+                zfbLoadGoogleFont(d.fontFamily);
+
+                const stack = zfbFontStack(d.fontFamily);
+
+                document.body.style.fontFamily = stack;
+
+                const cardFont = document.querySelector('.form-card');
+                if (cardFont) cardFont.style.fontFamily = stack;
+
+                document.querySelectorAll(
+                    '.form-label, .form-control, .form-select, .form-check-label, button, .btn'
+                ).forEach(el => el.style.fontFamily = stack);
+            }
+            if (d.fontSize) {
+                document.querySelectorAll('.form-label, .form-control, .form-select').forEach(el => el.style.fontSize = d.fontSize + 'px');
+            }
+
+            // NEW - floating fields: bigger text at rest (+3px) and a smaller label once it floats
+            // on the border (-3px, never below 10px). Follows the Form Designer font size.
+            {
+                const baseFs = parseInt(d.fontSize, 10) || 14;
+                document.querySelectorAll('.zfb-floating-group').forEach(el => {
+                    el.style.setProperty('--zfb-fs', (baseFs + 3) + 'px');
+                    el.style.setProperty('--zfb-fs-float', '11px'); // fixed size for the floated label - change 11px here
+                });
+            }
+
+            // ✅ ADDED — Font weight
+            if (d.fontWeight) {
+                document.querySelectorAll('.form-label, .form-control, .form-select').forEach(el => el.style.fontWeight = d.fontWeight);
+            }
+
+            // ✅ ADDED — Label alignment
+            // ✅ CHANGED — also skip .captcha-group here: the captcha field has its
+            // own, per-field "Label Alignment" (left/center/right) set in its Field
+            // Properties, which used the label-left/label-right .form-group rules
+            // below to reposition themselves — clobbering whatever the captcha's own
+            // alignment had just set.
+            // ✅ CHANGED — the Label Alignment option was removed from Form Designer;
+            // a previously saved left/right value is ignored (labels stay on top).
+            if (false && d.labelAlignment && d.labelAlignment !== 'top') {
+                document.querySelectorAll('.form-group:not(.form-heading-group):not(.captcha-group)').forEach(el => {
+                    // ✅ ADDED — floating-label fields (and their wrappers) keep the in-box style
+                    if (el.classList.contains('zfb-floating-group') || el.querySelector('.zfb-floating-group')) return;
+                    el.classList.remove('label-top', 'label-left', 'label-right');
+                    el.classList.add('label-' + d.labelAlignment);
+                });
+            }
+
+            // ✅ ADDED — Form width
+            if (d.formWidth) {
+                const cardEl = document.querySelector('.form-card');
+                if (cardEl) {
+                    cardEl.style.maxWidth = d.formWidth + 'px';
+                    cardEl.style.margin = '0 auto';
+                }
+            }
+
+            // ✅ ADDED — Question spacing
+            // ✅ CHANGED — gap between fields is never tighter than 30px (the old
+            // default of 12px made the boxes look cramped); a bigger value from the
+            // Form Designer is still respected. .form-row is skipped: its children
+            // already carry the margin, so adding it again doubled the gap.
+            {
+                const gap = Math.max(parseInt(d.questionSpacing, 10) || 0, 20); // was 30
+                document.querySelectorAll('.form-group').forEach(el => {
+                    el.style.marginBottom = gap + 'px';
+                });
+            }
+
+            // ✅ ADDED — Button style
+            if (d.buttonCss) {
+                const submitBtn = document.querySelector('.btn-submit-form');
+                if (submitBtn) {
+                    submitBtn.style.cssText = d.buttonCss + 'border:none; border-radius:8px; padding:12px 40px; font-weight:600; font-size:15px;';
+                }
+
+                // ✅ ADDED — Next button + active page-number dot use the same
+                // background / text colour as the Submit button (via CSS variables,
+                // so it works whether the nav is built before or after this runs).
+                const probe = document.createElement('span');
+                probe.style.cssText = d.buttonCss;
+                document.documentElement.style.setProperty('--zfb-btn-bg', probe.style.background || 'rgb(19 69 143)');
+                document.documentElement.style.setProperty('--zfb-btn-color', probe.style.color || '#fff');
+            }
+
+            // ✅ ADDED — Button text (the server already renders the saved text so this is
+            // mainly a safety net in case the design JSON is updated without a full reload).
+            if (d.submitButtonText) {
+                const submitBtnText = document.querySelector('.btn-submit-form');
+                if (submitBtnText) submitBtnText.textContent = d.submitButtonText;
+            }
+
+            // ✅ ADDED — Submit button alignment (the server already renders this inline;
+            // this is a safety net for design JSON updates without a full reload). Skipped
+            // once Submit has joined the multi-page nav row (.form-page-nav), which owns
+            // its own right-corner layout via margin-left:auto.
+            if (d.submitButtonAlign) {
+                const submitWrap = document.querySelector('.submit-wrap');
+                if (submitWrap && !submitWrap.closest('.form-page-nav')) {
+                    submitWrap.style.textAlign = d.submitButtonAlign;
+                }
+            }
+        }
+
+        // ============================================================
+        // COUNTRY LIST (for the "Country" field type)
+        // ============================================================
+        const WORLD_COUNTRIES = [
+            'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda',
+            'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain',
+            'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',
+            'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria',
+            'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada',
+            'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros',
+            'Congo (Congo-Brazzaville)', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia',
+            'Democratic Republic of the Congo', 'Denmark', 'Djibouti', 'Dominica',
+            'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea',
+            'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon',
+            'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea',
+            'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India',
+            'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Ivory Coast', 'Jamaica',
+            'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos',
+            'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania',
+            'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta',
+            'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova',
+            'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia',
+            'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria',
+            'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine',
+            'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal',
+            'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia',
+            'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe',
+            'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore',
+            'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Korea',
+            'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland',
+            'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo',
+            'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu',
+            'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States',
+            'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen',
+            'Zambia', 'Zimbabwe'
+        ];
+
+        // ============================================================
+        // STATE/PROVINCE LISTS — for the "State" part of the Address field.
+        // Countries not listed here fall back to a free-text State/Province
+        // box automatically (see refreshStateField() below).
+        // ============================================================
+        const STATES_BY_COUNTRY = {
+            'United States': ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming','District of Columbia'],
+            'Canada': ['Alberta','British Columbia','Manitoba','New Brunswick','Newfoundland and Labrador','Nova Scotia','Ontario','Prince Edward Island','Quebec','Saskatchewan','Northwest Territories','Nunavut','Yukon'],
+            'Australia': ['Australian Capital Territory','New South Wales','Northern Territory','Queensland','South Australia','Tasmania','Victoria','Western Australia'],
+            'India': ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi'],
+            'United Kingdom': ['England','Scotland','Wales','Northern Ireland']
+        };
+
+        const DEFAULT_STATE_COUNTRY = 'United States'; // used until the admin/visitor picks a Country
+
+        function getStatesForCountry(countryName) {
+            return STATES_BY_COUNTRY[countryName] || null;
+        }
+
+        function buildStateOptionsHtml(countryName, selectedValue) {
+            const states = getStatesForCountry(countryName || DEFAULT_STATE_COUNTRY) || [];
+            let html = `<option value="">Select State/Province</option>`;
+            states.forEach(s => {
+                html += `<option value="${s}" ${s === selectedValue ? 'selected' : ''}>${s}</option>`;
+            });
+            return html;
+        }
+
+        // Swaps a State control between a <select> (when the chosen country
+        // has a known list) and a plain text input (when it doesn't).
+        // data-field-id / data-field-label stay the same either way, so
+        // validation/data-gathering elsewhere needs no changes. Works for
+        // any state field by its exact data-field-id — used both by the
+        // (legacy) Address-internal state control and by standalone
+        // "State" fields cascading off a standalone "Country" field.
+        function refreshStateFieldById(stateFieldId, countryName) {
+            // ✅ FIXED — was `[data-field-id="${stateFieldId}"]`, which also
+            // matches the field's own outer wrapper <div> (it carries the
+            // same data-field-id) and, being the parent, comes first in
+            // document order. That made this grab the whole wrapper —
+            // label included — and replaceChild() below then swapped the
+            // ENTIRE wrapper (label + control) out for a bare new <select>,
+            // which is why the "State" label disappeared the moment a
+            // Country was picked. Scoping to .zfb-state-select targets only
+            // the actual control, never the wrapper.
+            const current = document.querySelector(`.zfb-state-select[data-field-id="${stateFieldId}"]`);
+            if (!current) return;
+            const oldValue = current.value;
+            const wasRequired = !!current.required;
+            const fieldLabel = current.getAttribute('data-field-label');
+            const states = getStatesForCountry(countryName);
+            let replacement;
+            if (states) {
+                replacement = document.createElement('select');
+                replacement.className = 'form-select zfb-state-select';
+                replacement.innerHTML = buildStateOptionsHtml(countryName, oldValue);
+            } else {
+                replacement = document.createElement('input');
+                replacement.type = 'text';
+                replacement.className = 'form-control zfb-state-select';
+                replacement.placeholder = 'State/Province';
+                if (oldValue) replacement.value = oldValue;
+            }
+            replacement.setAttribute('data-field-id', stateFieldId);
+            if (fieldLabel) replacement.setAttribute('data-field-label', fieldLabel);
+            if (wasRequired) replacement.required = true;
+            current.parentNode.replaceChild(replacement, current);
+        }
+
+        // Back-compat shim — kept in case any saved schema still references
+        // the old Address-internal "<addressId>_state" control.
+        function refreshStateField(addressId, countryName) {
+            refreshStateFieldById(`${addressId}_state`, countryName);
+        }
+
+        // ✅ ADDED — cascades every standalone "State" field on the form off
+        // whichever standalone "Country" field is present. Multiple Country
+        // fields each drive every State field on change; with no Country
+        // field on the form, State fields simply keep showing the default
+        // country's states (set at render time above).
+        function initCountryStateLinking() {
+            const countrySelects = document.querySelectorAll('.zfb-country-select');
+            if (!countrySelects.length) return;
+
+            const applyCountry = (countryName) => {
+                document.querySelectorAll('.zfb-state-select').forEach(stateEl => {
+                    refreshStateFieldById(stateEl.getAttribute('data-field-id'), countryName);
+                });
+            };
+
+            countrySelects.forEach(sel => {
+                sel.addEventListener('change', function () {
+                    applyCountry(this.value);
+                });
+
+                // select2 (initCountrySelects()) swaps in its own UI but keeps
+                // firing native 'change' on this underlying <select>, so jQuery's
+                // 'change' event covers the select2 case too when jQuery is present.
+                if (typeof $ !== 'undefined') {
+                    $(sel).on('change', function () {
+                        applyCountry(this.value);
+                    });
+                }
+
+                // If the Country field already has a value (e.g. a saved
+                // submission being edited), sync State immediately.
+                if (sel.value) applyCountry(sel.value);
+            });
+        }
+
+        // ============================================================
+        // BUILD FORM FIELDS
+        // ============================================================
+        let currentRow = null;
+        let halfBuffer = [];
+
+        function flushHalfBuffer() {
+            if (halfBuffer.length === 0) return;
+            // ✅ CHANGED — a lone Half-width field (no partner beside it) now stays Half width,
+            // exactly like the Form Builder canvas shows it, instead of stretching to full width.
+            if (halfBuffer.length === 1) {
+                const row = document.createElement('div');
+                row.className = 'form-row';
+                const group = document.createElement('div');
+                group.className = 'form-group half';
+                group.appendChild(halfBuffer[0]);
+                row.appendChild(group);
+                container.appendChild(row);
+            } else {
+                // Two half fields side by side
+                const row = document.createElement('div');
+                row.className = 'form-row';
+                halfBuffer.forEach(fieldEl => {
+                    const group = document.createElement('div');
+                    group.className = 'form-group half';
+                    group.appendChild(fieldEl);
+                    row.appendChild(group);
+                });
+                container.appendChild(row);
+            }
+            halfBuffer = [];
+        }
+
+        // ✅ ADDED — per-side Padding / Margin set in the Form Builder
+        // (field.padding / field.margin = { top, right, bottom, left }).
+        // Used for Heading, Paragraph and Captcha. A side that was never
+        // set is skipped, so the normal stylesheet spacing still applies.
+        function zfbApplyFieldSpacing(el, field) {
+            ['padding', 'margin'].forEach(kind => {
+                const box = field && field[kind];
+                if (!box) return;
+                ['top', 'right', 'bottom', 'left'].forEach(side => {
+                    const v = parseInt(box[side], 10);
+                    if (!isNaN(v)) {
+                        el.style[kind + side.charAt(0).toUpperCase() + side.slice(1)] = v + 'px';
+                    }
+                });
+            });
+        }
+
+        schema.forEach(field => {
+            if (field.type === 'heading') {
+                flushHalfBuffer();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'mb-3 form-heading-section form-heading-group';
+                wrapper.setAttribute('data-field-id', field.id);   // ✅ ADDED — lets Conditions target headings for show/hide
+                const bg = field.headingBgColor ? field.headingBgColor : 'transparent';
+                const fg = field.headingTextColor || '#1c2b39';
+                const fs = field.headingFontSize || 20;
+                const align = field.headingTextAlign || 'left';
+                const ff = field.headingFontFamily || 'inherit';
+                const mb = (field.headingMarginBottom ?? 22);
+                const pb = (field.headingPaddingBottom ?? 0);
+
+                // ✅ ADDED — per-heading font choices (Poppins, Playfair Display,
+                // Courier Prime, ...) are Google Fonts too, so fetch them.
+                if (ff && ff !== 'inherit') {
+                    zfbLoadGoogleFont(ff);
+                }
+
+                wrapper.style.backgroundColor = bg;
+                wrapper.style.marginBottom = mb + 'px';
+                wrapper.style.paddingBottom = pb + 'px';
+                zfbApplyFieldSpacing(wrapper, field);   // ✅ ADDED — Top/Right/Bottom/Left Padding + Margin
+                wrapper.innerHTML = `<h5 style="color:${fg};font-size:${fs}px;font-family:${ff};text-align:${align};width:100%;">${field.label}</h5>`;
+                container.appendChild(wrapper);
+                return;
+            }
+
+            if (field.type === 'paragraph') {
+                flushHalfBuffer();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'form-group';
+                wrapper.setAttribute('data-field-id', field.id);   // ✅ ADDED — lets Conditions target paragraphs for show/hide
+                wrapper.innerHTML = `<p class="text-muted">${field.label}</p>`;
+                zfbApplyFieldSpacing(wrapper, field);   // ✅ ADDED — Top/Right/Bottom/Left Padding + Margin
+                container.appendChild(wrapper);
+                return;
+            }
+
+            if (field.type === 'pagebreak') {
+                // ✅ ADDED — invisible marker (added via "+ Add New Page" in the
+                // Form Builder). wireUpMultiPageForm() below splits the flat
+                // #formFieldsContainer into one <div class="form-page"> per
+                // marker and wires up Next/Back/step-indicator. Forms with no
+                // pagebreak fields never hit this branch, so they render and
+                // behave exactly as a single page, same as before.
+                flushHalfBuffer();
+                const marker = document.createElement('div');
+                marker.className = 'zfb-page-break-marker';
+                marker.setAttribute('data-field-id', field.id);
+                container.appendChild(marker);
+                return;
+            }
+
+            if (field.type === 'borderlabel') {
+                // ✅ ADDED — labelled horizontal divider (section break), same
+                // look as the Form Builder canvas preview. showLabel === false
+                // renders a plain line with no text.
+                flushHalfBuffer();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'zfb-border-label';
+                wrapper.setAttribute('data-field-id', field.id);
+                const borderColor = field.borderColor || '#d7dce2';
+                const borderWidth = (typeof field.borderWidth === 'number') ? field.borderWidth : 1;
+                wrapper.style.setProperty('--zfb-border-color', borderColor);
+                wrapper.style.setProperty('--zfb-border-width', borderWidth + 'px');
+                wrapper.innerHTML = field.showLabel === false
+                    ? ''
+                    : `<span class="zfb-border-label-text">${field.label}</span>`;
+                container.appendChild(wrapper);
+                return;
+            }
+
+            // Create the field element
+            const fieldEl = document.createElement('div');
+            fieldEl.className = 'form-group label-top';
+            fieldEl.setAttribute('data-field-id', field.id);   // ✅ ADDED — lets Conditions find/toggle this field's wrapper regardless of type
+
+            // ✅ ADDED — matches the Form Builder canvas's floating-label field
+            // style (label sitting on the box's top border) instead of the
+            // plain "label above box with a gap" look the render view used to
+            // have — those were two different patterns for the same field.
+            // Fields with their own bespoke layout (checkboxes, radios,
+            // Full Name's two boxes, Address's three boxes, the captcha
+            // widget, etc.) keep their existing layout as-is. Only kicks in
+            // for the default "top" label alignment — if the admin picked
+            // the form-wide Left/Right label alignment instead, that side-by-
+            // side layout takes over below (label-left/label-right).
+            const NO_FLOATING_LABEL_TYPES = ['checkbox', 'radio', 'starrating', 'signature', 'productlist', 'payment', 'terms', 'captcha', 'fullname', 'address', 'heading', 'paragraph', 'borderlabel'];
+            // ✅ CHANGED — every field now uses the in-box floating label, whatever the
+            // Form Designer's "Label Alignment" says (side-by-side labels are no longer used).
+            const topAlign = true;
+            const useFloatingLabel = topAlign && !NO_FLOATING_LABEL_TYPES.includes(field.type);
+            if (useFloatingLabel) {
+                fieldEl.classList.add('zfb-floating-group');
+            }
+
+            const label = document.createElement('label');
+            label.className = 'form-label';
+            if (field.type === 'address') label.classList.add('zfb-address-heading'); // NEW - bold Address heading
+            // ✅ ADDED — Payment is the most important field on the form (it's
+            // what actually collects money), so its label gets its own bold,
+            // black styling instead of the regular label look.
+            if (field.type === 'payment') label.classList.add('zfb-payment-heading');
+            label.innerHTML = field.label + (field.required ? ' <span class="text-danger">*</span>' : '');
+            if (field.type !== 'terms' && field.type !== 'fullname' && field.type !== 'firstname' && field.type !== 'lastname') {
+                fieldEl.appendChild(label);
+            }
+
+            let input;
+            switch (field.type) {
+                case 'firstname':
+                case 'lastname':
+                    // For firstname/lastname, we want the label above the input
+                    const nameLabel = document.createElement('label');
+                    nameLabel.className = 'form-label';
+                    nameLabel.innerHTML = field.label + (field.required ? ' <span class="text-danger">*</span>' : '');
+                    fieldEl.appendChild(nameLabel);
+                    input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'form-control';
+                    input.placeholder = field.placeholder || field.label;
+                    input.setAttribute('data-field-id', field.id);
+                    input.setAttribute('data-field-label', field.label);
+                    if (field.required) input.required = true;
+                    fieldEl.appendChild(input);
+                    break;
+
+                case 'fullname':
+                    // Full Name with First/Last labels
+                    const firstLbl = field.firstNameLabel || 'First Name';
+                    const lastLbl = field.lastNameLabel || 'Last Name';
+                    const nameContainer = document.createElement('div');
+                    nameContainer.className = 'd-flex gap-2';
+                    if (topAlign) {
+                        // ✅ CHANGED — same floating-label boxes as every other field
+                        nameContainer.className = 'zfb-sub-row';
+                        nameContainer.innerHTML = `
+                        <div class="zfb-floating-group zfb-sub-group">
+                            <label class="form-label">${firstLbl}${field.required ? ' <span class="text-danger">*</span>' : ''}</label>
+                            <input type="text" class="form-control" placeholder=" " data-field-id="${field.id}_first" data-field-label="${firstLbl}" ${field.required ? 'required' : ''} />
+                        </div>
+                        <div class="zfb-floating-group zfb-sub-group">
+                            <label class="form-label">${lastLbl}${field.required ? ' <span class="text-danger">*</span>' : ''}</label>
+                            <input type="text" class="form-control" placeholder=" " data-field-id="${field.id}_last" data-field-label="${lastLbl}" ${field.required ? 'required' : ''} />
+                        </div>`;
+                        fieldEl.appendChild(nameContainer);
+                        break;
+                    }
+                    nameContainer.innerHTML = `
+                        <div class="flex-fill">
+                            <div class="text-muted small mb-1">${firstLbl}</div>
+                            <input type="text" class="form-control" placeholder="${firstLbl}" data-field-id="${field.id}_first" data-field-label="${firstLbl}" ${field.required ? 'required' : ''} />
+                        </div>
+                        <div class="flex-fill">
+                            <div class="text-muted small mb-1">${lastLbl}</div>
+                            <input type="text" class="form-control" placeholder="${lastLbl}" data-field-id="${field.id}_last" data-field-label="${lastLbl}" ${field.required ? 'required' : ''} />
+                        </div>
+                    `;
+                    fieldEl.appendChild(nameContainer);
+                    break;
+
+                case 'address':
+                    // ✅ CHANGED — Country and State were removed from inside the
+                    // Address field: they now live as separate, standalone
+                    // "Country" / "State" fields on the form (State cascades off
+                    // whichever standalone Country field is present — see
+                    // initCountryStateLinking() below). Address now only collects
+                    // Street, City, and Zip.
+                    const addrContainer = document.createElement('div');
+                    if (topAlign) {
+                        // ✅ CHANGED — Street / City / Zip use the same floating-label boxes
+                        addrContainer.innerHTML = `
+                        <div class="zfb-floating-group zfb-sub-group">
+                            <label class="form-label">Street Address${field.required ? ' <span class="text-danger">*</span>' : ''}</label>
+                            <input type="text" class="form-control" placeholder=" " data-field-id="${field.id}_street" ${field.required ? 'required' : ''} />
+                        </div>
+                        <div class="zfb-sub-row">
+                                                        <div class="zfb-floating-group zfb-sub-group">
+                                <label class="form-label">City${field.required ? ' <span class="text-danger">*</span>' : ''}</label>
+                                <input type="text" class="form-control" placeholder=" " data-field-id="${field.id}_city" ${field.required ? 'required' : ''} />
+                            </div>
+                            <div class="zfb-floating-group zfb-sub-group">
+                                <label class="form-label">Zip${field.required ? ' <span class="text-danger">*</span>' : ''}</label>
+                                <input type="text" class="form-control" placeholder=" " data-field-id="${field.id}_zip" ${field.required ? 'required' : ''} />
+                            </div>
+                        </div>`;
+                        fieldEl.appendChild(addrContainer);
+                        break;
+                    }
+                    addrContainer.innerHTML = `
+                        <input type="text" class="form-control mb-2" placeholder="Street Address" data-field-id="${field.id}_street" ${field.required ? 'required' : ''} />
+                        <div class="d-flex gap-2">
+                                                       <input type="text" class="form-control" placeholder="City" data-field-id="${field.id}_city" ${field.required ? 'required' : ''} />
+                            <input type="text" class="form-control" placeholder="Zip" data-field-id="${field.id}_zip" ${field.required ? 'required' : ''} />
+                        </div>
+                    `;
+                    fieldEl.appendChild(addrContainer);
+                    break;
+
+                case 'country':
+                    // ✅ ADDED — searchable Country dropdown (search box on top of the
+                    // list), populated from the full world-country list below and
+                    // enhanced with select2 once it's in the DOM (see initCountrySelects()).
+                    input = document.createElement('select');
+                    input.className = 'form-select zfb-country-select';
+                    const countryDefaultOpt = document.createElement('option');
+                    countryDefaultOpt.value = '';
+                    countryDefaultOpt.textContent = field.placeholder || 'Select Country';
+                    input.appendChild(countryDefaultOpt);
+                    WORLD_COUNTRIES.forEach(countryName => {
+                        const o = document.createElement('option');
+                        o.value = countryName;
+                        o.textContent = countryName;
+                        input.appendChild(o);
+                    });
+                    break;
+
+                case 'state':
+                    // ✅ ADDED — standalone State/Province dropdown. Starts out
+                    // showing the default country's states and re-populates itself
+                    // whenever a standalone Country field on the same form changes
+                    // (wired up in initCountryStateLinking(), after all fields are
+                    // rendered). Countries with no known state list fall back to a
+                    // free-text box — see refreshStateFieldById().
+                    input = document.createElement('select');
+                    input.className = 'form-select zfb-state-select';
+                    input.innerHTML = buildStateOptionsHtml(DEFAULT_STATE_COUNTRY, '');
+                    break;
+
+                case 'textarea':
+                    input = document.createElement('textarea');
+                    input.className = 'form-control';
+                    input.placeholder = field.placeholder || '';
+                    break;
+
+                case 'dropdown':
+                    input = document.createElement('select');
+                    input.className = 'form-select';
+                    const defaultOpt = document.createElement('option');
+                    defaultOpt.value = '';
+                    defaultOpt.textContent = 'Select...';
+                    input.appendChild(defaultOpt);
+                    if (field.options) {
+                        field.options.forEach(opt => {
+                            const o = document.createElement('option');
+                            o.value = opt;
+                            o.textContent = opt;
+                            input.appendChild(o);
+                        });
+                    }
+                    break;
+
+                case 'checkbox':
+                    const checkboxContainer = document.createElement('div');
+                    if (field.options) {
+                        field.options.forEach(opt => {
+                            const div = document.createElement('div');
+                            div.className = 'form-check';
+                            div.innerHTML = `
+                                <input class="form-check-input" type="checkbox" name="${field.id}" value="${opt}">
+                                <label class="form-check-label">${opt}</label>
+                            `;
+                            checkboxContainer.appendChild(div);
+                        });
+                    }
+                    fieldEl.appendChild(checkboxContainer);
+                    // Add the field as-is, no input variable
+                    fieldEl.setAttribute('data-field-id', field.id);
+                    fieldEl.setAttribute('data-field-label', field.label);
+                    break;
+
+                case 'radio':
+                    fieldEl.classList.add('zfb-radio-field'); // ✅ ADDED — radio label/gap styling
+                    const radioContainer = document.createElement('div');
+                    if (field.options) {
+                        field.options.forEach((opt, i) => {
+                            const div = document.createElement('div');
+                            div.className = 'form-check';
+                            div.innerHTML = `
+                                <input class="form-check-input" type="radio" name="${field.id}" value="${opt}" ${i === 0 && field.required ? 'required' : ''} ${i === 0 ? 'checked' : ''}>
+                                <label class="form-check-label">${opt}</label>
+                            `;
+                            radioContainer.appendChild(div);
+                        });
+                    }
+                    fieldEl.appendChild(radioContainer);
+                    fieldEl.setAttribute('data-field-id', field.id);
+                    fieldEl.setAttribute('data-field-label', field.label);
+                    break;
+
+                case 'starrating':
+                    const stars = field.maxStars || 5;
+                    const starHtml = `<div data-field-id="${field.id}" data-rating="0" style="font-size:28px; cursor:pointer;">`;
+                    let starHtmlContent = starHtml;
+                    for (let s = 1; s <= stars; s++) {
+                        starHtmlContent += `<span onclick="setStarRating('${field.id}', ${s})" style="color:#ccc;" id="star_${field.id}_${s}">★</span>`;
+                    }
+                    starHtmlContent += `</div>`;
+                    fieldEl.innerHTML += starHtmlContent;
+                    break;
+
+                case 'appointment':
+                    input = document.createElement('input');
+                    input.type = 'datetime-local';
+                    input.className = 'form-control';
+                    break;
+
+                case 'time':
+                    input = document.createElement('input');
+                    input.type = 'time';
+                    input.className = 'form-control';
+                    break;
+
+                case 'fileupload':
+                case 'image': {
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.className = 'form-control';
+
+                    // ✅ ADDED — Image fields now only accept jpg/jpeg/png; File Upload fields
+                    // only accept pdf/doc/docx. Previously any file type (.exe, etc.) was accepted.
+                    const isImageField = field.type === 'image';
+                    const allowedExt = isImageField ? ['jpg', 'jpeg', 'png'] : ['pdf', 'doc', 'docx'];
+                    input.accept = isImageField
+                        ? '.jpg,.jpeg,.png,image/jpeg,image/png'
+                        : '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+                    input.addEventListener('change', function () {
+                        // ✅ ADDED — a newly chosen file needs to be uploaded again; drop any URL
+                        // saved from a previous selection so uploadPendingFiles() picks it up.
+                        delete this.dataset.uploadedUrl;
+                        if (!this.files || !this.files.length) return;
+                        const fileName = this.files[0].name;
+                        const ext = fileName.split('.').pop().toLowerCase();
+                        if (!allowedExt.includes(ext)) {
+                            alert(isImageField
+                                ? 'Invalid file. Please upload only JPG, JPEG, or PNG images.'
+                                : 'Invalid file. Please upload only PDF or Word documents (.pdf, .doc, .docx).');
+                            this.value = '';
+                        }
+                        // ✅ ADDED — file inputs don't get jQuery Validate's usual focusout
+                        // re-check reliably (the native file picker dialog swallows the blur), so
+                        // the "required" error used to hang around until the visitor clicked into
+                        // some other field. Re-validate this input the instant a file is chosen
+                        // (or cleared for a bad extension above) so the message clears/reappears
+                        // immediately.
+                        if ($(this).closest('form').data('validator')) {
+                            $(this).valid();
+                        }
+                    });
+                    break;
+                }
+
+                case 'signature':
+                    fieldEl.innerHTML += `<div style="border:1px dashed #ccc; height:80px; background:#fafbfc; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#aaa;">Signature pad (draw here)</div>`;
+                    break;
+
+                case 'fillblank':
+                    input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'form-control';
+                    input.placeholder = 'Fill in the blank';
+                    input.setAttribute('data-field-id', field.id);
+                    break;
+
+                case 'productlist':
+                    fieldEl.innerHTML += `
+                        <div class="border rounded p-2 d-flex justify-content-between align-items-center">
+                            <span>${field.label}</span>
+                            <input type="number" min="0" class="form-control" style="width:80px;" placeholder="Qty" data-field-id="${field.id}" />
+                        </div>`;
+                    break;
+
+                case 'payment': {
+                    const gwLabel = { paypal: 'PayPal', stripe: 'Stripe', square: 'Square' }[field.gateway] || field.gateway;
+                    const amtLabel = field.amountType === 'fixed'
+                        ? `${field.currency} ${Number(field.amount || 0).toFixed(2)}`
+                        : (field.amountType === 'productlist' ? 'Amount based on your selections below' : 'Enter amount below');
+
+                    // ✅ ADDED — actual selectable product list with qty, sourced from field.products
+                    // (previously "Based on product list" showed no products at all)
+                    const productListHtml = (field.amountType === 'productlist' && Array.isArray(field.products) && field.products.length)
+                        ? `<div class="mb-2">${field.products.map((p, idx) => `
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-1">
+                                <div>
+                                    <div>${p.name || '(unnamed product)'}</div>
+                                    <div class="text-muted small">${field.currency || 'USD'} ${Number(p.price || 0).toFixed(2)}</div>
+                                </div>
+                                <input type="number" min="0" step="1" class="form-control" style="width:80px;"
+                                       value="0" placeholder="Qty"
+                                       data-payment-product="${field.id}" data-product-index="${idx}" data-product-price="${p.price || 0}" />
+                            </div>`).join('')}</div>`
+                        : (field.amountType === 'productlist' ? '<p class="text-muted small">No products configured for this payment field.</p>' : '');
+
+                    fieldEl.innerHTML += `
+                        <div class="payment-box">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">${gwLabel}</span>
+                                <span class="payment-amount-badge" id="paymentAmountBadge_${field.id}">${amtLabel}</span>
+                            </div>
+                            ${field.amountType === 'userdefined' ? `
+                            <input type="number" min="0" step="0.01" class="form-control mb-2" placeholder="Amount (${field.currency})" data-field-id="${field.id}_amount" />` : ''}
+                            ${productListHtml}
+                            <div class="payment-mount-wrap" style="position:relative;">
+                                <div id="paymentMount_${field.id}"></div>
+                                ${field.gateway === 'paypal' ? `<div id="paypalClickGuard_${field.id}" class="paypal-click-guard" title="Click to continue"></div>` : ''}
+                            </div>
+                            <div id="paymentMsg_${field.id}" class="payment-message"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'terms': {
+                    // ✅ ADDED — shows a "View Terms" link beside the checkbox that opens the
+                    // uploaded PDF (or the plain link, whichever was set in the builder) in a new tab.
+                    const termsDocUrl = field.termsDocType === 'pdf' ? field.termsPdfUrl : field.termsLinkUrl;
+                    const termsCheck = document.createElement('div');
+                    termsCheck.className = 'form-check';
+                    termsCheck.innerHTML = `
+                        <input class="form-check-input" type="checkbox" data-field-id="${field.id}" data-field-label="${field.label}" ${field.required ? 'required' : ''}>
+                        <label class="form-check-label">${field.label}</label>
+                        ${termsDocUrl ? `<a href="${termsDocUrl}" target="_blank" rel="noopener noreferrer" class="ms-2 small">${field.termsDocType === 'pdf' ? '📄 View PDF' : '🔗 View Terms'}</a>` : ''}
+                    `;
+                    fieldEl.appendChild(termsCheck);
+                    break;
+                }
+
+                case 'captcha': {
+                    // ✅ ADDED — actually renders the widget for the captcha type chosen in the
+                    // builder instead of falling through to the plain textbox default.
+
+                    // ✅ ADDED — the captcha's own "Label Alignment" (left/center/right, set
+                    // per-field in Field Properties) was never read here, so the live form
+                    // always rendered it as a plain top-label field no matter what was picked
+                    // in the builder. Apply the same align-left/center/right structure the
+                    // builder canvas uses (label.classList / captcha-group below).
+                    const captchaAlignment = field.labelAlignment || 'center';
+                    fieldEl.classList.add('captcha-group', 'captcha-align-' + captchaAlignment);
+                    zfbApplyFieldSpacing(fieldEl, field);   // ✅ ADDED — Top/Right/Bottom/Left Padding + Margin
+                    label.classList.add('captcha-field-label');
+
+                    const captchaBox = document.createElement('div');
+                    captchaBox.className = 'captcha-widget';
+                    captchaBox.setAttribute('data-field-id', field.id);
+                    captchaBox.setAttribute('data-captcha-type', field.captchaType || 'hcaptcha');
+
+                    if (field.captchaType === 'recaptcha') {
+                        const testKey = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Google's public test key — always passes
+                        captchaBox.innerHTML = `<div class="g-recaptcha" data-sitekey="${field.captchaSiteKey || testKey}"></div>`;
+                    } else if (field.captchaType === 'jotcaptcha') {
+                        // ✅ CHANGED — was just a plain "I am human" checkbox (no real check at all).
+                        // Now shows a distorted-text image the visitor has to read and type in,
+                        // like a classic CAPTCHA, with a refresh icon to get a new challenge.
+                        captchaBox.innerHTML = `
+                            <div class="jotcaptcha-box">
+                                <div class="jotcaptcha-img-wrap">
+                                    <canvas id="jotcaptchaCanvas_${field.id}" width="160" height="55"></canvas>
+                                </div>
+                                <div class="input-group jotcaptcha-input-group">
+                                    <input type="text" class="form-control" id="jotcaptchaInput_${field.id}" name="jotcaptcha_${field.id}" placeholder="Type the text above" autocomplete="off" />
+                                    <button type="button" class="jotcaptcha-refresh" title="Get a new challenge" onclick="refreshJotCaptcha('${field.id}')">↻</button>
+                                </div>
+                            </div>`;
+                    } else {
+                        const testKey = '10000000-ffff-ffff-ffff-000000000001'; // hCaptcha's public test key — always passes
+                        captchaBox.innerHTML = `<div class="h-captcha" data-sitekey="${field.captchaSiteKey || testKey}"></div>`;
+                    }
+                    fieldEl.appendChild(captchaBox);
+                    // ✅ ADDED — draw the first JotCaptcha challenge once the canvas is in the DOM
+                    if (field.captchaType === 'jotcaptcha') {
+                        setTimeout(function () { drawJotCaptcha(field.id); }, 0);
+                    }
+                    break;
+                }
+
+                default:
+                    input = document.createElement('input');
+                    input.type = (field.type === 'email' ? 'email' : field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'phone' ? 'tel' : 'text');
+                    input.className = 'form-control';
+                    input.placeholder = field.placeholder || '';
+                    if (field.type === 'phone') {
+                        // ✅ ADDED — blocks letters while typing; the phoneFormat validation rule is the backstop
+                        input.addEventListener('input', function () {
+                            this.value = this.value.replace(/[^0-9+\-\s()]/g, '');
+                        });
+                    }
+            }
+
+            // ✅ ADDED — floating-label support: text-like boxes need a non-empty
+            // placeholder so :placeholder-shown can tell "empty" from "filled";
+            // selects / date / time boxes never look empty, so their label always
+            // floats on the border.
+            if (useFloatingLabel && input) {
+                const _inType = (input.type || '').toLowerCase();
+                if (input.tagName === 'SELECT') {
+                    // dropdowns: label rests inside the box, floats once an option is chosen / opened
+                    fieldEl.classList.add('zfb-fl-select');
+                } else if (['date', 'time', 'datetime-local', 'month', 'week', 'file'].includes(_inType)) {
+                    fieldEl.classList.add('zfb-fl-always');
+                } else if (!input.placeholder || input.placeholder.trim() === String(field.label).trim()) {
+                    input.placeholder = ' ';
+                }
+            }
+
+            // Set common attributes for input types
+            if (input && (field.type !== 'checkbox' && field.type !== 'radio' && field.type !== 'starrating' && field.type !== 'signature' && field.type !== 'productlist' && field.type !== 'terms')) {
+                input.setAttribute('data-field-id', field.id);
+                input.setAttribute('data-field-label', field.label);
+                if (field.required) input.required = true;
+                fieldEl.appendChild(input);
+            }
+
+            // ✅ ADDED — Handle half/full width
+            const isHalf = field.width === 'half';
+            const isPayment = field.type === 'payment';
+
+            if (isPayment) {
+                // Payment always full width
+                flushHalfBuffer();
+                container.appendChild(fieldEl);
+            } else if (isHalf) {
+                halfBuffer.push(fieldEl);
+                // If we have 2 half fields, flush them
+                if (halfBuffer.length >= 2) {
+                    flushHalfBuffer();
+                }
+            } else {
+                // Full width field - flush any pending half fields first
+                flushHalfBuffer();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'form-group';
+                wrapper.appendChild(fieldEl);
+                container.appendChild(wrapper);
+            }
+        });
+
+        // Flush any remaining half fields at the end
+        flushHalfBuffer();
+
+        // ✅ ADDED — turn every rendered Country <select> into a searchable
+        // dropdown (search box on top of the list), matching the request
+        // for the Country field to be searchable by name.
+        function initCountrySelects() {
+            if (typeof $ === 'undefined' || !$.fn.select2) return;
+            $('.zfb-country-select').each(function () {
+                $(this).select2({
+                    width: '100%',
+                    placeholder: $(this).find('option').first().text() || 'Select Country'
+                });
+            });
+        }
+        initCountrySelects();
+
+        // ✅ ADDED — wire standalone State fields to cascade off standalone
+        // Country fields (see initCountryStateLinking() above).
+        initCountryStateLinking();
+
+        // ✅ ADDED — Apply designer styles after building all fields
+        applyDesignStyles(design);
+
+        // ✅ ADDED — Places the logo and the first Heading field side by side
+        // when "Side by Side" layout is chosen in the Form Builder, OR when
+        // the heading field itself has its Field Width set to "Half" (set
+        // from the heading's own Field Properties panel in the builder).
+        function applyLogoHeadingLayout(d, s) {
+            const firstFieldGroup = container.firstElementChild;
+            if (!firstFieldGroup || !firstFieldGroup.classList.contains('form-heading-group')) return;
+
+            const firstFieldSchema = s && s.length ? s[0] : null;
+            const headingWantsHalf = !!firstFieldSchema && firstFieldSchema.type === 'heading' && firstFieldSchema.width === 'half';
+
+            if (!(d && d.logoLayout === 'sideBySide') && !headingWantsHalf) return;
+
+            const logoWrap = document.querySelector('.form-logo-wrap');
+            if (!logoWrap) return;
+
+            const row = document.createElement('div');
+            row.className = 'form-logo-heading-row';
+
+            logoWrap.parentNode.insertBefore(row, logoWrap);
+            row.appendChild(logoWrap);
+            row.appendChild(firstFieldGroup);
+
+            // ✅ FIX — mirrors the same fix in the Form Builder canvas
+            // (applyLogoHeadingLayout in zfb-formbuilder.js). The Background
+            // Color was being painted only on .form-logo-wrap (the logo's
+            // own box, server-rendered above), which shrinks to fit the
+            // logo - so the color stopped short and left a plain/white gap
+            // behind the heading text and any empty space from Center/Right
+            // alignment. .form-logo-heading-row is full width, so move the
+            // color there instead for an edge-to-edge header strip.
+            row.style.background = (d && d.logoBgColor) || 'transparent';
+            logoWrap.style.background = 'transparent';
+
+            // ✅ ADDED — Space Below Title used to be forced to 0 in this layout
+            // (.form-logo-heading-row .form-heading-section { margin: 0 !important })
+            // so the control had no effect here. Apply it to the row itself instead,
+            // plus the new gap/side-padding controls.
+            row.style.gap = (d && d.logoHeadingGap != null ? d.logoHeadingGap : 16) + 'px';
+            row.style.paddingLeft = (d && d.logoHeadingRowPaddingX != null ? d.logoHeadingRowPaddingX : 35) + 'px';
+            row.style.paddingRight = (d && d.logoHeadingRowPaddingX != null ? d.logoHeadingRowPaddingX : 35) + 'px';
+            if (firstFieldSchema) {
+                row.style.marginBottom = (firstFieldSchema.headingMarginBottom ?? 22) + 'px';
+            }
+
+            // ✅ ADDED — the logo's Padding / Margin (per side) apply to the whole
+            // logo + heading row in this layout; same as the Form Builder canvas.
+            logoWrap.style.padding = '0';
+            ['top', 'right', 'bottom', 'left'].forEach(side => {
+                const cap = side.charAt(0).toUpperCase() + side.slice(1);
+                const pv = d && d.logoPadding ? parseInt(d.logoPadding[side], 10) : NaN;
+                const mv = d && d.logoMargin ? parseInt(d.logoMargin[side], 10) : NaN;
+                if (!isNaN(pv)) row.style['padding' + cap] = pv + 'px';
+                if (!isNaN(mv)) row.style['margin' + cap] = mv + 'px';
+            });
+
+            // ✅ ADDED — the Alignment buttons (Left/Center/Right, saved as
+            // d.logoAlignment) used to do nothing here: .form-heading-section
+            // was pinned to "flex: 1 1 auto" (see stylesheet above), so the
+            // heading always stretched to fill whatever space was left next
+            // to the logo and the pair stayed pinned to the left edge no
+            // matter which alignment was picked. This mirrors the same fix
+            // already applied to the Form Builder canvas (applyLogoHeadingLayout
+            // in zfb-formbuilder.js) so the live form actually matches it.
+            if (headingWantsHalf) {
+                // 50/50 split already fills the row - no spare space for
+                // Left/Center/Right to move the pair within.
+                logoWrap.style.setProperty('flex', '0 0 50%', 'important');
+                logoWrap.style.setProperty('width', '50%', 'important');
+                logoWrap.style.setProperty('max-width', '50%', 'important');
+                logoWrap.style.margin = '0';
+
+                firstFieldGroup.style.setProperty('flex', '0 0 50%', 'important');
+                firstFieldGroup.style.setProperty('width', '50%', 'important');
+                firstFieldGroup.style.setProperty('max-width', '50%', 'important');
+                firstFieldGroup.style.minWidth = '0';
+
+                row.style.justifyContent = 'flex-start';
+            } else {
+                const alignment = (d && d.logoAlignment) || 'center';
+
+                logoWrap.style.setProperty('flex', '0 0 auto', 'important');
+                logoWrap.style.setProperty('width', 'auto', 'important');
+                logoWrap.style.setProperty('max-width', '60%', 'important');
+                logoWrap.style.margin = '0';
+
+                // ✅ FIX — mirrors the same fix in the Form Builder canvas
+                // (applyLogoHeadingLayout in zfb-formbuilder.js). "Left" used
+                // to leave the heading's flex/width untouched, which fell
+                // back to the stylesheet's full-width stretch rule, so the
+                // heading didn't visually move next to the logo the way
+                // Center/Right did. All three now shrink the heading to a
+                // compact unit next to the logo and just change the row's
+                // justify-content, so the logo+heading pair always moves
+                // together as one.
+                row.style.justifyContent =
+                    alignment === 'left' ? 'flex-start' :
+                        alignment === 'right' ? 'flex-end' : 'center';
+
+                firstFieldGroup.style.setProperty('flex', '0 1 auto', 'important');
+                firstFieldGroup.style.setProperty('width', 'auto', 'important');
+                firstFieldGroup.style.setProperty('max-width', '70%', 'important');
+                firstFieldGroup.style.minWidth = '0';
+            }
+        }
+
+        applyLogoHeadingLayout(design, schema);
+
+        // ✅ ADDED — jQuery Validate setup (replaces native browser "Please fill out this
+        // field" popups with proper inline validation messages)
+        function attachJQueryValidation() {
+            // Every rendered control needs a `name` for jQuery Validate to track it —
+            // reuse the data-field-id we already set on every input/select/textarea.
+            document.querySelectorAll('[data-field-id]').forEach(el => {
+                if (!el.name && (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA')) {
+                    el.name = el.getAttribute('data-field-id');
+                }
+            });
+
+            $.validator.addMethod('phoneFormat', function (value, element) {
+                return this.optional(element) || /^[0-9+\-\s()]{10,12}$/.test(value);
+            }, 'Please enter a valid phone number (numbers only).');
+
+            // ✅ ADDED — lets JotCaptcha plug into jQuery Validate so a wrong/blank answer shows
+            // the same inline red message as every other field, instead of a separate alert().
+            $.validator.addMethod('jotcaptchaMatch', function (value, element) {
+                const fieldId = element.id.replace('jotcaptchaInput_', '');
+                const answer = jotCaptchaAnswers[fieldId];
+                return this.optional(element) || (!!answer && value.trim().toLowerCase() === answer.toLowerCase());
+            }, 'The text you entered did not match. Please try again.');
+
+            const rules = {};
+            const messages = {};
+
+            schema.forEach(field => {
+                if (field.type === 'fullname') {
+                    if (field.required) {
+                        rules[field.id + '_first'] = { required: true };
+                        rules[field.id + '_last'] = { required: true };
+                        messages[field.id + '_first'] = { required: 'First name is required' };
+                        messages[field.id + '_last'] = { required: 'Last name is required' };
+                    }
+                    return;
+                }
+                              if (field.type === 'address') {
+                    if (field.required) {
+                        rules[field.id + '_street'] = { required: true };
+                        rules[field.id + '_city'] = { required: true };
+                        rules[field.id + '_zip'] = { required: true };
+                        messages[field.id + '_street'] = { required: 'Street address is required' };
+                        messages[field.id + '_city'] = { required: 'City is required' };
+                        messages[field.id + '_zip'] = { required: 'Zip is required' };
+                    }
+                    return;
+                }
+                if (field.type === 'payment') {
+                    // ✅ ADDED — the payment amount field previously had no validation rule at
+                    // all, so clicking Submit (or the PayPal button) proceeded even when the
+                    // visitor left the amount blank. Only applies when the amount is user-entered;
+                    // fixed and product-list amounts don't need this since there's nothing to type.
+                    if (field.amountType === 'userdefined') {
+                        rules[field.id + '_amount'] = { required: true, min: 0.01 };
+                        messages[field.id + '_amount'] = {
+                            required: 'Please enter amount',
+                            min: 'Please enter an amount greater than 0'
+                        };
+                    }
+                    return;
+                }
+                if (field.type === 'captcha') {
+                    // ✅ CHANGED — JotCaptcha now gets a real jQuery Validate rule so wrong/blank
+                    // answers surface inline like every other field. reCAPTCHA/hCaptcha keep using
+                    // their own widget check in the submit handler below (there's no text input
+                    // to attach a jQuery Validate message to).
+                    if (field.captchaType === 'jotcaptcha') {
+                        rules['jotcaptcha_' + field.id] = { required: true, jotcaptchaMatch: true };
+                        messages['jotcaptcha_' + field.id] = {
+                            required: 'Please enter the text shown in the image',
+                            jotcaptchaMatch: 'The text you entered did not match. Please try again.'
+                        };
+                    }
+                    return;
+                }
+                if (['heading', 'paragraph', 'signature', 'starrating', 'productlist'].includes(field.type)) {
+                    return;
+                }
+
+                const rule = {};
+                if (field.required) rule.required = true;
+                if (field.type === 'email') rule.email = true;
+                if (field.type === 'phone') rule.phoneFormat = true;
+
+                if (Object.keys(rule).length) {
+                    rules[field.id] = rule;
+                    messages[field.id] = {
+                        required: (field.label || 'This field') + ' is required',
+                        email: 'Please enter a valid email address',
+                        phoneFormat: 'Please enter a valid phone number (numbers only)'
+                    };
+                }
+            });
+
+            $('#dynamicForm').validate({
+                ignore: [],
+                rules: rules,
+                messages: messages,
+                errorClass: 'text-danger small mt-1 d-block',
+                errorElement: 'div',
+                highlight: function (element) { $(element).addClass('is-invalid'); },
+                unhighlight: function (element) { $(element).removeClass('is-invalid'); },
+                // ✅ ADDED — after a failed submit, generate a fresh JotCaptcha challenge for any
+                // field the visitor actually typed a wrong answer into (skip fields left blank —
+                // no point burning a new challenge before they've even tried).
+                invalidHandler: function (event, validator) {
+                    (validator.errorList || []).forEach(function (err) {
+                        const el = err.element;
+                        if (el && el.id && el.id.indexOf('jotcaptchaInput_') === 0 && el.value.trim()) {
+                            refreshJotCaptcha(el.id.replace('jotcaptchaInput_', ''));
+                        }
+                    });
+                }
+            });
+        }
+        attachJQueryValidation();
+
+        // ============================================================
+        // ✅ ADDED — MULTI-PAGE / STEP FORM
+        // Splits the flat #formFieldsContainer into one <div class="form-page">
+        // per "pagebreak" marker (added in the Form Builder via + Add New Page),
+        // then shows one page at a time with a step indicator and Back/Next
+        // controls, revealing the real Submit button only on the last page.
+        // If the schema has no pagebreak fields, this is a no-op and the form
+        // behaves exactly as a single page, same as before.
+        // ============================================================
+        function wireUpMultiPageForm() {
+            const markers = Array.from(container.querySelectorAll('.zfb-page-break-marker'));
+            if (!markers.length) return; // single-page form — nothing to do
+
+            const allNodes = Array.from(container.children);
+            const pages = [];
+            let currentPage = document.createElement('div');
+            currentPage.className = 'form-page';
+            pages.push(currentPage);
+
+            allNodes.forEach(node => {
+                if (node.classList.contains('zfb-page-break-marker')) {
+                    currentPage = document.createElement('div');
+                    currentPage.className = 'form-page';
+                    pages.push(currentPage);
+                } else {
+                    currentPage.appendChild(node);
+                }
+            });
+
+            container.innerHTML = '';
+            pages.forEach(p => container.appendChild(p));
+
+            const submitWrap = document.querySelector('.submit-wrap');
+
+            // ✅ CHANGED — step indicator (1, 2, 3 ... dots) is shown at the TOP
+            // of each page, right under that page's heading (see placeStepper()
+            // below); the bottom row only holds Back / Next / Submit.
+            const stepper = document.createElement('div');
+            stepper.className = 'form-step-indicator';
+            stepper.innerHTML = pages.map((p, i) =>
+                `<span class="form-step-dot" data-step="${i}">${i + 1}</span>` +
+                (i < pages.length - 1 ? '<span class="form-step-connector"></span>' : '')
+            ).join('');
+
+            // ✅ CHANGED — bottom row: Back in the left corner, Next in the right
+            // corner; on the last page the real Submit button moves into this same
+            // row (right corner) instead of sitting centered below it.
+            const nav = document.createElement('div');
+            nav.className = 'form-page-nav';
+            nav.innerHTML = `
+                <button type="button" class="btn btn-page-back" id="formPageBackBtn">Back</button>
+                <button type="button" class="btn btn-page-next" id="formPageNextBtn">Next</button>
+            `;
+
+            if (submitWrap) {
+                submitWrap.parentNode.insertBefore(nav, submitWrap);
+                nav.appendChild(submitWrap);
+            } else {
+                container.parentNode.appendChild(nav);
+            }
+
+            let currentIndex = 0;
+
+            // ✅ ADDED — puts the step indicator at the top of the visible page,
+            // directly under its heading (Form Title / Page Heading). If the heading
+            // was moved beside the logo, or the page has none, it goes at the very
+            // top of the page (i.e. right below the logo).
+            function placeStepper() {
+                const page = pages[currentIndex];
+                const first = page.firstElementChild;
+                if (first && first.classList.contains('form-heading-group')) {
+                    first.insertAdjacentElement('afterend', stepper);
+                } else {
+                    page.insertBefore(stepper, page.firstChild);
+                }
+            }
+
+            function updateStepUI() {
+                pages.forEach((p, i) => { p.style.display = i === currentIndex ? '' : 'none'; });
+                placeStepper();
+
+                stepper.querySelectorAll('.form-step-dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentIndex);
+                    dot.classList.toggle('done', i < currentIndex);
+                });
+                stepper.querySelectorAll('.form-step-connector').forEach((c, i) => {
+                    c.classList.toggle('done', i < currentIndex);
+                });
+
+                const isLast = currentIndex === pages.length - 1;
+                document.getElementById('formPageBackBtn').style.display = currentIndex === 0 ? 'none' : '';
+                document.getElementById('formPageNextBtn').style.display = isLast ? 'none' : '';
+                if (submitWrap) submitWrap.style.display = isLast ? '' : 'none';
+            }
+
+            // Validates only the fields on the given page, reusing jQuery
+            // Validate (already initialized by attachJQueryValidation() above)
+            // so the same inline error messages show as everywhere else on
+            // the form — but scoped to this page instead of the whole form.
+            function validatePage(pageEl) {
+                if (typeof $ === 'undefined' || !$.fn.valid) return true;
+                let valid = true;
+                pageEl.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (!$(el).valid()) valid = false;
+                });
+                return valid;
+            }
+
+            document.getElementById('formPageNextBtn').addEventListener('click', function () {
+                if (!validatePage(pages[currentIndex])) return;
+                if (currentIndex < pages.length - 1) currentIndex++;
+                updateStepUI();
+                // ✅ CHANGED — scroll to the top of the newly shown page
+                // itself, not the stepper (which now lives at the bottom
+                // of the page, next to the nav buttons).
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            document.getElementById('formPageBackBtn').addEventListener('click', function () {
+                if (currentIndex > 0) currentIndex--;
+                updateStepUI();
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            updateStepUI();
+        }
+        wireUpMultiPageForm();
+
+        // ✅ ADDED — "Hide" field property: fields the builder marked Hidden start hidden
+        // on the live form (and aren't required while hidden). Conditions defined below can
+        // still reveal them later via a Show/Hide rule — condApplyShowHide already restores
+        // the required state correctly when that happens.
+        // ✅ ADDED — a field's starting ("base") visibility comes from its Hide switch:
+        //   hidden === true  -> hidden, hidden === false -> visible.
+        // Older forms never touched the switch (hidden not set): there a field is hidden by
+        // default only if a "Show" condition targets it — exactly how they behaved before.
+        function zfbIsBaseHidden(field) {
+            if (!field) return false;
+            if (field.hidden === true) return true;
+            if (field.hidden === false) return false;
+            return Array.isArray(formConditions) && formConditions.some(function (r) {
+                return r && r.action === 'show' && Array.isArray(r.targetFieldIds) && r.targetFieldIds.indexOf(field.id) > -1;
+            });
+        }
+        function zfbIsBaseHiddenById(fieldId) {
+            return zfbIsBaseHidden(schema.find(function (f) { return f.id === fieldId; }));
+        }
+
+        schema.forEach(function (field) {
+            if (!zfbIsBaseHidden(field)) return;
+            // Existing helper (kept as-is) so Conditions can still reveal the field later.
+            condApplyShowHide(field.id, false);
+            // ✅ ADDED — also cover wrappers/controls the helper can't see (Full Name, Address,
+            // Border Label ...): hide the whole block and drop "required" on every control inside
+            // it, otherwise an invisible required box would silently block Submit
+            // (the validator runs with ignore: []).
+            const hiddenWrap = container.querySelector(
+                `.form-group[data-field-id="${field.id}"], .form-heading-group[data-field-id="${field.id}"], .zfb-border-label[data-field-id="${field.id}"]`);
+            if (!hiddenWrap) return;
+            hiddenWrap.style.display = 'none';
+            hiddenWrap.querySelectorAll('input, select, textarea').forEach(function (inp) {
+                inp.required = false;
+                if ($(inp).closest('form').data('validator')) {
+                    try { $(inp).rules('remove', 'required'); } catch (e) { }
+                }
+            });
+        });
+
+        // ✅ ADDED — whenever a field is hidden/shown (by its Hide switch OR by a Condition),
+        // collapse/restore the column around it, so the neighbouring field slides into its place
+        // instead of leaving an empty gap. Runs for every show/hide, so it never touches the
+        // Conditions logic itself.
+        function zfbSyncCollapsedColumns() {
+            container.querySelectorAll('.form-group[data-field-id]').forEach(function (fieldEl) {
+                const col = fieldEl.parentElement;
+                if (!col || !col.classList.contains('form-group') || col.children.length !== 1) return;
+                const want = fieldEl.style.display === 'none' ? 'none' : '';
+                if (col.style.display !== want) col.style.display = want;
+            });
+        }
+        new MutationObserver(zfbSyncCollapsedColumns).observe(container, { subtree: true, attributes: true, attributeFilter: ['style'] });
+        zfbSyncCollapsedColumns();
+
+        // ============================================================
+        // ✅ ADDED — CONDITIONAL LOGIC ENGINE
+        // Applies show/hide, require/optional, and enable/disable rules
+        // built in the Form Builder's Conditions modal, live as the
+        // visitor fills out the form.
+        // ============================================================
+        function condGetValueEl(fieldId) {
+            const candidates = Array.from(container.querySelectorAll(`[data-field-id="${fieldId}"]`));
+            let el = candidates.find(e => e.tagName === 'INPUT' || e.tagName === 'SELECT' || e.tagName === 'TEXTAREA');
+            if (el) return el;
+            el = candidates.find(e => e.hasAttribute('data-rating'));
+            if (el) return el;
+            return candidates[0] || null;
+        }
+
+        function condGetControlEls(fieldId) {
+            const groupInputs = container.querySelectorAll(`input[name="${fieldId}"]`);
+            if (groupInputs.length) return Array.from(groupInputs);
+            const el = condGetValueEl(fieldId);
+            return el ? [el] : [];
+        }
+
+        function condGetWrapper(fieldId) {
+            return container.querySelector(`.form-group[data-field-id="${fieldId}"]`) ||
+                   container.querySelector(`.form-heading-group[data-field-id="${fieldId}"]`);
+        }
+
+        function condGetFieldValue(fieldId) {
+            const groupInputs = container.querySelectorAll(`input[name="${fieldId}"]`);
+            if (groupInputs.length) {
+                if (groupInputs[0].type === 'checkbox') {
+                    const vals = Array.from(groupInputs).filter(c => c.checked).map(c => c.value);
+                    return { value: vals.join(', '), checked: vals.length > 0 };
+                }
+                if (groupInputs[0].type === 'radio') {
+                    const checked = container.querySelector(`input[name="${fieldId}"]:checked`);
+                    return { value: checked ? checked.value : '', checked: !!checked };
+                }
+            }
+            const el = condGetValueEl(fieldId);
+            if (!el) return { value: '', checked: false };
+            if (el.hasAttribute('data-rating')) {
+                const r = el.getAttribute('data-rating') || '0';
+                return { value: r, checked: r !== '0' };
+            }
+            if (el.type === 'checkbox') {
+                return { value: el.checked ? (el.value || 'true') : '', checked: el.checked };
+            }
+            if (el.type === 'file') {
+                return { value: el.files && el.files.length ? el.files[0].name : '', checked: !!(el.files && el.files.length) };
+            }
+            return { value: el.value != null ? el.value : '', checked: !!el.value };
+        }
+
+        function condEvaluateRule(rule) {
+            const fv = condGetFieldValue(rule.triggerFieldId);
+            const val = (fv.value || '').toString().trim().toLowerCase();
+            const target = (rule.triggerValue || '').toString().trim().toLowerCase();
+            switch (rule.operator) {
+                case 'equals': return val === target;
+                case 'notEquals': return val !== target;
+                case 'contains': return target !== '' && val.includes(target);
+                case 'isChecked': return !!fv.checked;
+                case 'isEmpty': return val === '';
+                case 'notEmpty': return val !== '';
+                default: return false;
+            }
+        }
+
+        function condApplyShowHide(fieldId, show) {
+            const wrapper = condGetWrapper(fieldId);
+            if (!wrapper) return;
+            wrapper.style.display = show ? '' : 'none';
+            condGetControlEls(fieldId).forEach(inp => {
+                if (!show) {
+                    if (inp.required) inp.dataset.condWasRequired = '1';
+                    inp.required = false;
+                    if ($(inp).closest('form').data('validator')) { try { $(inp).rules('remove', 'required'); } catch (e) { } }
+                } else if (inp.dataset.condWasRequired === '1') {
+                    inp.required = true;
+                    if ($(inp).closest('form').data('validator')) { try { $(inp).rules('add', { required: true }); } catch (e) { } }
+                    delete inp.dataset.condWasRequired;
+                }
+            });
+        }
+
+        function condApplyRequireToggle(fieldId, required) {
+            const wrapper = condGetWrapper(fieldId);
+            condGetControlEls(fieldId).forEach(inp => {
+                inp.required = required;
+                if ($(inp).closest('form').data('validator')) {
+                    try { required ? $(inp).rules('add', { required: true }) : $(inp).rules('remove', 'required'); } catch (e) { }
+                }
+            });
+            if (wrapper) {
+                const label = wrapper.querySelector('.form-label, label');
+                if (label) {
+                    const star = label.querySelector('.cond-required-star');
+                    if (required && !star && !label.querySelector('.text-danger')) {
+                        label.insertAdjacentHTML('beforeend', ' <span class="text-danger cond-required-star">*</span>');
+                    } else if (!required && star) {
+                        star.remove();
+                    }
+                }
+            }
+        }
+
+        function condApplyEnableDisable(fieldId, disabled) {
+            const wrapper = condGetWrapper(fieldId);
+            condGetControlEls(fieldId).forEach(inp => { inp.disabled = disabled; });
+            if (wrapper) wrapper.classList.toggle('cond-field-disabled', disabled);
+        }
+
+        function condApplyMask(fieldId, masked) {
+            condGetControlEls(fieldId).forEach(inp => {
+                if (inp.tagName !== 'INPUT') return;
+                if (masked) {
+                    if (!inp.dataset.condOrigType) inp.dataset.condOrigType = inp.type || 'text';
+                    if (inp.type !== 'password') inp.type = 'password';
+                } else if (inp.dataset.condOrigType) {
+                    inp.type = inp.dataset.condOrigType;
+                    delete inp.dataset.condOrigType;
+                }
+            });
+        }
+
+
+        function condApplyCopyValue(sourceFieldId, targetFieldId) {
+            if (!sourceFieldId) return;
+            const sourceVal = condGetFieldValue(sourceFieldId).value;
+            condGetControlEls(targetFieldId).forEach(inp => {
+                if (inp.type === 'checkbox' || inp.type === 'radio' || inp.type === 'file') return;
+                if (inp.value !== sourceVal) inp.value = sourceVal;
+            });
+        }
+function evaluateAllConditions() {
+    if (!Array.isArray(formConditions) || !formConditions.length) return;
+
+    // 1) SHOW / HIDE — first combine ALL rules that target the same field,
+    //    then apply once, so a later "false" rule can't undo an earlier "true" rule.
+    const showHideState = {};   // fieldId -> { hideHit, showHit }
+    formConditions.forEach(rule => {
+        if (!rule || !rule.triggerFieldId || !Array.isArray(rule.targetFieldIds)) return;
+        if (rule.action !== 'show' && rule.action !== 'hide') return;
+        const isTrue = condEvaluateRule(rule);
+        rule.targetFieldIds.forEach(tid => {
+            const s = showHideState[tid] || (showHideState[tid] = { hideHit: false, showHit: false });
+            if (isTrue && rule.action === 'hide') s.hideHit = true;
+            if (isTrue && rule.action === 'show') s.showHit = true;
+        });
+    });
+    Object.keys(showHideState).forEach(tid => {
+        const s = showHideState[tid];
+        let visible;
+        if (s.hideHit) visible = false;                 // any triggered Hide rule wins
+        else if (s.showHit) visible = true;             // else a triggered Show rule
+        else visible = !zfbIsBaseHiddenById(tid);       // else the field's own Hide switch
+        condApplyShowHide(tid, visible);
+    });
+
+    // 2) All other actions — unchanged
+    formConditions.forEach(rule => {
+        if (!rule || !rule.triggerFieldId || !Array.isArray(rule.targetFieldIds)) return;
+        if (rule.action === 'show' || rule.action === 'hide') return;
+        const isTrue = condEvaluateRule(rule);
+        rule.targetFieldIds.forEach(tid => {
+            switch (rule.action) {
+                case 'require': condApplyRequireToggle(tid, isTrue); break;
+                case 'optional': condApplyRequireToggle(tid, !isTrue); break;
+                case 'enable': condApplyEnableDisable(tid, !isTrue); break;
+                case 'disable': condApplyEnableDisable(tid, isTrue); break;
+                case 'mask': condApplyMask(tid, isTrue); break;
+                case 'unmask': condApplyMask(tid, !isTrue); break;
+                case 'update': if (isTrue) condApplyCopyValue(rule.sourceFieldId, tid); break;
+            }
+        });
+    });
+}
+
+        function initFormConditions() {
+            if (!Array.isArray(formConditions) || !formConditions.length) return;
+            container.addEventListener('change', evaluateAllConditions);
+            container.addEventListener('input', evaluateAllConditions);
+            evaluateAllConditions();
+        }
+        initFormConditions();
+
+        function setStarRating(fieldId, rating) {
+            const wrap = document.querySelector(`[data-field-id="${fieldId}"]`);
+            if (wrap) wrap.setAttribute('data-rating', rating);
+            for (let i = 1; i <= 10; i++) {
+                const star = document.getElementById(`star_${fieldId}_${i}`);
+                if (star) star.style.color = (i <= rating ? '#ffc107' : '#ccc');
+            }
+            // ✅ ADDED — star clicks don't fire native input/change events, so re-evaluate here
+            if (typeof evaluateAllConditions === 'function') evaluateAllConditions();
+        }
+
+
+        const paymentField = schema.find(f => f.type === 'payment');
+        let PaymentBridge = null;
+
+        if (paymentField) {
+            const mountEl = document.getElementById('paymentMount_' + paymentField.id);
+            const msgEl = document.getElementById('paymentMsg_' + paymentField.id);
+
+            function showPaymentError(text) {
+                msgEl.className = 'payment-message payment-error';
+                msgEl.textContent = text;
+                msgEl.style.display = 'block';
+            }
+
+            function showPaymentSuccess(text) {
+                msgEl.className = 'payment-message payment-info';
+                msgEl.textContent = text;
+                msgEl.style.display = 'block';
+            }
+
+            function currentAmount() {
+                if (paymentField.amountType === 'fixed') return paymentField.amount || 0;
+                if (paymentField.amountType === 'userdefined') {
+                    const el = document.querySelector(`[data-field-id="${paymentField.id}_amount"]`);
+                    return el ? parseFloat(el.value || '0') : 0;
+                }
+                if (paymentField.amountType === 'productlist') {
+                    // ✅ ADDED — sums qty * price across every product row for this payment field
+                    const rows = document.querySelectorAll(`[data-payment-product="${paymentField.id}"]`);
+                    let total = 0;
+                    rows.forEach(row => {
+                        const qty = parseFloat(row.value || '0');
+                        const price = parseFloat(row.getAttribute('data-product-price') || '0');
+                        total += qty * price;
+                    });
+                    return total;
+                }
+                return paymentField.amount || 0;
+            }
+
+            // ✅ ADDED — clear, plain-language message for a missing/zero payment amount,
+            // worded to match how the amount is actually collected for this field.
+            function amountErrorMessage() {
+                if (paymentField.amountType === 'userdefined') return 'Please enter a payment amount to continue.';
+                if (paymentField.amountType === 'productlist') return 'Please select a quantity for at least one item to continue.';
+                return 'Please enter a valid payment amount.';
+            }
+
+            // ✅ ADDED — once the amount error has been shown at least once (via a click on
+            // PayPal with nothing selected), keep it live: clear it the instant a quantity makes
+            // the amount valid, and bring it back automatically if the visitor drops the
+            // quantity back down to 0 — instead of it just sitting there stale either way.
+            let amountValidationArmed = false;
+
+            function syncAmountValidationLive() {
+                if (!amountValidationArmed) return;
+                const isShowingAmountError = msgEl.classList.contains('payment-error') && msgEl.textContent === amountErrorMessage();
+                if (currentAmount() > 0) {
+                    if (isShowingAmountError) {
+                        msgEl.style.display = 'none';
+                        msgEl.textContent = '';
+                    }
+                } else if (!isShowingAmountError) {
+                    showPaymentError(amountErrorMessage());
+                }
+            }
+
+            // ✅ ADDED — keeps the amount badge in sync as the visitor changes product quantities
+            if (paymentField.amountType === 'productlist') {
+                const badge = document.getElementById('paymentAmountBadge_' + paymentField.id);
+                document.querySelectorAll(`[data-payment-product="${paymentField.id}"]`).forEach(row => {
+                    row.addEventListener('input', function () {
+                        if (badge) badge.textContent = `${paymentField.currency || 'USD'} ${currentAmount().toFixed(2)}`;
+                        syncAmountValidationLive();
+                    });
+                });
+            }
+
+            const gateways = {
+                stripe: {
+                    init: function () {
+                        if (typeof Stripe === 'undefined') {
+                            showPaymentError('Stripe failed to load.');
+                            return;
+                        }
+
+                        // ✅ ADDED — "Could not load payment form." was swallowing the
+                        // real reason. The single most common cause: a Stripe SECRET
+                        // key (sk_...) was pasted into the Publishable Key field
+                        // instead of the actual Publishable key (pk_...). Stripe.js
+                        // throws on that, so catch it here with a message that
+                        // actually says what to fix, instead of a generic error.
+                        const key = paymentField.publicKey || '';
+
+                        if (!key) {
+                            showPaymentError('Stripe Publishable Key is not set for this form. Add it in Field Properties.');
+                            return;
+                        }
+
+                        if (key.indexOf('sk_') === 0) {
+                            showPaymentError('The Stripe key entered is a Secret Key (sk_...). Field Properties needs the Publishable Key (starts with pk_) instead — never the Secret Key.');
+                            return;
+                        }
+
+                        if (key.indexOf('pk_') !== 0) {
+                            showPaymentError('This does not look like a valid Stripe Publishable Key (it should start with pk_). Please check the key in Field Properties.');
+                            return;
+                        }
+
+                        const stripe = Stripe(key);
+                        const elements = stripe.elements();
+                        const card = elements.create('card');
+                        const div = document.createElement('div');
+                        div.style.padding = '10px';
+                        div.style.border = '1px solid #d7dce1';
+                        div.style.borderRadius = '8px';
+                        mountEl.appendChild(div);
+                        card.mount(div);
+                        gateways.stripe._stripe = stripe;
+                        gateways.stripe._card = card;
+                    },
+                    collect: function (done) {
+                        gateways.stripe._stripe.createPaymentMethod({ type: 'card', card: gateways.stripe._card })
+                            .then(function (result) {
+                                if (result.error) {
+                                    done(null, result.error.message);
+                                    return;
+                                }
+                                const amount = currentAmount();
+                                done({
+                                    txnId: result.paymentMethod.id,
+                                    status: 'Completed',
+                                    gateway: paymentField.gateway,
+                                    amount: amount,
+                                    currency: paymentField.currency || 'USD'
+                                }, null);
+                            });
+                    }
+                },
+                paypal: {
+                    init: function () {
+                        if (typeof paypal === 'undefined') {
+                            showPaymentError('PayPal SDK not loaded. Please check your Client ID.');
+                            return;
+                        }
+
+                        let paymentResolve = null;
+                        this._paymentPromise = new Promise((resolve) => {
+                            paymentResolve = resolve;
+                        });
+                        this._paymentResolve = paymentResolve;
+
+                        try {
+                            paypal.Buttons({
+                                // ✅ ADDED — PayPal renders its own button outside the normal
+                                // <form> submit flow, so without this it skipped all field/captcha
+                                // validation and went straight to checkout. This runs the same
+                                // jQuery Validate check (and captcha check) before letting the
+                                // popup open, and cancels it if anything required is missing.
+                                onClick: function (data, actions) {
+                                    if (!$('#dynamicForm').valid()) {
+                                        return actions.reject();
+                                    }
+                                    const captchaField = getCaptchaField();
+                                    if (captchaField && !isCaptchaVerified(captchaField)) {
+                                        alertCaptchaFailure(captchaField);
+                                        return actions.reject();
+                                    }
+                                    // ✅ ADDED — catch a missing/zero amount here, before PayPal's
+                                    // popup opens, instead of letting checkout start and fail with
+                                    // PayPal's own "Expected an order id to be passed" error.
+                                    if (currentAmount() <= 0) {
+                                        amountValidationArmed = true;
+                                        showPaymentError(amountErrorMessage());
+                                        return actions.reject();
+                                    }
+                                    return actions.resolve();
+                                },
+                                createOrder: function (data, actions) {
+                                    const amount = currentAmount();
+                                    if (amount <= 0) {
+                                        // Safety net only — onClick above should already have
+                                        // stopped this. Reject cleanly so PayPal doesn't surface
+                                        // its own confusing order-id error over ours.
+                                        amountValidationArmed = true;
+                                        showPaymentError(amountErrorMessage());
+                                        return Promise.reject(new Error('Invalid amount'));
+                                    }
+                                    return actions.order.create({
+                                        purchase_units: [{
+                                            amount: {
+                                                value: amount.toFixed(2),
+                                                currency_code: paymentField.currency || 'USD'
+                                            }
+                                        }]
+                                    });
+                                },
+                                onApprove: function (data, actions) {
+                                    return actions.order.capture().then(function (details) {
+                                        const amount = currentAmount();
+                                        const paymentResult = {
+                                            txnId: details.id,
+                                            status: 'Completed',
+                                            gateway: paymentField.gateway,
+                                            amount: amount,
+                                            currency: paymentField.currency || 'USD'
+                                        };
+                                        showPaymentSuccess('Payment completed successfully!');
+                                        if (paymentResolve) {
+                                            paymentResolve(paymentResult);
+                                        }
+                                        // Auto-submit after successful payment
+                                        doSubmit(paymentResult);
+                                    });
+                                },
+                                onError: function (err) {
+                                    // ✅ CHANGED — skip PayPal's own generic wording for the
+                                    // amount rejection above; our clearer message is already showing.
+                                    if (!(err && err.message === 'Invalid amount')) {
+                                        showPaymentError('Payment failed: ' + (err.message || err));
+                                    }
+                                    if (paymentResolve) {
+                                        paymentResolve(null);
+                                    }
+                                },
+                                onCancel: function () {
+                                    showPaymentError('Payment cancelled.');
+                                    if (paymentResolve) {
+                                        paymentResolve(null);
+                                    }
+                                }
+                            }).render(mountEl);
+
+                            // ✅ ADDED — wires up the click-guard overlay (see .paypal-click-guard
+                            // CSS comment above) so validation runs before PayPal's own click
+                            // handler / popup pre-open ever fires.
+                            const guard = document.getElementById('paypalClickGuard_' + paymentField.id);
+                            if (guard) {
+                                guard.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!$('#dynamicForm').valid()) {
+                                        return;
+                                    }
+                                    const captchaField = getCaptchaField();
+                                    if (captchaField && !isCaptchaVerified(captchaField)) {
+                                        alertCaptchaFailure(captchaField);
+                                        return;
+                                    }
+                                    // ✅ ADDED — same amount check as onClick above, so the guard
+                                    // won't hand off to the real PayPal button until an amount is
+                                    // actually entered/selected.
+                                    if (currentAmount() <= 0) {
+                                        amountValidationArmed = true;
+                                        showPaymentError(amountErrorMessage());
+                                        return;
+                                    }
+                                    // Everything required is filled in — reveal the real PayPal
+                                    // button underneath so the visitor's next click opens checkout
+                                    // with no flash, since validation already passed.
+                                    guard.style.display = 'none';
+                                });
+                            }
+                        } catch (e) {
+                            showPaymentError('Failed to initialize PayPal: ' + e.message);
+                        }
+                    },
+                    collect: function (done) {
+                        if (this._paymentPromise) {
+                            this._paymentPromise.then((result) => {
+                                if (result) {
+                                    done(result, null);
+                                } else {
+                                    done(null, 'Payment was not completed');
+                                }
+                            });
+                        } else {
+                            done(null, 'PayPal not initialized');
+                        }
+                    }
+                },
+                square: {
+                    init: async function () {
+                        if (typeof Square === 'undefined') {
+                            showPaymentError('Square failed to load.');
+                            return;
+                        }
+                        try {
+                            const payments = Square.payments(paymentField.publicKey, paymentField.gatewayMode === 'live' ? 'production' : 'sandbox');
+                            const card = await payments.card();
+                            await card.attach(mountEl);
+                            gateways.square._card = card;
+                        } catch (e) {
+                            showPaymentError('Failed to initialize Square: ' + e.message);
+                        }
+                    },
+                    collect: function (done) {
+                        if (!gateways.square._card) {
+                            done(null, 'Square not initialized');
+                            return;
+                        }
+                        gateways.square._card.tokenize().then(function (result) {
+                            if (result.status === 'OK') {
+                                const amount = currentAmount();
+                                done({
+                                    txnId: result.token,
+                                    status: 'Completed',
+                                    gateway: paymentField.gateway,
+                                    amount: amount,
+                                    currency: paymentField.currency || 'USD'
+                                }, null);
+                            } else {
+                                done(null, 'Card details were invalid.');
+                            }
+                        }).catch(function (e) {
+                            done(null, 'Payment tokenization failed: ' + e.message);
+                        });
+                    }
+                }
+            };
+
+            const active = gateways[paymentField.gateway];
+            if (active) {
+                if (paymentField.gateway === 'square') {
+                    active.init().catch(function (e) {
+                        showPaymentError('Could not load payment form.');
+                        console.error(e);
+                    });
+                } else {
+                    try {
+                        active.init();
+                    } catch (e) {
+                        // ✅ CHANGED — show the actual Stripe error (e.g. "Invalid API
+                        // Key provided") instead of a generic message, so a bad key
+                        // is diagnosable without opening devtools.
+                        showPaymentError(
+                            paymentField.gateway === 'stripe' && e && e.message
+                                ? e.message
+                                : 'Could not load payment form.'
+                        );
+                        console.error(e);
+                    }
+                }
+            }
+
+            PaymentBridge = {
+                collect: function (done) {
+                    if (!active) {
+                        done(null, 'Payment gateway not configured for this form.');
+                        return;
+                    }
+                    active.collect(function (result, error) {
+                        if (error) {
+                            showPaymentError(error);
+                            done(null, error);
+                            return;
+                        }
+                        done(result, null);
+                    });
+                },
+                usesOwnButton: paymentField.gateway === 'paypal'
+            };
+
+            // ✅ CHANGED — the generic Submit button never actually completed a PayPal payment
+            // (only PayPal's own button does), which was confusing. It's now hidden whenever
+            // PayPal is the gateway; the visitor uses the PayPal button instead, and that
+            // button's own onClick handler (above) still enforces every required field —
+            // including the amount — before it lets the checkout popup open.
+            if (paymentField.gateway === 'paypal') {
+                const submitWrap = document.querySelector('.submit-wrap');
+                if (submitWrap) submitWrap.style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // FORM SUBMISSION
+        // ============================================================
+        function collectFieldData() {
+            // ✅ FIXED — the .form-group wrapper also carries data-field-id, so the old querySelector returned
+            // the wrapper <div> (no .value) and JSON.stringify dropped those keys. condGetValueEl() returns
+            // the real INPUT / SELECT / TEXTAREA (or the star-rating element).
+            const data = {};
+            schema.forEach(field => {
+                if (field.type === 'heading' || field.type === 'paragraph' || field.type === 'borderlabel' || field.type === 'signature' || field.type === 'payment' || field.type === 'pagebreak') return;
+
+                if (field.type === 'radio') {
+                    const checked = document.querySelector(`input[name="${field.id}"]:checked`);
+                    data[field.label] = checked ? checked.value : '';
+                }
+                else if (field.type === 'checkbox') {
+                    const checkedBoxes = document.querySelectorAll(`input[name="${field.id}"]:checked`);
+                    data[field.label] = Array.from(checkedBoxes).map(c => c.value).join(', ');
+                }
+                else if (field.type === 'firstname') {
+                    const el = condGetValueEl(field.id);
+                    data[field.label] = el ? el.value : '';
+                }
+                else if (field.type === 'lastname') {
+                    const el = condGetValueEl(field.id);
+                    data[field.label] = el ? el.value : '';
+                }
+                else if (field.type === 'fullname') {
+                    const first = document.querySelector(`[data-field-id="${field.id}_first"]`);
+                    const last = document.querySelector(`[data-field-id="${field.id}_last"]`);
+                    data[field.label] = (first ? first.value : '') + ' ' + (last ? last.value : '');
+                }
+                else if (field.type === 'address') {
+                    // ✅ CHANGED — Address no longer carries its own Country/State;
+                    // those are collected separately from the standalone
+                    // Country/State fields (handled by the generic branch below).
+                    const street = document.querySelector(`[data-field-id="${field.id}_street"]`);
+                    const city = document.querySelector(`[data-field-id="${field.id}_city"]`);
+                    const zip = document.querySelector(`[data-field-id="${field.id}_zip"]`);
+                    data[field.label] = `${street ? street.value : ''}, ${city ? city.value : ''} ${zip ? zip.value : ''}`.trim();
+                }
+                else if (field.type === 'starrating') {
+                    const wrap = condGetValueEl(field.id);
+                    data[field.label] = wrap ? wrap.getAttribute('data-rating') : '0';
+                }
+                else if (field.type === 'fileupload' || field.type === 'image') {
+                    // ✅ CHANGED — use the real uploaded URL (set by uploadPendingFiles() during
+                    // submit) so the submission can be previewed later. Falls back to just the
+                    // filename if, for some reason, the upload never happened.
+                    const el = condGetValueEl(field.id);
+                    data[field.label] = el && el.files.length ? (el.dataset.uploadedUrl || el.files[0].name) : '';
+                }
+                else if (field.type === 'captcha') {
+                    // ✅ ADDED — record whether the visitor actually passed the captcha
+                    data[field.label] = isCaptchaVerified(field) ? 'Verified' : 'Not verified';
+                }
+                else {
+                    const el = condGetValueEl(field.id);
+                    if (field.type === 'terms') {
+                        data[field.label] = el ? el.checked : false;
+                    } else {
+                        data[field.label] = el ? el.value : '';
+                    }
+                }
+            });
+            return data;
+        }
+
+        // ✅ ADDED — JotCaptcha: draws a distorted-text challenge on a canvas and checks the
+        // visitor's typed answer against it (previously JotCaptcha was just an unchecked
+        // "I am human" checkbox with no real verification at all).
+        const jotCaptchaAnswers = {};
+
+        function generateJotCaptchaText(len) {
+            const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; // skips 0/O, 1/l/I
+            let s = '';
+            for (let i = 0; i < len; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+            return s;
+        }
+
+        function drawJotCaptcha(fieldId) {
+            const canvas = document.getElementById('jotcaptchaCanvas_' + fieldId);
+            if (!canvas || !canvas.getContext) return;
+            const text = generateJotCaptchaText(6);
+            jotCaptchaAnswers[fieldId] = text;
+
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.fillStyle = '#eef1f5';
+            ctx.fillRect(0, 0, w, h);
+
+            // noise lines
+            for (let i = 0; i < 6; i++) {
+                ctx.strokeStyle = `rgba(${Math.floor(Math.random() * 150)},${Math.floor(Math.random() * 150)},${Math.floor(Math.random() * 150)},0.4)`;
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * w, Math.random() * h);
+                ctx.lineTo(Math.random() * w, Math.random() * h);
+                ctx.stroke();
+            }
+
+            // distorted characters
+            const charSlot = w / (text.length + 1);
+            for (let i = 0; i < text.length; i++) {
+                ctx.save();
+                const x = charSlot * (i + 0.9);
+                const y = h / 2 + (Math.random() * 10 - 5);
+                ctx.translate(x, y);
+                ctx.rotate((Math.random() * 0.6 - 0.3));
+                ctx.font = `bold ${Math.floor(h * 0.55)}px Georgia, serif`;
+                ctx.fillStyle = `rgb(${30 + Math.floor(Math.random() * 80)},${30 + Math.floor(Math.random() * 80)},${30 + Math.floor(Math.random() * 80)})`;
+                ctx.fillText(text[i], 0, 0);
+                ctx.restore();
+            }
+
+            // noise dots
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.15})`;
+                ctx.beginPath();
+                ctx.arc(Math.random() * w, Math.random() * h, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function refreshJotCaptcha(fieldId) {
+            drawJotCaptcha(fieldId);
+            const input = document.getElementById('jotcaptchaInput_' + fieldId);
+            if (input) input.value = '';
+        }
+
+        // ✅ ADDED — shared helper so both the Submit flow and the PayPal guard show a message
+        // that matches whichever captcha type is on the form, and JotCaptcha gets a fresh
+        // challenge after a wrong guess instead of silently reusing the same one.
+        function alertCaptchaFailure(field) {
+            if (field.captchaType === 'jotcaptcha') {
+                alert('The text you entered did not match. A new challenge has been generated — please try again.');
+                refreshJotCaptcha(field.id);
+            } else {
+                alert('Please verify that you are human.');
+            }
+        }
+
+        // ✅ ADDED — checks the right API for whichever captcha type this form uses
+        function isCaptchaVerified(field) {
+            if (field.captchaType === 'recaptcha') {
+                return typeof grecaptcha !== 'undefined' && grecaptcha.getResponse().length > 0;
+            } else if (field.captchaType === 'jotcaptcha') {
+                const input = document.getElementById('jotcaptchaInput_' + field.id);
+                const answer = jotCaptchaAnswers[field.id];
+                return !!(input && answer && input.value.trim().toLowerCase() === answer.toLowerCase());
+            } else {
+                return typeof hcaptcha !== 'undefined' && hcaptcha.getResponse().length > 0;
+            }
+        }
+
+        function getCaptchaField() {
+            return schema.find(f => f.type === 'captcha');
+        }
+
+        // ✅ ADDED — actually sends any selected "Upload File"/"Image" fields to the server
+        // before submitting, so the submission stores a real, previewable URL instead of just a
+        // filename. Skips fields already uploaded (dataset.uploadedUrl set) and fields with no
+        // file chosen. Returns false (and shows an alert) if any upload fails, so submission can
+        // be stopped rather than silently going through with a missing file.
+        async function uploadPendingFiles() {
+            const fileFields = schema.filter(f => f.type === 'fileupload' || f.type === 'image');
+            for (const field of fileFields) {
+                const el = condGetValueEl(field.id);
+                if (!el || !el.files || !el.files.length || el.dataset.uploadedUrl) continue;
+                try {
+                    const fd = new FormData();
+                    fd.append('file', el.files[0]);
+                    const res = await fetch('/FormBuilder/Form/UploadFormFieldFile', { method: 'POST', body: fd });
+                    const result = await res.json();
+                    if (result.success) {
+                        el.dataset.uploadedUrl = result.url;
+                    } else {
+                        alert('Failed to upload "' + field.label + '": ' + (result.message || 'Unknown error'));
+                        return false;
+                    }
+                } catch (err) {
+                    alert('Failed to upload "' + field.label + '": ' + err.message);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function doSubmit(paymentResult) {
+            // ✅ ADDED — upload any pending files first; bail out (leaving the visitor on the
+            // form) if a file fails to upload instead of submitting without it.
+            const submitBtn = document.querySelector('.btn-submit-form');
+            const originalBtnText = submitBtn ? submitBtn.textContent : null;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading files...';
+            }
+            const uploadsOk = await uploadPendingFiles();
+            if (!uploadsOk) {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }
+                return;
+            }
+            if (submitBtn) {
+                submitBtn.textContent = 'Submitting...';
+            }
+
+            const formData = collectFieldData();
+            const payload = {
+                data: formData,
+                payment: paymentResult || null,
+                // ✅ ADDED — bot-detection fields, read by SubmitForm on the server
+                hpCheck: document.getElementById('hp_website')?.value || '',
+                formLoadedAt: document.getElementById('formLoadedAt')?.value || ''
+            };
+
+            console.log('🔄 Submitting payload:', JSON.stringify(payload, null, 2));
+
+            fetch('/FormBuilder/Form/SubmitForm?formId=' + formId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        window.location.href = '/FormBuilder/Form/ThankYou/' + encryptedFormId;
+                    } else {
+                        alert('Submission failed: ' + result.message);
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        }
+                    }
+                })
+                .catch(err => {
+                    alert('An error occurred: ' + err.message);
+                    console.error('Submission error:', err);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalBtnText;
+                    }
+                });
+        }
+
+        // ============================================================
+        // EVENT HANDLERS
+        // ============================================================
+        document.getElementById('dynamicForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // ✅ CHANGED — jQuery Validate now owns field validation (shows its own inline
+            // messages instead of the browser's native popup). It also paints error messages
+            // on screen as a side effect, so nothing else to do here if it fails.
+            if (!$('#dynamicForm').valid()) {
+                return;
+            }
+
+            // ✅ ADDED — block submission until the captcha is actually solved
+            const captchaField = getCaptchaField();
+            if (captchaField && !isCaptchaVerified(captchaField)) {
+                alertCaptchaFailure(captchaField);
+                return;
+            }
+
+            console.log('📝 Form submitted, PaymentBridge:', PaymentBridge);
+
+            if (!PaymentBridge) {
+                doSubmit(null);
+                return;
+            }
+
+            if (PaymentBridge.usesOwnButton) {
+                // ✅ CHANGED — all required fields + captcha already passed at this point (the
+                // checks above ran first). PayPal itself has to be triggered by a direct click on
+                // its own button though — browsers block the checkout popup if it's opened from
+                // any other button's click handler — so guide the visitor to it instead of
+                // silently doing nothing.
+                showPaymentError('Please click the PayPal button above to complete your payment.');
+                return;
+            }
+
+            // For Stripe and Square - collect payment first
+            PaymentBridge.collect(function (result, error) {
+                if (error) {
+                    console.error('❌ Payment error:', error);
+                    return;
+                }
+                console.log('✅ Payment collected:', result);
+                doSubmit(result);
+            });
+        });
+
+        // Load PayPal SDK if needed
+        if (paymentField && paymentField.gateway === 'paypal') {
+            function loadPayPalSDK(clientId, currency, callback) {
+                if (window.paypal) {
+                    callback();
+                    return;
+                }
+
+                var existingScript = document.getElementById('paypal-sdk-script');
+                if (existingScript) {
+                    existingScript.remove();
+                }
+
+                var script = document.createElement('script');
+                script.id = 'paypal-sdk-script';
+                script.src = 'https://www.paypal.com/sdk/js?client-id=' + encodeURIComponent(clientId) + '&currency=' + encodeURIComponent(currency || 'USD');
+
+                var timeout = setTimeout(function () {
+                    showPaymentError('PayPal SDK load timed out.');
+                }, 10000);
+
+                script.onload = function () {
+                    clearTimeout(timeout);
+                    if (window.paypal) {
+                        callback();
+                    } else {
+                        showPaymentError('PayPal SDK loaded but window.paypal is undefined.');
+                    }
+                };
+
+                script.onerror = function () {
+                    clearTimeout(timeout);
+                    showPaymentError('PayPal SDK failed to load.');
+                };
+
+                document.head.appendChild(script);
+            }
+
+            loadPayPalSDK(paymentField.publicKey, paymentField.currency || 'USD', function () {
+                if (gateways.paypal && gateways.paypal.init) {
+                    try {
+                        gateways.paypal.init();
+                    } catch (e) {
+                        console.error('Failed to initialize PayPal:', e);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+-------------------START-------------12/9/2024 1:29:43 PM
+Page :/global/member-registration
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090800.30574310932@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 1:29:43 PM
+-------------------START-------------12/9/2024 1:29:44 PM
+Page :/global/member-registration
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090800.46599446833@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 1:29:44 PM
+-------------------START-------------12/9/2024 1:36:22 PM
+Page :/global/member-registration
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090806.44451411518@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 1:36:22 PM
+-------------------START-------------12/9/2024 1:36:23 PM
+Page :/global/member-registration
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090806.66301575993@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 1:36:23 PM
+-------------------START-------------12/9/2024 2:30:33 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090901.28775501767@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 2:30:33 PM
+-------------------START-------------12/9/2024 2:30:34 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090901.80531294811@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 2:30:34 PM
+-------------------START-------------12/9/2024 2:38:38 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090909.13309503925@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 2:38:38 PM
+-------------------START-------------12/9/2024 2:38:39 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090909.70655445678@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 2:38:39 PM
+-------------------START-------------12/9/2024 2:44:08 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090914.35809597344@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 2:44:08 PM
+-------------------START-------------12/9/2024 2:44:09 PM
+Page :/add-servicesdonation
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412090914.13934851120@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 2:44:09 PM
+-------------------START-------------12/9/2024 3:37:22 PM
+Page :/reset-password
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412091007.93737798170@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 3:37:22 PM
+-------------------START-------------12/9/2024 4:24:02 PM
+Page :/renewal-membership
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412091054.44058534577@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 4:24:02 PM
+-------------------START-------------12/9/2024 4:24:03 PM
+Page :/renewal-membership
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412091054.67138210400@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 4:24:03 PM
+-------------------START-------------12/9/2024 5:30:44 PM
+Page :/Admin/Users/CreateUser
+API call to Brevo completed. Status: Created, Response: {"messageId":"<202412091201.57435949308@smtp-relay.mailin.fr>"}
+
+-------------------END-------------12/9/2024 5:30:44 PM

@@ -1,0 +1,18 @@
+<<<<<<< HEAD
+-------------------START-------------1/28/2025 10:46:24 AM
+Page :/Global/contact-us
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"email is missing in to"}
+
+-------------------END-------------1/28/2025 10:46:24 AM
+=======
+-------------------START-------------1/28/2025 10:09:32 AM
+Page :/Admin/Volunteers/Volunteerstatus
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"subject is required"}
+
+-------------------END-------------1/28/2025 10:09:32 AM
+-------------------START-------------1/28/2025 10:30:11 AM
+Page :/Admin/Volunteers/Volunteerstatus
+API call to Brevo completed. Status: BadRequest, Response: {"code":"missing_parameter","message":"subject is required"}
+
+-------------------END-------------1/28/2025 10:30:11 AM
+>>>>>>> b87459d0eb6bf1437b19dc200b08c99dac601d43

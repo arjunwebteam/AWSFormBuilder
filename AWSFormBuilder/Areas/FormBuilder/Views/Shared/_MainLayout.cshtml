@@ -1,0 +1,1172 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System.Linq
+@{
+    Layout = null;
+
+    var objuser = new AWSFormBuilder.Entities.Users();
+    List<AWSFormBuilder.Entities.AdminMenuItems> lstMainMenu = new();
+    List<AWSFormBuilder.Entities.AdminMenuItems> lstSubMenu = new();
+    List<AWSFormBuilder.Entities.AdminMenuItems> lstSubmenuCount = new();
+
+    var Pageheading = ViewBag.Pageheading;
+    int status = 0;
+
+    AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo _AppInfo = new AWSFormBuilder.Areas.FormBuilder.BLL.AppInfo();
+    AWSFormBuilder.Entities.AppInfo objAppInfo = _AppInfo.GetAppInfoDetails(ref status);
+
+    string url = objAppInfo.UserSiteUrl;
+
+    string userRole = Context.Session.GetString("userrole") ?? "";
+    string userName = Context.Session.GetString("UserName") ?? "";
+    string UserEmail = Context.Session.GetString("UserEmail") ?? "";
+    string userIdStr = Context.Session.GetString("UserId") ?? "0";
+    long.TryParse(userIdStr, out long userId);
+
+    if (userId > 0)
+    {
+        AWSFormBuilder.Areas.FormBuilder.BLL.Users _user = new AWSFormBuilder.Areas.FormBuilder.BLL.Users();
+        objuser = _user.GetAdminUsersGetByEmail(UserEmail, ref status);
+
+        if (objuser != null)
+        {
+            _AppInfo.GetAdminMenuData(objuser.UserId, objuser.RoleId,
+                ref lstMainMenu, ref lstSubMenu, ref status);
+        }
+    }
+
+    if (string.IsNullOrEmpty(Context.Session.GetString("SiteName")))
+    {
+        Context.Session.SetString("SiteName", objAppInfo.SiteName ?? "");
+        Context.Session.SetString("CompanyAddress", objAppInfo.CompanyAddress ?? "");
+        Context.Session.SetString("CompanyWebSite", objAppInfo.CompanyWebSite ?? "");
+        Context.Session.SetString("CompanyEmail", objAppInfo.CompanyEmail ?? "");
+        Context.Session.SetString("CompanyPhone", objAppInfo.CompanyPhone ?? "");
+        Context.Session.SetString("BaseUrl", objAppInfo.BaseUrl ?? "");
+        Context.Session.SetString("UploadPath", objAppInfo.UploadPath ?? "");
+        Context.Session.SetString("UserSiteUrl", objAppInfo.UserSiteUrl ?? "");
+        Context.Session.SetString("AdminImageUrl", objAppInfo.AdminImageUrl ?? "");
+        Context.Session.SetString("AdminSiteUrl", objAppInfo.AdminSiteUrl ?? "");
+    }
+
+    int.TryParse(Context.Session.GetString("chapterid"), out int ChapterId);
+    var imglocNormal = objAppInfo.BaseUrl + "Areas/FormBuilder/Content/Logo/";
+
+    var Layout1 = Context.Session.GetString("BaseUrl") + "Areas/FormBuilder/Content/LayoutLogo/normalimages/";
+    var fevicon = Context.Session.GetString("BaseUrl") + "Areas/FormBuilder/Content/faviconlogo/normalimages/";
+    var EventName = ViewBag.EventName;
+
+    string URL = Context.Request.Path.Value ?? "";
+
+    string NormalizeMenuPath(string p)
+    {
+        p = (p ?? "").Trim();
+        if (p.StartsWith("~")) p = p.Substring(1);
+        if (!p.StartsWith("/")) p = "/" + p;
+        p = p.TrimEnd('/');
+        if (p.EndsWith("/Index", StringComparison.OrdinalIgnoreCase))
+            p = p.Substring(0, p.Length - "/Index".Length);
+        return p.ToLowerInvariant();
+    }
+
+    bool IsMenuActive(string currentPath, string menuUrl)
+    {
+        if (string.IsNullOrWhiteSpace(menuUrl)) return false;
+        return NormalizeMenuPath(currentPath) == NormalizeMenuPath(menuUrl);
+    }
+    // Generate version once for this page load
+    var cssVersion = DateTime.Now.Ticks;
+}
+<!doctype html>
+<html lang="en" class="minimal-theme">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @{
+        var baseurl = objAppInfo.BaseUrl;
+    }
+    <base href="@(baseurl)" />
+
+    <title>@objAppInfo.SiteName - Control Panel</title>
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zentic.css">
+    <style>
+        /* Uploaded menu logo (AdminMenuItems.Logo) shown in place of the icon */
+        .zfb-btn .zfb-menu-logo {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+        /* active / hover: make the menu icon clearly visible on the navy background */
+        .zfb-btn-customize .zfb-menu-logo {
+            transition: filter 0.2s ease-in;
+        }
+
+        .zfb-btn-customize.active .zfb-menu-logo,
+        .zfb-btn-customize:hover .zfb-menu-logo {
+            filter: brightness(0) invert(1); /* any dark icon image -> white */
+        }
+
+        /* same for font icons (when a menu has no uploaded logo) */
+        .zfb-btn-customize.active i,
+        .zfb-btn-customize:hover i {
+            color: #fff;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="icon" href="@fevicon/@objAppInfo.faviconlogo" type="image/png" />
+
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/vendor/bootstrap.min.css" id="bootstrapLtr">
+
+    <link href="~/Areas/FormBuilder/Content/plugins/notifications/css/lobibox.min.css" rel="stylesheet" />
+    <!--plugins-->
+    <link href="~/Areas/FormBuilder/Content/plugins/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="~/Areas/FormBuilder/Content/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    @*<link href="Areas/FormBuilder/Content/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />*@
+    <link href="~/Areas/FormBuilder/Content/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+    <link href="~/Areas/FormBuilder/Content/css/bootstrap-extended.css" rel="stylesheet" />
+    @*     <link href="Areas/FormBuilder/Content/css/style.css" rel="stylesheet" /> *@
+    <link href="~/Areas/FormBuilder/Content/css/icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/vendor/bootstrap.min.css" id="bootstrapLtr">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/vendor/bootstrap.rtl.min.css" id="bootstrapRtl" disabled>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link href="~/Areas/FormBuilder/Content/plugins/notifications/css/lobibox.css" rel="stylesheet" />
+
+
+    <link rel="stylesheet" href="Areas/FormBuilder/Content/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    @*     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet"> *@
+
+    <script src="~/Areas/FormBuilder/Content/js/jquery.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/Scripts/jquery.validate.js"></script>
+    <script src="~/Areas/FormBuilder/Content/js/jquery-validate.min.js"></script>
+    <!-- loader-->
+    <link href="~/Areas/FormBuilder/Content/css/pace.min.css" rel="stylesheet" />
+
+
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zentic-icons.css?ver=@objAppInfo.DesktopVersion.ToString()">
+    <link rel="stylesheet" href="~/Areas/FormBuilder/Content/css/zfb-formbuilder.css?ver=@objAppInfo.DesktopVersion.ToString()">
+    <!-- Bootstrap bundle JS -->
+    <script src="~/Areas/FormBuilder/Content/js/bootstrap.bundle.min.js"></script>
+    <!--plugins-->
+    <script src="~/Areas/FormBuilder/Content/js/jquery.min.js"></script>
+
+
+    <script src="~/Areas/FormBuilder/Content/js/jquery-validate.min.js"></script>
+
+    @*cropper*@
+    <link href="~/Areas/FormBuilder/Content/css/croppie.css" rel="stylesheet" />
+    <script src="~/Areas/FormBuilder/Content/Scripts/croppers.js"></script>
+    <script src="~/Areas/FormBuilder/Content/Scripts/jquery.validate.js"></script>
+
+
+    <script type="text/javascript">
+
+        function DropDown(el) {
+            this.dd = el;
+            this.initEvents();
+        }
+        DropDown.prototype = {
+            initEvents: function () {
+                var obj = this;
+
+                obj.dd.on('click', function (event) {
+                    $(this).toggleClass('active');
+                    event.stopPropagation();
+                });
+            }
+        }
+
+        $(function () {
+
+            var dd = new DropDown($('#dd'));
+
+            $(document).click(function () {
+                // all dropdowns
+                $('.wrapper-dropdown-3').removeClass('active');
+            });
+
+        });
+
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $(".ui-accordion").accordion({
+                collapsible: true,
+                heightStyle: "content"
+            });
+
+            // date picker
+            $(function () {
+                $(function () {
+                    $(".datepicker").datepicker({
+                        altField: "#alternate",
+                        altFormat: "DD, d MM, yy"
+                    });
+                });
+            });
+        });
+        $(document).ready(function () {
+
+
+            $('.date, #DateOfBirth, #StartDate, #EndDate, #StartPaymentDate, #EndPaymentDate').keypress(function (evt) {
+                var charCode = (evt.which) ? evt.which : event.keyCode
+                if (charCode == 08 || charCode == 127) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    @* ✅ ADDED — sticky "Viewing as ..." banner, shown site-wide only while
+       an admin is impersonating another user (see UsersController). Placed
+       first inside <body> so it renders above the topbar. *@
+    @await Html.PartialAsync("~/Areas/FormBuilder/Views/Shared/_ImpersonationBanner.cshtml")
+
+    @if (TempData["messageType"] != null && TempData["message"] != null)
+    {
+        <script>
+            $(document).ready(function () {
+                showLobiboxNotification('@TempData["messageType"]', '@TempData["message"]');
+            });
+        </script>
+    }
+
+    <script>
+        function showLobiboxNotification(messageType, message) {
+            var iconClass;
+            switch (messageType.toLowerCase()) {
+                case 'success':
+                    iconClass = 'bx bx-check-circle';
+                    break;
+                case 'warning':
+                    iconClass = 'bx bx-warning-circle';
+                    break;
+                case 'error':
+                    iconClass = 'bx bx-x-circle';
+                    break;
+                default:
+                    iconClass = 'bx bx-info-circle';
+                    break;
+            }
+
+            Lobibox.notify(messageType, {
+                pauseDelayOnHover: true,
+                size: 'mini',
+                rounded: true,
+                icon: iconClass,
+                delayIndicator: false,
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                msg: message
+            });
+        }
+    </script>
+
+    @{
+
+        string MenuIcon(string displayName)
+        {
+            string key = (displayName ?? "").Replace(" ", "").Trim().ToLowerInvariant();
+            switch (key)
+            {
+                case "formlist": return "icon-folder-kanban";
+                case "formbuilders": return "icon-square-check";
+                case "dashboard": return "icon-gauge";
+                default: return "icon-list";
+            }
+        }
+    }
+    <!--start sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+    <!--end sidebar -->
+
+    <div class="zentic-main" id="zenticMain">
+
+        <header class="zentic-topbar">
+            <div class="topbar-left">
+                <img style="max-height:50px"
+                     src="@Layout1/@objAppInfo.LayoutLogo"
+                     alt="@objAppInfo.SiteName"
+                     class="sidebar-logo sidebar-logo-full" />
+            </div>
+
+            <div class="topbar-right">
+
+                @{
+                    bool isSuperOrDev =
+                    userRole.Contains("SuperAdmin") ||
+                    userRole.Contains("DeveloperAdmin");
+
+                    var menuSource = lstMainMenu;
+                }
+
+                @* =========================================================
+           MENU ICON MAPPING
+           ========================================================= *@
+
+                @functions {
+                    public string MenuIcon(string menuName)
+                    {
+                        switch (menuName?.Trim().ToLower())
+                        {
+                            case "dashboard":
+                                return "icon-panel-left";
+
+                            case "members":
+                                return "icon-users";
+
+                            case "active members":
+                                return "icon-user-check";
+
+                            case "inactive members":
+                                return "icon-user-x";
+
+                            case "pending members":
+                                return "icon-user-clock";
+
+                            case "users":
+                            case "admin users":
+                                return "icon-users";
+
+                            case "roles":
+                            case "roles & permissions":
+                                return "icon-shield";
+
+                            case "events":
+                                return "icon-calendar";
+
+                            case "developers":
+                                return "icon-code-2";
+
+                            case "settings":
+                            case "application settings":
+                                return "icon-settings-2";
+
+                            case "profile":
+                                return "icon-circle-user";
+
+                            case "reports":
+                                return "icon-chart-column";
+
+                            case "forms":
+                                return "icon-file-text";
+
+                            case "pages":
+                                return "icon-file-text";
+
+                            case "notifications":
+                                return "icon-bell";
+
+                            case "messages":
+                            case "mail":
+                                return "icon-mail";
+
+                            case "content":
+                                return "icon-file-text";
+
+                            case "media":
+                                return "icon-image";
+
+                            case "categories":
+                                return "icon-folder";
+
+                            case "products":
+                                return "icon-package";
+
+                            case "orders":
+                                return "icon-shopping-cart";
+
+                            case "calendar":
+                                return "icon-calendar";
+
+                            case "analytics":
+                                return "icon-chart-column";
+
+                            case "security":
+                                return "icon-shield";
+
+                            case "permissions":
+                                return "icon-key";
+
+                            default:
+                                return "icon-circle";
+                        }
+                    }
+                }
+
+
+                @if (menuSource != null && menuSource.Count != 0)
+                {
+                    <div class="zfb-topbar-actions">
+
+                        @foreach (var item in menuSource)
+                        {
+                            lstSubmenuCount =
+                            lstSubMenu.FindAll(x => x.PageParentId == item.MenuItemId);
+
+
+                            @* =====================================================
+                       SUPER ADMIN / DEVELOPER ADMIN RESTRICTION
+                       ===================================================== *@
+
+                            if (isSuperOrDev &&
+                            userRole.Contains("SuperAdmin") &&
+                            item.DisplayName == "Developers")
+                            {
+                                continue;
+                            }
+
+
+                            @* =====================================================
+                       IF PARENT HAS SUBMENU
+                       SHOW ONLY SUBMENU ITEMS
+                       DO NOT SHOW PARENT
+                       ===================================================== *@
+
+                            if (lstSubmenuCount != null &&
+                            lstSubmenuCount.Count != 0)
+                            {
+                                foreach (var submenu in lstSubmenuCount)
+                                {
+                                    bool subActive =
+                                    IsMenuActive(URL, submenu.PageUrl);
+
+
+                                    string subHref =
+                                    (submenu.DisplayName == "Active Members" ||
+                                    submenu.DisplayName == "Inactive Members" ||
+                                    submenu.DisplayName == "Pending Members")
+                                    ? submenu.PageUrl +
+                                    "&mid=" +
+                                    submenu.MenuItemId
+                                    : submenu.PageUrl +
+                                    "?mid=" +
+                                    submenu.MenuItemId;
+
+
+                                    <a href="@subHref"
+                                       class="zfb-btn zfb-btn-customize @(subActive ? "active" : "")"
+                                       style="text-decoration:none">
+
+                                        @if (!string.IsNullOrEmpty(submenu.Logo))
+                                        {
+                                            <img src="@(imglocNormal + submenu.Logo)" alt="@submenu.DisplayName" class="zfb-menu-logo" />
+                                        }
+                                        else
+                                        {
+                                            <i class="@MenuIcon(submenu.DisplayName)"></i>
+                                        }
+
+                                        <span>
+                                            @submenu.DisplayName
+                                        </span>
+
+                                    </a>
+                                }
+                            }
+
+
+                            @* =====================================================
+                       PARENT WITHOUT SUBMENU
+                       SHOW NORMAL MENU ITEM
+                       ===================================================== *@
+
+                            else
+                            {
+                                bool itemActive =
+                                IsMenuActive(URL, item.PageUrl);
+
+
+                                string itemHref =
+                                item.DisplayName == "Events"
+                                ? item.PageUrl +
+                                "&mid=" +
+                                item.MenuItemId
+                                : item.PageUrl +
+                                "?mid=" +
+                                item.MenuItemId;
+
+
+                                <a href="@itemHref"
+                                   class="zfb-btn zfb-btn-customize @(itemActive ? "active" : "")">
+
+                                    @if (!string.IsNullOrEmpty(item.Logo))
+                                    {
+                                        <img src="@(imglocNormal + item.Logo)" alt="@item.DisplayName" class="zfb-menu-logo" />
+                                    }
+                                    else
+                                    {
+                                        <i class="@MenuIcon(item.DisplayName)"></i>
+                                    }
+
+                                    <span>
+                                        @item.DisplayName
+                                    </span>
+
+                                </a>
+                            }
+                        }
+
+                    </div>
+                }
+
+
+                @* =============================================================
+           TOPBAR DIVIDER
+           ============================================================= *@
+
+                <div class="topbar-divider"></div>
+
+
+                @* =============================================================
+           USER DROPDOWN
+           ============================================================= *@
+
+                <div class="topbar-user position-relative"
+                     id="topbarUser">
+
+                    <button class="topbar-user-trigger"
+                            type="button"
+                            id="topbarUserTrigger">
+
+                        <img class="topbar-user-avatar"
+                             src="Areas/FormBuilder/Content/images/avatars/President.png"
+                             alt="@objuser.UserName">
+
+                        <span class="topbar-user-name">
+                            @objAppInfo.SiteName @objuser.UserName
+                        </span>
+
+                        <i class="icon-chevron-down topbar-user-arrow"></i>
+
+                    </button>
+
+
+                    <div class="user-dropdown-menu"
+                         id="topbarUserDropdown">
+
+                        <div class="user-dropdown-header">
+
+                            <img class="udm-avatar"
+                                 src="Areas/FormBuilder/Content/images/avatars/President.png"
+                                 alt="@objuser.UserName">
+
+                            <div class="udm-info">
+
+                                <p class="user-dropdown-name">
+                                    @objAppInfo.SiteName Admin
+                                </p>
+
+                                <p class="user-dropdown-email">
+                                    Designation
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="udm-body">
+
+                            <a href="@Url.Action("Profile", "Account")"
+                               class="user-dropdown-item">
+
+                                <i class="icon-circle-user"></i>
+
+                                <span>
+                                    Profile
+                                </span>
+
+                            </a>
+
+                            @if (userRole.Contains("SuperAdmin") || userRole.Contains("DeveloperAdmin"))
+                            {
+                                
+                          
+                            <a href="@Url.Action("Index", "Users")"
+                               class="user-dropdown-item">
+
+                                <i class="icon-users"></i>
+
+                                <span>
+                                    Admin Users
+                                </span>
+
+                            </a>
+
+
+                            <a href="@Url.Action("Index", "Roles", new { mid = 52 })"
+                               class="user-dropdown-item">
+
+                                <i class="icon-shield"></i>
+
+                                <span>
+                                    Roles &amp; Permissions
+                                </span>
+
+                            </a>
+                            <a href="@Url.Action("logreport", "home")"
+                               class="user-dropdown-item">
+
+                                <i class="bi bi-person-badge"></i>
+
+                                <span>
+                                    Log Report
+                                </span>
+
+                            </a>
+                            }
+                            <hr class="user-dropdown-divider">
+
+
+                            <a href="@Url.Action("LogOff", "Account")"
+                               class="user-dropdown-item danger">
+
+                                <i class="icon-log-out"></i>
+
+                                <span>
+                                    Logout
+                                </span>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <main class="zentic-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <div class="switcher-body">
+        <button class="btn btn-primary btn-switcher shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"><i class="bi bi-paint-bucket me-0"></i></button>
+        <div class="offcanvas offcanvas-end shadow border-start-0 p-2" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Theme Customizer</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body">
+                <h6 class="mb-0">Theme Variation</h6>
+                <hr />
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="LightTheme" value="option1" />
+                    <label class="form-check-label" for="LightTheme">Light</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="DarkTheme" value="option2" />
+                    <label class="form-check-label" for="DarkTheme">Dark</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="SemiDarkTheme" value="option3" />
+                    <label class="form-check-label" for="SemiDarkTheme">Semi Dark</label>
+                </div>
+                <hr />
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="MinimalTheme" value="option3" checked=checked />
+                    <label class="form-check-label" for="MinimalTheme">Minimal Theme</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end switcher-->
+    <div class="modal fade" id="formAccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="width:100% !important;">
+                <div class="modal-header fa-header">
+                    <h5 class="fa-title">Form Access</h5>
+                    <span class="fa-form-name" id="faModalFormTitle"></span>
+                    <button type="button" class="btn-close fa-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="faFormId" />
+                    <div class="fa-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Only the selected users will have access to this form.</span>
+                    </div>
+                    <div class="fa-users-heading">Users</div>
+                    <div id="faUserListContainer">
+                        <p class="text-muted">Loading...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveFormAccess();">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function faEsc(t) {
+            return $('<div>').text(t == null ? '' : t).html();
+        }
+
+        function openFormAccessModal(formId, formTitle) {
+            $('#faFormId').val(formId);
+            $('#faModalFormTitle').text(formTitle);
+            $('#faUserListContainer').html('<p class="text-muted">Loading...</p>');
+            $('#formAccessModal').modal('show');
+
+            $.ajax({
+                type: "GET",
+                cache: false,
+                url: '@Url.Action("GetFormAccessUsers", "Form")',
+                data: { FormId: formId },
+                success: function (result) {
+                    if (!result.ok) {
+                        $('#faUserListContainer').html('<p class="text-danger">' + faEsc(result.message) + '</p>');
+                        return;
+                    }
+                    var html = '';
+                    if (result.users.length === 0) {
+                        html = '<p class="text-muted">No users found.</p>';
+                    } else {
+                        // nothing is pre-checked; only users already granted access are ticked
+                        $.each(result.users, function (i, u) {
+                            var checked = result.selectedIds.indexOf(u.userId) !== -1 ? 'checked' : '';
+                        html += '<div class="form-check fa-user-item">' +
+        '<input class="form-check-input fa-user-chk" type="checkbox" value="' + u.userId + '" id="faUser' + u.userId + '" ' + checked + '>' +
+        '<label class="form-check-label" for="faUser' + u.userId + '">' +
+            '<span class="fa-user-name">' + faEsc(u.userName) + '</span>' +
+            '<span class="fa-user-email">' + faEsc(u.email) + '</span>' +
+        '</label>' +
+        '</div>';
+                        });
+                    }
+                    $('#faUserListContainer').html(html);
+                },
+                error: function () {
+                    $('#faUserListContainer').html('<p class="text-danger">Failed to load users.</p>');
+                }
+            });
+        }
+
+        function saveFormAccess() {
+            var formId = $('#faFormId').val();
+            var selectedIds = [];
+            $('.fa-user-chk:checked').each(function () {
+                selectedIds.push($(this).val());
+            });
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveFormAccess", "Form")',
+                data: { FormId: formId, UserIds: selectedIds.join(',') },
+                success: function (result) {
+                    showLobiboxNotification(result.messageType, result.message);
+                    if (result.ok) {
+                        $('#formAccessModal').modal('hide');
+                    }
+                },
+                error: function () {
+                    showLobiboxNotification('error', 'Failed transaction.');
+                }
+            });
+        }
+    </script>
+
+    <div class="modal fade cropImageModal" id="cropImagePop" data-bs-backdrop="static" style="z-index: 11000;" tabindex="-1" aria-labelledby="CropImageModalLabel" aria-hidden="true">
+        <button type="button" class="close-modal-custom close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <div class="modal-header-bg"></div>
+                    <div class="up-photo-title">
+                        <h3 class="modal-title"> Photo Crop</h3>
+                    </div>
+                    <div class="up-photo-content pb-5">
+                        <div id="upload-demo" class="center-block">
+                            <h5><i class="fas fa-arrows-alt mr-1"></i> Drag your photo as you require</h5>
+                        </div>
+                        <div class="upload-action-btn text-center px-2">
+                            <button type="button" id="cropImageBtn" class="btn btn-success">Save Photo</button>
+                            <button type="button" class="btn btn-primary replacePhoto position-relative">Replace Photo</button>
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="~/Areas/FormBuilder/Content/js/jquery-ui-timepicker-addon.js"></script>
+    <script src="~/Areas/FormBuilder/Content/plugins/simplebar/js/simplebar.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/plugins/notifications/js/lobibox.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/plugins/notifications/js/notifications.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/plugins/notifications/js/notification-custom-script.js"></script>
+    @*<script src="Areas/FormBuilder/Content/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>*@
+    @*<script src="Areas/FormBuilder/Content/js/pace.min.js"></script>*@
+    <script src="~/Areas/FormBuilder/Content/plugins/select2/js/select2.min.js"></script>
+    <script src="~/Areas/FormBuilder/Content/js/form-select2.js"></script>
+    <!--app-->
+    <script src="~/Areas/FormBuilder/Content/js/app.js"></script>
+
+    <script src="~/Areas/FormBuilder/Content/Scripts/Common.js"></script>
+
+    <script>
+        $(document).on('keyup', '#menuSearch', function () {
+            var searchTerm = $(this).val().toLowerCase();
+
+            if (searchTerm.length > 0) {
+                $('#sidebarMenu .nav-item').hide().filter(function () {
+                    return $(this).text().toLowerCase().indexOf(searchTerm) !== -1;
+                }).show();
+                $('#sidebarMenu .nav-section').each(function () {
+                    var hasVisible = $(this).find('.nav-item:visible').length > 0;
+                    $(this).toggle(hasVisible).removeClass('collapsed');
+                });
+            } else {
+                $('#sidebarMenu .nav-item, #sidebarMenu .nav-section').show();
+            }
+        });
+
+        $(document).on('click', '#sidebarToggle', function () {
+            if ($(window).width() < 992) {
+                $('#zenticSidebar').toggleClass('mobile-open');
+                $('#sidebarOverlay').toggleClass('active');
+            } else {
+                $('#zenticSidebar').toggleClass('collapsed');
+                $('#zenticMain').toggleClass('sidebar-collapsed');
+            }
+        });
+
+        $(document).on('click', '#sidebarClose, #sidebarOverlay', function () {
+            $('#zenticSidebar').removeClass('mobile-open');
+            $('#sidebarOverlay').removeClass('active');
+        });
+
+
+        $(document).on('click', '.nav-section-label', function () {
+            $(this).closest('.nav-section').toggleClass('collapsed');
+        });
+
+
+        $(document).on('click', '#topbarUserTrigger', function (e) {
+            e.stopPropagation();
+            $('#topbarUserDropdown').toggleClass('open');
+        });
+
+        $(document).on('click', '#sidebarUserBtn', function (e) {
+            e.stopPropagation();
+            $('#sidebarProfilePopup').toggleClass('open');
+        });
+        $(document).on('click', '#sidebarProfileClose', function (e) {
+            e.stopPropagation();
+            $('#sidebarProfilePopup').removeClass('open');
+        });
+
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#topbarUser').length) {
+                $('#topbarUserDropdown').removeClass('open');
+            }
+            if (!$(e.target).closest('#sidebarUserTrigger').length) {
+                $('#sidebarProfilePopup').removeClass('open');
+            }
+        });
+    </script>
+    <script>
+                var $uploadCrop,
+                    tempFilename,
+                    rawImg,
+                    imageId;
+
+              function readFile(input) {
+
+            if (input.files && input.files[0]) {
+
+                var file = input.files[0];
+
+                var allowedTypes = [
+                    'image/jpeg',
+                    'image/jpg',
+                    'image/png',
+                    'image/gif'
+                ];
+
+                if ($.inArray(file.type, allowedTypes) === -1) {
+
+                    alert('Only JPG, JPEG, PNG and GIF images are allowed.');
+
+                    $(input).val('');
+
+                    return false;
+                }
+
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+
+                    $('.upload-demo').addClass('ready');
+
+                    $('#cropImagePop').modal('show');
+
+                    rawImg = e.target.result;
+                }
+
+                reader.readAsDataURL(file);
+
+            } else {
+
+                console.log("Sorry - your browser doesn't support the FileReader API");
+            }
+        }
+
+                $uploadCrop = $('#upload-demo').croppie({
+                    viewport: {
+                        width: '@ViewBag.v1',
+                        height: '@ViewBag.v2',
+                        type: 'square'
+                    },
+                    enforceBoundary: false,
+                    enableExif: true
+                });
+
+                $('#cropImagePop').on('shown.bs.modal', function () {
+                    //$('.cr-slider-wrap').prepend('<p>Image Zoom</p>');
+                    $uploadCrop.croppie('bind', {
+                        url: rawImg
+                    }).then(function () {
+
+                    });
+                });
+
+                $('#cropImagePop').on('hidden.bs.modal', function () {
+                    $('.item-img').val(rawImg);
+                    $('.cr-slider-wrap p').remove();
+                });
+
+                $('.item-img').on('change', function () {
+                    readFile(this);
+                });
+
+                $('.replacePhoto').on('click', function () {
+                    $('#cropImagePop').modal('hide');
+                    $('.item-img').trigger('click');
+                });
+
+                $('#cropImageBtn').on('click', function (ev) {
+                    $('.ci-user-picture').show();
+                    $uploadCrop.croppie('result', {
+                        type: 'base64',
+                        backgroundColor: "#000000",
+                        format: 'png',
+                        size: { width: '@ViewBag.v1', height: '@ViewBag.v2' }
+                    }).then(function (resp) {
+                        $('#item-img-output').attr('src', resp);
+                        $('#Thumbimage').val(resp);  // Set the hidden input value
+                        $('#cropImagePop').modal('hide');
+                        $('.item-img').val(rawImg);
+                    });
+                });
+    </script>
+
+
+</body>
+
+</html>
+<style>
+    /* ===== Modal box ===== */
+    #formAccessModal .modal-content {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+    }
+
+    /* ===== Header ===== */
+    #formAccessModal .fa-header {
+        position: relative;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 22px 20px 16px;
+        background: linear-gradient(180deg, #f5f7ff 0%, #ffffff 100%);
+        border-bottom: 1px solid #e9ecf5;
+        text-align: center;
+    }
+
+    #formAccessModal .fa-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #1f2544;
+    }
+
+    #formAccessModal .fa-form-name {
+        display: inline-block;
+        max-width: 100%;
+        padding: 4px 14px;
+        background: #e8f0ff;
+        color: #0d6efd;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #formAccessModal .fa-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        margin: 0;
+        background-size: 12px;
+        border-radius: 50%;
+        opacity: 0.7;
+        transition: all 0.2s;
+    }
+
+        #formAccessModal .fa-close:hover {
+            background-color: #f1f3f9;
+            opacity: 1;
+        }
+
+    .fa-header:before {
+        content: none;
+    }
+
+    /* ===== Body ===== */
+    #formAccessModal .modal-body {
+        padding: 18px 22px;
+        max-height: 55vh;
+    }
+
+    #formAccessModal .fa-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        background: #fff8e6;
+        border: 1px solid #ffe2a3;
+        border-left: 4px solid #f5a623;
+        border-radius: 8px;
+        color: #7a5200;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+        #formAccessModal .fa-info i {
+            margin-top: 2px;
+            color: #f5a623;
+        }
+
+    #formAccessModal .fa-users-heading {
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #6b7280;
+    }
+
+    /* ===== User cards ===== */
+    #formAccessModal .fa-user-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        margin: 0 0 8px;
+        background: #fff;
+        border: 1px solid #e3e6ef;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        #formAccessModal .fa-user-item:hover {
+            border-color: #a9b8ff;
+            background: #f8f9ff;
+        }
+
+        #formAccessModal .fa-user-item .form-check-input {
+            float: none;
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        #formAccessModal .fa-user-item .form-check-label {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+    #formAccessModal .fa-user-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1f2544;
+    }
+
+    #formAccessModal .fa-user-email {
+        font-size: 12.5px;
+        color: #6b7280;
+        word-break: break-all;
+    }
+
+    /* selected ayite highlight */
+    #formAccessModal .fa-user-item:has(.fa-user-chk:checked) {
+        background: #eef2ff;
+        border-color: #4f5bd5;
+        box-shadow: 0 0 0 2px rgba(79, 91, 213, 0.12);
+    }
+
+    /* ===== Footer ===== */
+    #formAccessModal .modal-footer {
+        padding: 14px 22px;
+        background: #fafbfe;
+        border-top: 1px solid #e9ecf5;
+    }
+
+        #formAccessModal .modal-footer .btn {
+            min-width: 90px;
+            padding: 8px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+</style>

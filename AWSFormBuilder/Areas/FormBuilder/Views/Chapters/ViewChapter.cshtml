@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "ViewChapter";
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+
+    var cssloc = System.Configuration.ConfigurationManager.AppSettings["usersiteurl"] + "Content/Admin/front-end-style.css";
+
+    AWSFormBuilder.Entities.Chapters objChapters = ViewBag.objChapters;
+    ViewBag.Pageheading = "View Chapters";
+}
+
+<script>
+    $(document).ready(function () {
+        $('#Chapters').addClass('active');
+        $('#wChapters').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+</script>
+
+
+
+
+<div class="content">
+    <div class="clearfix sepH_b"></div>
+    @using (Html.BeginForm("ViewChapter", "Chapters", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="tab-pane active">
+                    <input type="hidden" id="mid" name="mid" value="@ViewBag.mid" />
+                    <div class="box validation">
+
+                        <div class="box-body">
+
+                            <div class="row">
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label>Chapter Name : </label>
+                                    @objChapters.ChapterName
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label>ShortName : </label>
+                                    @objChapters.ShortName
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label>City : </label>
+                                    @objChapters.City
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label class="t-p5">State :</label>
+                                    @objChapters.State
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label class="t-p5">ZipCode :</label>
+                                    @objChapters.ZipCode
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label class="t-p5">OrderNo :</label>
+                                    @objChapters.OrderNo
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label class="t-p5">ShortDescription :</label>
+                                    @objChapters.ShortDescription
+                                </div>
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label class="t-p5">Address :</label>
+                                    @objChapters.Address
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-lg-3 col-sm-6">
+                                    <label>Description : </label>
+                                    @Html.Raw(objChapters.Description)
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+
+                    <div class="box">
+                        <!-- /.box-header -->
+                        <div class="box-body" style="text-align: end;">
+                            <a class="btn btn-info" href="@Url.Action("Index", "Chapters")">Cancel</a>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+

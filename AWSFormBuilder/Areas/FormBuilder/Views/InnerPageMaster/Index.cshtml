@@ -1,0 +1,69 @@
+﻿@* @{
+    Layout = "~/Areas/FormBuilder/Views/Shared/_MainLayout.cshtml";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#wInnerPageCategories, #WebPages').addClass('active');
+        $('.alert-danger').append('<i class="fa fa-ban"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+        $('.alert-success').append('<i class="fa fa-check"></i><button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>');
+    });
+
+    function InnerPageCategoriesBind() {
+        var txtSearch = $('#txtSearch').val();
+        $.ajax({
+            type: "GET",
+            cache: false,
+            url: '@Url.Action("InnerPageCategoriesList", "InnerPageMaster")',
+            data: { Search: txtSearch }, // optional data
+            success: function (result) {
+                $('#divInnerPageCategoriesList').html(result);
+            }
+        });
+    }
+</script>
+<!-- breadcumb -->
+<div class="content-header">
+    <h1>Webpage Categories</h1>
+    <ol class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>Home</a></li>
+        <li class="active">Webpage Categories</li>
+    </ol>
+</div>
+<!--end breadcumb -->
+<div class="content">
+    <div id="divmessage">
+        @if (TempData["message"] != null)
+        { @Html.Raw(TempData["message"].ToString())}
+
+        @if (ViewBag.message != null)
+        { @Html.Raw(ViewBag.message.ToString())}
+    </div>
+    <!-- Main content -->
+    <div class="box">
+        <!-- /.box-header -->
+        <div class="clearfix box-body">
+            <div class="clearfix row">
+                <div class="col-xs-12 col-lg-12 col-sm-12">
+                    <div>
+                        <label>&nbsp;</label>
+                    </div>
+                    <a data-toggle="modal" href="@Url.Action("CreateInnerPageCategories", "InnerPageMaster")" class="btn btn-danger pull-right">Add Category</a>
+                </div>
+            </div>
+        </div>
+        <div id="divInnerPageCategoriesList" class="box-body">
+            @{Html.RenderAction("InnerPageCategoriesList", "InnerPageMaster");}
+            <div class="clearfix text-right">
+                <a onclick="ScrollUp();" style="display: inline-block; padding-top: 10px;">Back to top <i class="fa fa-arrow-up"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function ScrollUp() {
+        $('html, body').animate({
+            scrollTop: "0px"
+        }, 800);
+    }
+</script>
+ *@
